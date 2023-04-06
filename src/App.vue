@@ -11,6 +11,7 @@
             <!-- <router-link to="/dashboard" class="navbar-item">Dashboard</router-link>
             <router-link to="/dashboard/clients" class="navbar-item">Clients</router-link> -->
             <router-link to="/dashboard/articles" class="navbar-item">Articles</router-link>
+            <router-link to="/dashboard/notes" class="navbar-item">Notes</router-link>
             
             <div class="navbar-item">
               <div class="buttons">

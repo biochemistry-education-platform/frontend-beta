@@ -9,6 +9,8 @@ import Client from '../views/dashboard/Client.vue'
 import ArticlesList from '../views/dashboard/ArticlesList.vue'
 import Article from '../views/dashboard/Article.vue'
 import AddArticle from '../views/dashboard/AddArticle.vue'
+import NotesList from '../views/dashboard/NotesList.vue'
+import Note from '../views/dashboard/Note.vue'
 
 import store from '../store'
 
@@ -88,6 +90,22 @@ const routes = [
     path: '/dashboard/articles/:id',
     name: 'Article',
     component: Article,
+    meta: {
+      requireLogin: true
+    }
+  },
+  {
+    path: '/dashboard/notes',
+    name: 'Notes',
+    component: NotesList,
+    meta: {
+      requireLogin: true
+    }
+  },
+  {
+    path: '/dashboard/notes/:id',
+    name: 'Note',
+    component: Note,
     meta: {
       requireLogin: true
     }

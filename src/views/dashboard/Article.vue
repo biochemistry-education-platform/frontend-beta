@@ -6,14 +6,13 @@
 
         <div class="column is-12">
             <h2 class="subtitle">{{ article.author }}, {{ date }}</h2>
-            <!-- <h2 class="subtitle">{{ (new Date(Date.parse(article.publish_date.slice(0,19)))).toLocaleString('en-GB') }}</h2> -->
             <p id="newtags"></p>
         </div>
 
         <div class="column is-12" id="articleText">
 
         </div>
-        <button class="button is-success" v-on:click="getSelectedText"><strong>Get selected text</strong></button>
+        <button class="button is-success" v-on:click="getSelectedText"><strong>Add selected text to the note</strong></button>
 
     </div>
 </template>
@@ -99,6 +98,50 @@ export default {
             if (window.getSelection()) {
                 var select = window.getSelection()
                 console.log(select.toString())
+                axios
+                    .get('/api/v1/notes/')
+                    .then(response => {
+                        for (let i = 0; i < response.data.length; i++) {
+                            // TODO !!! check not by title but by id
+                            if (this.article.article_title === response.data[i].based_on_article) {
+                                // add text to the existing note
+                                let current_text = response.data[i].note_text
+                                current_text = current_text.substring(0, current_text.length-1)
+                                let new_text = `${current_text},{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"${select.toString()}"}]}]`
+                                console.log(response.data[i].id)
+                                axios
+                                    .patch(`/api/v1/notes/${response.data[i].id}/`, {note_text: new_text})
+                                    .then(response => {
+                                        toast({
+                                            message: 'The article has been updated',
+                                            type: 'is-success',
+                                            dismissible: true,
+                                            pauseOnHover: true,
+                                            duration: 2000,
+                                            position: 'top-right',
+                                        })
+
+                                        this.$router.push('/dashboard/notes')
+                                    })
+                                    .catch(error => {
+                                        console.log(JSON.stringify(error))
+                                    })
+                            } else {
+                                // create a new note and add text there
+                            }                         
+                        }
+                    })
+
+
+
+                    .then(response => {
+                        if (response.data) {
+                            // add text to the end of the note
+                        }
+                        else {
+                            // create new note and add text there
+                        }
+                    })
             }
         }
     }
