@@ -5,8 +5,12 @@
         </div>
 
         <div class="column is-12">
-            <h2 class="subtitle">{{ article.author }}, {{ date }}</h2>
+            <h2 class="subtitle">{{ author }}, {{ date }}</h2>
             <p id="newtags"></p>
+
+            <hr>
+
+            <button v-on:click="getPdf" class="button is-dark">Download PDF</button>
         </div>
 
         <div class="column is-12" id="articleText">
@@ -20,21 +24,25 @@
 <script>
 import axios from 'axios'
 
+const fileDownload = require('js-file-download')
+
 export default {
     name: 'Article',
     data() {
         return {
             article: {},
-            date: ''
+            date: '',
+            author: ''
         }
     },
     async mounted() {
         await this.getArticle()
+        await this.getAuthor()
     },
     methods: {
-        getArticle() {
+        async getArticle() {
             const articleID = this.$route.params.id
-            axios
+            await axios
                 .get(`/api/v1/articles/${articleID}`)
                 .then(response => {
                     this.article = response.data
@@ -49,6 +57,22 @@ export default {
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
+                })
+        },
+        async getAuthor() {
+            await axios
+                .get('/api/v1/clients/')
+                .then(response => {
+                    console.log(this.article)
+                    for (let i=0; i< response.data.length; i++) {
+                        if (response.data[i].email == this.article.author) {
+                            
+                            this.author = `${response.data[i].surname} ${response.data[i].name} ${response.data[i].patronymic}`
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.log(error)
                 })
         },
         toDOM(input) {
@@ -143,6 +167,20 @@ export default {
                         }
                     })
             }
+        },
+        getPdf(event) {
+            const articleID = this.$route.params.id
+            
+            axios
+                .get(`/api/v1/articles/${articleID}/generate_pdf/`, {
+                    responseType: 'blob',
+                })
+                .then(response => {
+                    fileDownload(response.data, `${this.article.article_title}.pdf`)
+                })
+                .catch(error => {
+                    console.log(error)
+                })
         }
     }
 }
