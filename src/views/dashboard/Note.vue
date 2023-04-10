@@ -13,6 +13,7 @@
 
         </div>
         <button class="button is-success"><strong>Edit</strong></button>
+        <button class="button is-danger" v-on:click="deleteNote"><strong>Delete</strong></button>
 
     </div>
 </template>
@@ -92,6 +93,10 @@ export default {
                 }
             }
             return node
+        },
+        deleteNote(event) {
+            const noteID = this.$route.params.id
+            axios.delete(`/api/v1/notes/${noteID}`)
         }
     }
 }

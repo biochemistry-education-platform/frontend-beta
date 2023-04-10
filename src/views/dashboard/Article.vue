@@ -120,19 +120,19 @@ export default {
         },
         getSelectedText(event) {
             if (window.getSelection()) {
+                let isExist = false
                 var select = window.getSelection()
-                console.log(select.toString())
                 axios
                     .get('/api/v1/notes/')
                     .then(response => {
                         for (let i = 0; i < response.data.length; i++) {
-                            // TODO !!! check not by title but by id
+                            // TODO !!! check not by title but by id (check if the note based on this article already exists)
                             if (this.article.article_title === response.data[i].based_on_article) {
                                 // add text to the existing note
+                                isExist = true
                                 let current_text = response.data[i].note_text
                                 current_text = current_text.substring(0, current_text.length-1)
                                 let new_text = `${current_text},{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"${select.toString()}"}]}]`
-                                console.log(response.data[i].id)
                                 axios
                                     .patch(`/api/v1/notes/${response.data[i].id}/`, {note_text: new_text})
                                     .then(response => {
@@ -144,26 +144,34 @@ export default {
                                             duration: 2000,
                                             position: 'top-right',
                                         })
-
-                                        this.$router.push('/dashboard/notes')
                                     })
                                     .catch(error => {
                                         console.log(JSON.stringify(error))
                                     })
-                            } else {
-                                // create a new note and add text there
-                            }                         
+                            }                      
                         }
-                    })
-
-
-
-                    .then(response => {
-                        if (response.data) {
-                            // add text to the end of the note
-                        }
-                        else {
-                            // create new note and add text there
+                        if (isExist == false) {
+                            const articleID = this.$route.params.id
+                            let title = this.article.article_title
+                            let note = {
+                                note_text: `[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"${select.toString()}"}]}]`,
+                                based_on_article: articleID
+                            }
+                            axios
+                                .post('/api/v1/notes/', note)
+                                .then(response => {
+                                    toast({
+                                        message: 'The note has been created',
+                                        type: 'is-success',
+                                        dismissible: true,
+                                        pauseOnHover: true,
+                                        duration: 2000,
+                                        position: 'top-right',
+                                    })
+                                })
+                                .catch(error => {
+                                    console.log(JSON.stringify(error))
+                                })
                         }
                     })
             }
