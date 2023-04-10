@@ -69,6 +69,10 @@
                         </div>
                     </div>
                 </form>
+
+                <hr>
+
+                Already have an account? <router-link to="/log-in">Log in</router-link>
             </div>
         </div>
     </div>

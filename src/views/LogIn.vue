@@ -29,6 +29,10 @@
                         </div>
                     </div>
                 </form>
+
+                <hr>
+
+                Don't have an account? <router-link to="/sign-up">Sign up</router-link>
             </div>
         </div>
     </div>
