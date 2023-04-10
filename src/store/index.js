@@ -3,7 +3,12 @@ import { createStore } from 'vuex'
 export default createStore({
   state: {
     user: {
-      username: ''
+      id: '',
+      username: '',
+      role: '',
+      surname: '',
+      name: '',
+      patronymic: ''
     },
     isAuthenticated: false,
     token: ''
@@ -15,7 +20,15 @@ export default createStore({
       if (localStorage.getItem('token')) {
         state.token = localStorage.getItem('token')
         state.isAuthenticated = true
+        state.user.username = localStorage.getItem('username')
+        state.user.id = localStorage.getItem('userid')
       } else {
+        state.user.id = ''
+        state.user.username = ''
+        state.user.role = ''
+        state.user.surname = ''
+        state.user.name = ''
+        state.user.patronymic = ''
         state.token = ''
         state.isAuthenticated = false
       }
@@ -25,8 +38,13 @@ export default createStore({
       state.isAuthenticated = true
     },
     removeToken(state) {
+      state.user.id = ''
+      state.user.username = ''
       state.token = ''
       state.isAuthenticated = false
+    },
+    setUser(state, user) {
+      state.user = user
     }
   },
   actions: {

@@ -92,7 +92,7 @@ export default {
         }
     },
     methods: {
-        submitForm(e) {
+        async submitForm(e) {
             if (this.password != this.repeat) {
                 console.log('passwords are different')
             } else {
@@ -112,12 +112,10 @@ export default {
                     role: this.student === true ? 'Студент' : 'Преподаватель'
                 }
 
-                axios
+                await axios
                     .post('/api/v1/users/', formData)
                     .then(response => {
                         console.log(response)
-
-                        this.$router.push('/log-in')
                     })
                     .catch(error => {
                         if (error.response) {
@@ -132,6 +130,71 @@ export default {
                             console.log(JSON.stringify(error))
                         }
                     })
+                
+                axios.defaults.headers.common["Authorization"] = ""
+
+                localStorage.removeItem('token')
+
+                const logInData = {
+                    username: this.username,
+                    password: this.password
+                }
+
+                await axios
+                    .post('/api/v1/token/login/', logInData)
+                    .then(response => {
+                        const token = response.data.auth_token
+                        this.$store.commit('setToken', token)
+                        axios.defaults.headers.common["Authorization"] = "Token " + token
+                        localStorage.setItem('token', token)
+                    })
+                    .catch(error => {
+                        if (error.response) {
+                            for (const property in error.response.data) {
+                                this.errors.push(`${property}: ${error.response.data[property]}`)
+                            }
+
+                            console.log(JSON.stringify(error.response.data))
+                        } else if (error.message) {
+                            console.log(JSON.stringify(error.message))
+                        } else {
+                            console.log(JSON.stringify(error))
+                        }
+                    })
+                    
+                await axios
+                    .get('/api/v1/users/me')
+                    .then(response => {
+                        this.$store.commit('setUser', {'username': response.data.username, 'id': response.data.id})
+
+                        console.log(response.data)
+                        
+                        localStorage.setItem('username', response.data.username)
+                        localStorage.setItem('userid', response.data.id)
+
+                    })
+                    .catch(error => {
+                        console.log(JSON.stringify(error))
+                    })
+
+                axios
+                    .post('/api/v1/clients/', client)
+                    .then(response => {
+                        toast({
+                            message: 'The client has been created',
+                            type: 'is-success',
+                            dismissible: true,
+                            pauseOnHover: true,
+                            duration: 2000,
+                            position: 'top-right',
+                        })
+
+                    })
+                    .catch(error => {
+                        console.log(JSON.stringify(error))
+                    })
+                
+                this.$router.push('/dashboard/articles')
             }
             
         }
