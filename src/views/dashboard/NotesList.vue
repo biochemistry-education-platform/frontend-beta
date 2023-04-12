@@ -35,8 +35,8 @@ export default {
                 .then(response => {
                     for (let i = 0; i < response.data.length; i++) {
                         this.notes.push(response.data[i])
-                        console.log(response.data[i])
                     }
+                    this.notes = this.notes.reverse()
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))

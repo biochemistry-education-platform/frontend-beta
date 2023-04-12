@@ -37,6 +37,7 @@ export default {
                     for (let i = 0; i < response.data.length; i++) {
                         this.articles.push(response.data[i])
                     }
+                    this.articles = this.articles.reverse()
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
