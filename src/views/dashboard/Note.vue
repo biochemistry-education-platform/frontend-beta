@@ -53,7 +53,7 @@ export default {
                 .get(`/api/v1/notes/${noteID}`)
                 .then(response => {
                     this.note = response.data
-                    let text = JSON.parse(this.note.note_text)
+                    let text = JSON.parse(this.note.text)
                     Object.entries(text).forEach(entry => {
                         const [key, value] = entry
                         let place = document.getElementById('noteText')
@@ -114,7 +114,7 @@ export default {
         },
         async editNote(event) {
             await (this.isEditMode = true)
-            let text = JSON.parse(this.note.note_text)
+            let text = JSON.parse(this.note.text)
             let place = document.getElementsByClassName('ql-editor')[0]   
             place.removeChild(place.firstChild)            
             console.log(place.children)
@@ -135,10 +135,10 @@ export default {
                 arr.push(this.toJSON(element))
             })
             let jsonresult = JSON.stringify(arr)
-            this.note.note_text = jsonresult
+            this.note.text = jsonresult
             
             axios
-            .patch(`/api/v1/notes/${noteID}/`, {note_text: this.note.note_text})
+            .patch(`/api/v1/notes/${noteID}/`, {text: this.note.text})
                 .then(response => {
                     toast({
                         message: 'The note has been updated',
@@ -154,7 +154,7 @@ export default {
                 })
             await (this.isEditMode = false)
 
-            let text = JSON.parse(this.note.note_text)
+            let text = JSON.parse(this.note.text)
             Object.entries(text).forEach(entry => {
                 const [key, value] = entry
                 let place = document.getElementById('noteText')

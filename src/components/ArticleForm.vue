@@ -3,7 +3,7 @@
         <div class="field">
             <label class="is-size-5 mb-4">Title</label>
             <div class="control">
-                <input type="text" class="input" v-model="article.article_title">
+                <input type="text" class="input" v-model="article.title">
             </div>
         </div>
     </div>
@@ -46,8 +46,8 @@ export default {
                 arr.push(this.toJSON(element))
             })
             let jsonresult = JSON.stringify(arr)
-            this.article.article_title = this.article.article_title
-            this.article.article_text = jsonresult
+            this.article.title = this.article.title
+            this.article.text = jsonresult
             
             axios
                 .post('/api/v1/articles/', this.article)

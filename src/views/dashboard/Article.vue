@@ -1,7 +1,7 @@
 <template>
     <div class="article-page">
         <div class="columns is-multiline">
-            <h1 class="title">{{ article.article_title }}</h1>
+            <h1 class="title">{{ article.title }}</h1>
         </div>
 
         <div class="column is-12">
@@ -47,7 +47,7 @@ export default {
                 .then(response => {
                     this.article = response.data
                     this.date = (new Date(Date.parse(this.article.publish_date.slice(0,19)))).toLocaleString('en-GB')
-                    let text = JSON.parse(this.article.article_text)
+                    let text = JSON.parse(this.article.text)
                     Object.entries(text).forEach(entry => {
                         const [key, value] = entry
                         let place = document.getElementById('articleText')
@@ -127,17 +127,17 @@ export default {
                     .then(response => {
                         for (let i = 0; i < response.data.length; i++) {
                             // TODO !!! check not by title but by id (check if the note based on this article already exists)
-                            if (this.article.article_title === response.data[i].based_on_article) {
+                            if (this.article.title === response.data[i].based_on_article) {
                                 // add text to the existing note
                                 isExist = true
-                                let current_text = response.data[i].note_text
+                                let current_text = response.data[i].text
                                 current_text = current_text.substring(0, current_text.length-1)
                                 let new_text = `${current_text},{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"${select.toString()}"}]}]`
                                 axios
-                                    .patch(`/api/v1/notes/${response.data[i].id}/`, {note_text: new_text})
+                                    .patch(`/api/v1/notes/${response.data[i].id}/`, {text: new_text})
                                     .then(response => {
                                         toast({
-                                            message: 'The article has been updated',
+                                            message: 'The note has been updated',
                                             type: 'is-success',
                                             dismissible: true,
                                             pauseOnHover: true,
@@ -152,9 +152,9 @@ export default {
                         }
                         if (isExist == false) {
                             const articleID = this.$route.params.id
-                            let title = this.article.article_title
+                            let title = this.article.title
                             let note = {
-                                note_text: `[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"${select.toString()}"}]}]`,
+                                text: `[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"${select.toString()}"}]}]`,
                                 based_on_article: articleID
                             }
                             axios
@@ -184,7 +184,7 @@ export default {
                     responseType: 'blob',
                 })
                 .then(response => {
-                    fileDownload(response.data, `${this.article.article_title}.pdf`)
+                    fileDownload(response.data, `${this.article.title}.pdf`)
                 })
                 .catch(error => {
                     console.log(error)

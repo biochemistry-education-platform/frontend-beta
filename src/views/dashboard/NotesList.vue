@@ -3,7 +3,8 @@
         <div class="columns is-multiline">
             <h1 class="title">Notes</h1>
         </div>
-        <div class="column is-12" v-for="note in notes" v-bind:key="note.id">
+        <SearchForm v-bind:items="notes" v-on:filterit="filterit"/>
+        <div class="column is-12" v-for="note in filteredNotes" v-bind:key="note.id">
             <div class="box">
                 <h3 class="is-size-4 mb-4">{{ note.based_on_article }}</h3>
                 <div style="display:flex; flex-direction: row; justify-content: space-between;">
@@ -17,12 +18,17 @@
 
 <script>
 import axios from 'axios'
+import SearchForm from '@/components/SearchForm.vue'
 
 export default {
     name: 'Notes',
+    components: {
+        SearchForm
+    },
     data() {
         return {
-            notes: []
+            notes: [],
+            filteredNotes: []
         }
     },
     mounted() {
@@ -35,12 +41,17 @@ export default {
                 .then(response => {
                     for (let i = 0; i < response.data.length; i++) {
                         this.notes.push(response.data[i])
+                        this.filteredNotes.push(response.data[i])
                     }
-                    this.notes = this.notes.reverse()
+                    this.filteredNotes = this.filteredNotes.reverse()
+                    console.log(this.filteredNotes)
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
+        },
+        filterit(newNotes) {
+            this.filteredNotes = newNotes
         }
     }
 }

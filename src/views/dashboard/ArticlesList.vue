@@ -3,9 +3,10 @@
         <div class="columns is-multiline">
             <h1 class="title">Articles</h1>
         </div>
-        <div class="column is-12" v-for="article in articles" v-bind:key="article.id">
+        <SearchForm v-bind:items="articles" v-on:filterit="filterit"/>
+        <div class="column is-12" v-for="article in filteredArticles" v-bind:key="article.id">
             <div class="box">
-                <h3 class="is-size-4 mb-4">{{ article.article_title }}</h3>
+                <h3 class="is-size-4 mb-4">{{ article.title }}</h3>
                 <div style="display:flex; flex-direction: row; justify-content: space-between;">
                     <p>{{ article.author }}</p>
                     <p>{{ (new Date(Date.parse(article.publish_date.slice(0,19)))).toLocaleString('en-GB') }}</p>
@@ -18,12 +19,17 @@
 
 <script>
 import axios from 'axios'
+import SearchForm from '@/components/SearchForm.vue'
 
 export default {
     name: 'Articles',
+    components: {
+        SearchForm
+    },
     data() {
         return {
-            articles: []
+            articles: [],
+            filteredArticles: []
         }
     },
     mounted() {
@@ -36,12 +42,16 @@ export default {
                 .then(response => {
                     for (let i = 0; i < response.data.length; i++) {
                         this.articles.push(response.data[i])
+                        this.filteredArticles.push(response.data[i])
                     }
-                    this.articles = this.articles.reverse()
+                    this.filteredArticles = this.filteredArticles.reverse()
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
+        },
+        filterit(newArticles) {
+            this.filteredArticles = newArticles
         }
     }
 }
