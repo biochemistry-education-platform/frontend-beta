@@ -27,7 +27,7 @@
             </div>
 
             <div class="column is-12">
-                <ArticleForm v-bind:initialArticle="article"></ArticleForm>
+                <ArticleForm v-bind:initialArticle="article" v-bind:initialTags="tags"></ArticleForm>
             </div>
         </div>
     </div>
@@ -52,11 +52,13 @@ export default {
             article: {
                 author: ''
             },
-            clients: []
+            clients: [],
+            tags: []
         }
     },
     async mounted() {
         await this.getClients()
+        await this.getTags()
     },
     methods: {
         getClients() {
@@ -67,6 +69,18 @@ export default {
                         if (response.data[i].role === 'Преподаватель') {
                             this.clients.push(response.data[i])
                         }
+                    }
+                })
+                .catch(error => {
+                    console.log(JSON.stringify(error))
+                })
+        },
+        getTags() {
+            axios
+                .get('/api/v1/tags')
+                .then(response => {
+                    for (let i = 0; i < response.data.length; i++) {
+                        this.tags.push(response.data[i].name)
                     }
                 })
                 .catch(error => {

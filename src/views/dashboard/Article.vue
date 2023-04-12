@@ -6,7 +6,9 @@
 
         <div class="column is-12">
             <h2 class="subtitle">{{ author }}, {{ date }}</h2>
-            <p id="newtags"></p>
+            <div id="newtags">
+                <div v-for="tag in article.tags" class="button is-success tag-div">{{ tag }}</div>
+            </div>
 
             <hr>
 
@@ -198,5 +200,14 @@ export default {
 h1 {
     font-size: 24px;
     font-weight: bold;
+}
+
+#newtags {
+    display: flex;
+    flex-direction: row;
+}
+
+.tag-div {
+    margin-right: 14px;
 }
 </style>

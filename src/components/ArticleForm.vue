@@ -6,12 +6,15 @@
                 <input type="text" class="input" v-model="article.title">
             </div>
         </div>
+        <div class="field">
+            <Tags v-bind:initialTags="tags" v-on:addTag="addTag" />
+        </div>
     </div>
     <div class="column is-12">
         <div class="field">
             <label class="is-size-5 mb-4">Text</label>
             <QuillEditor theme="snow"/>
-            <button class="button is-success" @click="getJsonText">Save</button>
+            <button class="button is-success" @click="createArticle">Save</button>
         </div>
     </div>
 </template>
@@ -21,23 +24,28 @@ import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import axios from 'axios'
 import { toast } from 'bulma-toast'
+import Tags from './Tags.vue'
 
 export default {
     name: 'ArticleForm',
     props: {
-        initialArticle: Object
+        initialArticle: Object,
+        initialTags: Object
     },
     components: {
-        QuillEditor
+        QuillEditor,
+        Tags
     },
     data() {
         return {
             article: this.initialArticle,
-            textarea: ''
+            tags: this.initialTags,
+            chosenTags: [],
+            textarea: '',
         }
     },
     methods: {
-        getJsonText() {
+        createArticle() {
             const textarea = document.getElementsByClassName('ql-editor')[0]
             const children = textarea.children;
 
@@ -48,6 +56,18 @@ export default {
             let jsonresult = JSON.stringify(arr)
             this.article.title = this.article.title
             this.article.text = jsonresult
+            this.article.tags = this.chosenTags
+            
+            this.chosenTags.forEach(tag => {
+                if (!this.tags.includes(tag)) {
+                    let newTag = {
+                        name: tag
+                    }
+                    axios
+                        .post('/api/v1/tags/', newTag)
+                }
+            })
+           
             
             axios
                 .post('/api/v1/articles/', this.article)
@@ -112,6 +132,9 @@ export default {
                 }
             }
             return obj
+        },
+        addTag(chosenTags) {
+            this.chosenTags = chosenTags
         }
     }
 }
