@@ -8,12 +8,12 @@
         </div>
     </div>
     <div class="column is-12">
-            <div class="field">
-                <label class="is-size-5 mb-4">Text</label>
-                <QuillEditor theme="snow"/>
-                <button class="button is-success" @click="getJsonText">Save</button>
-            </div>
+        <div class="field">
+            <label class="is-size-5 mb-4">Text</label>
+            <QuillEditor theme="snow"/>
+            <button class="button is-success" @click="getJsonText">Save</button>
         </div>
+    </div>
 </template>
 
 <script>
@@ -42,7 +42,6 @@ export default {
             const children = textarea.children;
 
             let arr = []
-            let i = 0
             Array.from(children).forEach(element => {
                 arr.push(this.toJSON(element))
             })
