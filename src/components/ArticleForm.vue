@@ -6,9 +6,14 @@
                 <input type="text" class="input" v-model="article.title">
             </div>
         </div>
-        <div class="field">
-            <Tags v-bind:initialTags="tags" v-on:addTag="addTag" />
+        <label for="tag-choice">Tags</label>
+        <div class="oneline">
+            <div class="field tag-field" v-for="index in numberOfTags" :key="index">
+                <Tags v-bind:initialTags="tags" v-on:addTag="addTag" v-on:deleteTag="deleteTag" />
+            </div>
+            <div class="add-tag-btn" @click="addNewTag">+</div>
         </div>
+        
     </div>
     <div class="column is-12">
         <div class="field">
@@ -42,6 +47,7 @@ export default {
             tags: this.initialTags,
             chosenTags: [],
             textarea: '',
+            numberOfTags: 1
         }
     },
     methods: {
@@ -135,7 +141,41 @@ export default {
         },
         addTag(chosenTags) {
             this.chosenTags = chosenTags
+        },
+        addNewTag(event) {
+            this.numberOfTags += 1
+        },
+        deleteTag(tagToDelete) {
+            let inputs = document.getElementsByClassName('tag-input')
+            for (let input of inputs) {
+                if (input.value == tagToDelete) {
+                    input.parentElement.parentElement.remove()
+                }
+            }
         }
     }
 }
 </script>
+
+<style>
+.add-tag-btn {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    border: 1px solid black;
+}
+
+.oneline {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.tag-field {
+    padding-right: 20px;
+    margin-bottom: 0 !important;
+}
+</style>
