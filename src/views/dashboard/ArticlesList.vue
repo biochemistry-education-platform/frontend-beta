@@ -6,7 +6,10 @@
         <SearchForm v-bind:items="articles" v-on:filterit="filterit"/>
         <div class="column is-12" v-for="article in filteredArticles" v-bind:key="article.id">
             <div class="box">
-                <h3 class="is-size-4 mb-4">{{ article.title }}</h3>
+                <h3 class="is-size-4 mb-4 article-title">{{ article.title }}</h3>
+                <div class="tags-list" v-if="article.tags.length > 0">
+                    <div class="tag-div button is-success" v-for="tag in article.tags">{{ tag }}</div>
+                </div>
                 <div style="display:flex; flex-direction: row; justify-content: space-between;">
                     <p>{{ article.author }}</p>
                     <p>{{ (new Date(Date.parse(article.publish_date.slice(0,19)))).toLocaleString('en-GB') }}</p>
@@ -56,3 +59,18 @@ export default {
     }
 }
 </script>
+
+<style>
+.article-title {
+    margin: 8px !important;
+}
+.tags-list {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 8px;
+}
+.tag-div {
+    margin-right: 14px;
+    height: 1.5rem;
+}
+</style>

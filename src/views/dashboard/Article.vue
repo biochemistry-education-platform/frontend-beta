@@ -209,5 +209,6 @@ h1 {
 
 .tag-div {
     margin-right: 14px;
+    margin-top: 14px;
 }
 </style>
