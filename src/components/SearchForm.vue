@@ -1,6 +1,6 @@
 <template>
     <div class="column is-12 search-form">
-        <img src="@/assets/search-icon.png">
+        <img src="@/assets/icons/search-icon.png">
         <input class="search-field" type="text" v-model="name" @input="filterit">
     </div>
     <div class="extra-search">

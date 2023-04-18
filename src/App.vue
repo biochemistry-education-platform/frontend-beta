@@ -1,47 +1,8 @@
 <template>
-  <div id="wrapper">
-    <nav class="navbar is-dark">
-      <div class="navbar-brand">
-        <router-link to="/" class="navbar-item"><strong>Biochemistry</strong></router-link>
-      </div>
-
-      <div class="navbar-menu">
-        <div class="navbar-end">
-          <template v-if="this.$store.state.isAuthenticated">
-            <!-- <router-link to="/dashboard" class="navbar-item">Dashboard</router-link>
-            <router-link to="/dashboard/clients" class="navbar-item">Clients</router-link> -->
-            <router-link to="/dashboard/articles" class="navbar-item">Articles</router-link>
-            <router-link to="/dashboard/notes" class="navbar-item">Notes</router-link>
-            
-            <div class="navbar-item">
-              <div class="buttons">
-                <router-link to="/dashboard/articles/add" class="button is-success">Add article</router-link>
-                <router-link to="/dashboard/my-account" class="button is-light">My account</router-link>
-              </div>
-            </div>
-          </template>
-
-          <template v-else>
-            <router-link to="/" class="navbar-item">Home</router-link>
-
-            <div class="navbar-item">
-              <div class="buttons">
-                <router-link to="/sign-up" class="button is-success"><strong>Sign up</strong></router-link>
-                <router-link to="/log-in" class="button is-light">Log in</router-link>
-              </div>
-            </div>
-          </template>
-        </div>
-      </div>
-    </nav>
-
-    <section class="section">
+  <div id="wrapper">  
+    <section>
         <router-view/>
-    </section>
-
-    <footer class="footer">
-      <p class="has-text-centered">Made by Lena in 2023</p>
-    </footer>  
+    </section> 
   </div>
 </template>
 
@@ -60,10 +21,20 @@
       } else {
         axios.defaults.headers.common['Authorization'] = ""
       }
+    },
+    data() {
+      return {
+        themeLight: true
+      }
     }
   }
 </script>
 
 <style lang="scss">
 @import '../node_modules/bulma';
+@font-face {
+  font-family: "RalewayLight";
+  font-weight: 200;
+  src: url(@/assets/fonts/Raleway-ExtraLight.ttf) fomat("truetype");
+}
 </style>
