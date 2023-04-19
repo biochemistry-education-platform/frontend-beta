@@ -10,41 +10,48 @@
     
 </template>
   
-<script>
-    import axios from 'axios'
+<script setup>
     import NavMenu from '@/layouts/TeacherNavMenu.vue'
-  
-    export default {
-        name: 'App',
-        beforeCreate() {
-            this.$store.commit('initializeStore')
-  
-            const token = this.$store.state.token
-  
-            if (token) {
-                axios.defaults.headers.common['Authorization'] = "Token " + token
-            } else {
-                axios.defaults.headers.common['Authorization'] = ""
-            }
-        },
-        components: {
-            NavMenu
-        },
-        data() {
-            return {
-                theme: 'light',
-                language: 'ru'
-            }
-        },
-        methods: {
-            switchTheme(theme) {
-                this.theme = theme
-            },
-            switchLanguage(language) {
-                this.language = language
-            }
+    import { ref, onMounted, watchEffect } from 'vue'
+    import { useI18n } from 'vue-i18n'
+
+    const i18n = useI18n()
+    
+    onMounted(() => {
+        console.log('tema v locali')
+        console.log(localStorage.theme)
+        if (localStorage.theme) {
+            theme.value = localStorage.theme;
         }
+        if (localStorage.language) {
+            language.value = localStorage.language;
+        }
+    })    
+    
+    const theme = ref('light')
+    const language = ref('ru')
+
+    watchEffect(() => {
+        localStorage.theme = theme.value
+        localStorage.language = language.value
+    })
+
+    function switchTheme (newTheme) {
+        theme.value = newTheme
+        localStorage.theme = theme.value
     }
+
+    function switchLanguage (newLanguage) {
+        language.value = newLanguage
+        localStorage.language = language.value
+        if (language.value === 'ru') {
+            i18n.locale.value = 'ru-RU'
+        } else {
+            i18n.locale.value = 'en-US'
+        }
+  }
+
+
 </script>
   
 <style lang="scss">

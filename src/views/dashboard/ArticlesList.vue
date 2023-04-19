@@ -1,7 +1,7 @@
 <template>
     <NavMenu />
     <div class="articles-page">
-        <h1 class="articles__title">Лента</h1>
+        <h1 class="articles__title">{{ $t('feed') }}</h1>
         <!-- <SearchForm v-bind:items="articles" v-on:filterit="filterit"/> -->
         <hr class="articles__hr">
         <div class="articles__article" v-for="article in filteredArticles" v-bind:key="article.id">
