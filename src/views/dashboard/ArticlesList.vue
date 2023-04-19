@@ -37,13 +37,12 @@
 <script>
 import axios from 'axios'
 import SearchForm from '@/components/SearchForm.vue'
-import NavMenu from '@/components/NavMenu.vue'
+
 
 export default {
     name: 'Articles',
     components: {
         SearchForm,
-        NavMenu
     },
     data() {
         return {
@@ -77,12 +76,9 @@ export default {
 </script>
 
 <style>
-@import url("@/css/variables.css");
-
 .articles-page {
-    width: calc(100% - 200px);
+    width: 100%;
     height: 100vh;
-    margin-left: 200px;
     background: var(--background);
 }
 
@@ -90,6 +86,7 @@ export default {
     padding-left: 10%;
     padding-top: 30px;
     font-size: 32px;
+    color: var(--text-color);
 }
 
 .articles__hr {

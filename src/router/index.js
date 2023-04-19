@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import TeacherLayout from '@/layouts/TeacherLayout.vue'
 import HomeView from '../views/HomeView.vue'
 import SignUp from '../views/SignUp.vue'
 import LogIn from '../views/LogIn.vue'
@@ -17,8 +18,33 @@ import store from '../store'
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    component: TeacherLayout,
+    children: [
+      {
+        path: '/dashboard/articles',
+        name: 'Articles',
+        component: ArticlesList,
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: '/dashboard/articles/add',
+        name: 'AddArticle',
+        component: AddArticle,
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: '/dashboard/articles/:id',
+        name: 'Article',
+        component: Article,
+        meta: {
+          requireLogin: true
+        }
+      },
+    ]
   },
   {
     path: '/about',
@@ -70,30 +96,30 @@ const routes = [
       requireLogin: true
     }
   },
-  {
-    path: '/dashboard/articles',
-    name: 'Articles',
-    component: ArticlesList,
-    meta: {
-      requireLogin: true
-    }
-  },
-  {
-    path: '/dashboard/articles/add',
-    name: 'AddArticle',
-    component: AddArticle,
-    meta: {
-      requireLogin: true
-    }
-  },
-  {
-    path: '/dashboard/articles/:id',
-    name: 'Article',
-    component: Article,
-    meta: {
-      requireLogin: true
-    }
-  },
+  // {
+  //   path: '/dashboard/articles',
+  //   name: 'Articles',
+  //   component: ArticlesList,
+  //   meta: {
+  //     requireLogin: true
+  //   }
+  // },
+  // {
+  //   path: '/dashboard/articles/add',
+  //   name: 'AddArticle',
+  //   component: AddArticle,
+  //   meta: {
+  //     requireLogin: true
+  //   }
+  // },
+  // {
+  //   path: '/dashboard/articles/:id',
+  //   name: 'Article',
+  //   component: Article,
+  //   meta: {
+  //     requireLogin: true
+  //   }
+  // },
   {
     path: '/dashboard/notes',
     name: 'Notes',

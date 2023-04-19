@@ -1,9 +1,5 @@
 <template>
-  <div id="wrapper">  
-    <section>
-        <router-view/>
-    </section> 
-  </div>
+  <router-view/>
 </template>
 
 <script>
