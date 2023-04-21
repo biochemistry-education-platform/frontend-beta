@@ -18,14 +18,14 @@
     <div class="column is-12">
         <div class="field">
             <label class="is-size-5 mb-4">Text</label>
-            <QuillEditor theme="snow"/>
+            <div id="maineditor"></div>
             <button class="button is-success" @click="createArticle">Save</button>
         </div>
     </div>
 </template>
 
 <script>
-import { QuillEditor } from '@vueup/vue-quill'
+import { QuillEditor, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import axios from 'axios'
 import { toast } from 'bulma-toast'
@@ -49,6 +49,34 @@ export default {
             textarea: '',
             numberOfTags: 1
         }
+    },
+    mounted() {
+        var toolbarOptions = [            
+            [{ 'header': [1, 2, 3,  false] }],            
+            
+            [{ 'font': [] }],
+
+            ['bold', 'italic', 'underline'],                  
+            
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],    
+            
+            [{ 'align': ''}, { 'align': 'center'}, { 'align': 'right'}, { 'align': 'justify'}],            
+            
+            ['image', 'link'],          
+
+            [{ 'color': [] }, { 'background': ['#47FDB0', '#40E3CC', '#52E4FA', '#40A2E3', '#4785FD', '#9359FF', '#A637E6', 
+                                               '#73F2BC', '#6EE0D0', '#7AE1F0', '#6EB2E0', '#739EF2', '#A87FF3', '#B567E2', 
+                                               '#FFF436', '#FFBF2E', '#FA7325', '#E63034', '#FF4F63', '#E62EA2', '#E82DFA',   
+                                               '#F3EC67', '#F3C761', '#F0915B', '#E26365', '#F37886', '#E261B2', '#E360F0'] }],          // dropdown with defaults from theme
+
+        ];
+
+        var quill = new Quill('#maineditor', {
+            modules: {
+                toolbar: toolbarOptions
+            },
+            theme: 'snow'
+        });
     },
     methods: {
         createArticle() {
@@ -177,5 +205,9 @@ export default {
 .tag-field {
     padding-right: 20px;
     margin-bottom: 0 !important;
+}
+
+#maineditor {
+    min-height: 200px;
 }
 </style>
