@@ -4,5 +4,19 @@ export default {
     myArticles: 'My articles',
     forChecking: 'For checking',
     createArticle: 'Create article',
-    favorites: 'Favorites'
+    favorites: 'Favorites',
+
+    signUp: 'Sign up',
+    email: 'E-mail',
+    surname: 'Surname',
+    surnamePlaceholder: 'Doe',
+    name: 'Name',
+    namePlaceholder: 'John',
+    password: 'Password',
+    student: 'I am student',
+    toSignUp: 'Sign up',
+    alreadySigned: 'Already have an account? ',
+    toLogIn: 'Log in',
+    logIn: 'Log in',
+    dontSigned: "Don't have an account? ",
 }

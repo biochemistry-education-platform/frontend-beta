@@ -87,6 +87,7 @@ export default {
     padding-top: 30px;
     font-size: 32px;
     color: var(--text-color);
+    font-weight: 500;
 }
 
 .articles__hr {

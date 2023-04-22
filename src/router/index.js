@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TeacherLayout from '@/layouts/TeacherLayout.vue'
+import InitialLayout from '@/layouts/InitialLayout.vue'
 import HomeView from '../views/HomeView.vue'
 import SignUp from '../views/SignUp.vue'
 import LogIn from '../views/LogIn.vue'
@@ -18,10 +19,26 @@ import store from '../store'
 const routes = [
   {
     path: '/',
+    component: InitialLayout,
+    children: [
+      {
+        path: '/sign-up',
+        name: 'SignUp',
+        component: SignUp
+      },
+      {
+        path: '/log-in',
+        name: 'LogIn',
+        component: LogIn
+      },
+    ]
+  },
+  {
+    path: '/teacher',
     component: TeacherLayout,
     children: [
       {
-        path: '/dashboard/articles',
+        path: '/teacher/articles',
         name: 'Articles',
         component: ArticlesList,
         meta: {
@@ -29,7 +46,7 @@ const routes = [
         }
       },
       {
-        path: '/dashboard/articles/add',
+        path: '/teacher/articles/add',
         name: 'AddArticle',
         component: AddArticle,
         meta: {
@@ -37,9 +54,17 @@ const routes = [
         }
       },
       {
-        path: '/dashboard/articles/:id',
+        path: '/teacher/articles/:id',
         name: 'Article',
         component: Article,
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: '/teacher/my-account',
+        name: 'MyAccount',
+        component: MyAccount,
         meta: {
           requireLogin: true
         }
@@ -55,27 +80,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   },
   {
-    path: '/sign-up',
-    name: 'SignUp',
-    component: SignUp
-  },
-  {
-    path: '/log-in',
-    name: 'LogIn',
-    component: LogIn
-  },
-  {
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard,
-    meta: {
-      requireLogin: true
-    }
-  },
-  {
-    path: '/dashboard/my-account',
-    name: 'MyAccount',
-    component: MyAccount,
     meta: {
       requireLogin: true
     }

@@ -4,5 +4,19 @@ export default {
     myArticles: 'Мои статьи',
     forChecking: 'На проверку',
     createArticle: 'Создать статью',
-    favorites: 'Избранное'
+    favorites: 'Избранное',
+
+    signUp: 'Регистрация',
+    email: 'Почта',
+    surname: 'Фамилия',
+    surnamePlaceholder: 'Иванов',
+    name: 'Имя',
+    namePlaceholder: 'Иван',
+    password: 'Пароль',
+    student: 'Я студент',
+    toSignUp: 'Зарегистрироваться',
+    alreadySigned: 'Уже зарегистрированы? ',
+    toLogIn: 'Войти',
+    logIn: 'Вход',
+    dontSigned: 'Еще нет аккаунта? ',
 }

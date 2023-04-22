@@ -66,6 +66,7 @@
     width: calc(100% - 200px);
     margin-left: 200px;
     height: 100vh;
+    font-family: Montserrat;
 }
 
 .light-theme {

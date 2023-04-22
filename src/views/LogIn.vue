@@ -1,39 +1,19 @@
 <template>
-    <div class="login-page">
-        <div class="columns">
-            <div class="column is-4 is-offset-4">
-                <h1 class="title">Log in</h1>
-
-                <form @submit.prevent="submitForm">
-                    <div class="field">
-                        <label>E-mail</label>
-                        <div class="control">
-                            <input type="email" name="username" class="input" v-model="username">
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label>Password</label>
-                        <div class="control">
-                            <input type="password" name="password" class="input" v-model="password">
-                        </div>
-                    </div>
-
-                    <div class="notification is-danger" v-if="errors.length">
-                        <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
-                    </div>
-
-                    <div class="field">
-                        <div class="control">
-                            <button class="button is-success">Log in</button>
-                        </div>
-                    </div>
-                </form>
-
-                <hr>
-
-                Don't have an account? <router-link to="/sign-up">Sign up</router-link>
-            </div>
+    <div class="initial-page">
+        <div class="initial-form">
+            <h1 class="initial-title">{{ $t('logIn') }}</h1>
+            <form @submit.prevent="submitForm">
+                <div class="initial-field">
+                    <label class="initial-field-label">{{ $t('email') }}</label>
+                    <input type="email" name="username" class="initial-input" v-model="username" placeholder="example@mail.ru">
+                </div>
+                <div class="initial-field">
+                    <label class="initial-field-label">{{ $t('password') }}</label>
+                    <input type="password" name="name" class="initial-input" v-model="password" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;">
+                </div>
+                <button class="initial-btn">{{ $t('toLogIn') }}</button>
+                <p class="initial-link">{{ $t('dontSigned') }}<router-link :to="{name: 'SignUp'}" class="initial-link">{{ $t('toSignUp') }}</router-link></p>
+            </form>
         </div>
     </div>
 </template>
@@ -74,7 +54,6 @@ export default {
                         for (const property in error.response.data) {
                             this.errors.push(`${property}: ${error.response.data[property]}`)
                         }
-
                         console.log(JSON.stringify(error.response.data))
                     } else if (error.message) {
                         console.log(JSON.stringify(error.message))
@@ -87,9 +66,6 @@ export default {
                 .get('/api/v1/users/me')
                 .then(response => {
                     this.$store.commit('setUser', {'username': response.data.username, 'id': response.data.id})
-
-                    console.log(response.data)
-                    
                     localStorage.setItem('username', response.data.username)
                     localStorage.setItem('userid', response.data.id)
 
