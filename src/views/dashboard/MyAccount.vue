@@ -1,13 +1,71 @@
 <template>
     <div class="my-account-page">
-        <h1 class="title">My account</h1>
+        <div class="my-account__header">
+            <h1 class="my-account__title">My account</h1>
+            <button @click="logout()" class="button is-danger">Log out</button>
+        </div>
+        <hr class="my-account__hr">
+        <div class="my-account__content">
+            <div class="my-account__info">
+                <img class="my-account__img" src="@/assets/icons/profile_img.png">
+                <h2 class="my-account-name">{{ $store.state.user.surname }} {{ $store.state.user.name }} {{ $store.state.user.patronymic }}</h2>
+                <p class="my-account-role">{{ $store.state.user.role }}</p>
+                <p class="my-account-mail">{{ $store.state.user.username }}</p>
+                <button class="my-account-password-btn">Изменить пароль</button>
+                <hr class="my-account-info-hr">
+                <div class="my-account-channels">
+                    <div class="my-account-channel">
+                        <img src="@/assets/icons/mail-icon.png">
+                        <p class="my-account-channel-filled">{{ $store.state.user.username }}</p>
+                    </div>
+                    <div class="my-account-channel">
+                        <img src="@/assets/icons/vk-icon.png">
+                        <input class="my-account-channel-empty" type="text" placeholder="vk.com/id123456">
+                    </div>
+                    <div class="my-account-channel">
+                        <img src="@/assets/icons/telegram-icon.png">
+                        <input class="my-account-channel-empty" type="text" placeholder="t.me/Example">
+                    </div>
+                </div>
+            </div>
+            <div class="my-account__subscriptions">                    
+                <div class="tags-subscriptions">
+                    <h2 class="subscription-title">Подписки на теги</h2>
+                    <div class="tags-subscriptions-content">
+                        <div v-for="tag, index in tags" :key="index" class="subscription-tag"><p>{{ tag }}</p><svg class="delete-tag-sub-btn" xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 96 960 960" width="18"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
+                        <svg class="add-tag-subscription" xmlns="http://www.w3.org/2000/svg" height="27" viewBox="0 96 960 960" width="27"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
+                    </div>
 
-        <p><b>Username:</b> {{ $store.state.user.username }}</p>
-        <p><b>Name:</b> {{ $store.state.user.surname }} {{ $store.state.user.name }} {{ $store.state.user.patronymic }}</p>
-        <p><b>{{ $store.state.user.role }}</b></p>
-        <hr>
-
-        <button @click="logout()" class="button is-danger">Log out</button>
+                    
+                </div>
+                <div class="authors-subscriptions">
+                    <h2 class="subscription-title">Подписки на авторов</h2>
+                    <div class="authors-subscriptions-content">
+                        <div v-for="author, index in authors" :key="index">
+                            <div class="subscription-author">
+                                <p class="subscription-author-number">{{ index + 1 }}</p>
+                                <hr class="vertical-hr">
+                                <div class="subscription-author-content">
+                                    <div class="subscription-author-name">
+                                        <img src="@/assets/icons/profile_img.png">
+                                        <p>{{ author.surname }} {{ author.name }} {{ author.patronymic }}</p>
+                                    </div>
+                                    
+                                    <p class="subscription-author-role">{{ author.role }}</p>
+                                </div>
+                                <hr class="vertical-hr">
+                                <p class="delete-subscription-author">delete</p>
+                            </div>
+                            <hr class="authors-subscription-hr">
+                        </div>
+                        <div class="add-author-subscription">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="36" viewBox="0 96 960 960" width="36"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -19,6 +77,28 @@ export default {
     name: 'MyAccount',
     async mounted() {
         await this.getMyInfo()
+    },
+    data() {
+        return {
+            tags: ['белки', 'липиды', 'гормоны'],
+            authors: [{
+                surname: 'Иванов',
+                name: 'Иван',
+                patronymic: 'Иванович',
+                role: 'Преподаватель'
+            },
+            {
+                surname: 'Константинопольская',
+                name: 'Анастасия',
+                patronymic: 'Александровна',
+                role: 'Преподаватель'
+            },
+            {
+                surname: 'Фамилия',
+                name: 'Имя',
+                patronymic: 'Отчество',
+                role: 'Студент'}]
+        }
     },
     methods: {
         logout() {
@@ -62,3 +142,247 @@ export default {
     }
 }
 </script>
+
+<style>
+.my-account-page {
+    width: 100%;
+    height: 100vh;
+    background: var(--background);
+}
+
+.my-account__header {
+    padding-top: 20px;
+    width: 80%;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between
+}
+
+.my-account__title {
+    font-size: 32px;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.my-account__hr {
+    background: var(--lines-color);
+    height: 2px;
+    width: 80%;
+    margin: 20px auto;
+}
+
+.my-account__content {
+    width: 80%;
+    margin: 40px auto;
+    display: flex;
+    flex-direction: row;
+}
+
+.my-account__info {
+    width: 500px;
+    background: var(--card-color);
+    box-shadow: 0px 3.2375px 3.2375px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.my-account__img{
+    margin: 40px 0 20px 0;
+}
+
+.my-account-name {
+    color: var(--text-color);
+    font-size: 28px;
+    font-weight: 500;
+}
+
+.my-account-role, .my-account-mail {
+    font-size: 16px;
+    color: var(--text-extra);
+}
+
+.my-account-password-btn {
+    background: var(--pages-color);
+    width: 400px;
+    height: 40px;
+    color: var(--card-color);
+    font-size: 16px;
+    line-height: 16px;
+    padding: 12px 0;
+    text-align: center;
+    border: none;
+    border-radius: 10px;
+    margin: 24px 0 0 0;
+}
+
+.my-account-info-hr {
+    background: var(--lines-color);
+    height: 1px;
+    width: 400px;
+}
+
+.my-account-channels {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    margin-bottom: 24px;
+}
+
+.my-account-channel {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 40px;
+    margin-bottom: 20px;
+}
+
+.my-account-channel img{
+    margin-right: 20px;
+}
+
+.my-account-channel-filled {
+    font-size: 20px;
+    color: var(--text-color);
+}
+
+.my-account-channel-empty {
+    width: 340px;
+    border: none;
+    border-bottom: 1px solid var(--lines-color);
+    height: 26px;
+    font-size: 18px;
+    outline: none;
+    color: var(--text-color);
+    background: var(--card-color);
+}
+
+.my-account-channel-empty::placeholder {
+    font-size: 18px;
+    color: var(--lines-color)
+}
+
+.my-account__subscriptions {
+    width: calc(100% - 500px - 40px);
+}
+
+.subscription-title {
+    font-size: 28px;
+    color: var(--text-color);
+    padding: 20px 0 0 40px;
+}
+
+.tags-subscriptions, .authors-subscriptions {
+    width: 100%;
+    background: var(--card-color);
+    box-shadow: 0px 3.2375px 3.2375px rgba(0, 0, 0, 0.25);
+    margin-left: 40px;
+    margin-bottom: 40px;
+}
+
+.tags-subscriptions-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 20px 40px;
+}
+
+.subscription-tag {
+    background: var(--tags-color);
+    color: var(--tags-text);
+    font-size: 18px;
+    border-radius: 16px;
+    padding: 6px 12px;
+    margin-right: 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.delete-tag-sub-btn {
+    margin-left: 8px;
+    fill: var(--tags-text);
+}
+
+.add-tag-subscription {
+    fill: var(--pages-color);
+}
+.authors-subscriptions-content {
+    width: calc(100% - 80px);
+    margin: auto;
+    padding-top: 20px;
+}
+
+.subscription-author {
+    display: flex;
+    flex-direction: row;
+}
+
+.subscription-author-number {
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-color);
+}
+
+.vertical-hr {
+    border: none;
+    border-right: 1px solid var(--lines-color);
+    height: 40px;
+    width: 1px;
+    margin: 0;
+}
+
+.subscription-author-content {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    justify-content: space-between;
+    padding: 0 34px 0 12px;
+    align-items: center;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.subscription-author-name {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.subscription-author-name img {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+}
+
+.subscription-author-role {
+    font-size: 12px;
+    color: var(--text-extra);
+}
+
+.delete-subscription-author {
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-color);
+}
+
+.authors-subscription-hr {
+    width: 100%;
+    height: 1px;
+    background: var(--lines-color);
+}
+
+.add-author-subscription {
+    text-align: center;
+}
+
+.add-author-subscription svg{
+    fill: var(--pages-color);
+    transform: translateY(-20%);
+}
+</style>

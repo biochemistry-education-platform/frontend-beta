@@ -18,8 +18,6 @@
     const i18n = useI18n()
     
     onMounted(() => {
-        console.log('tema v locali')
-        console.log(localStorage.theme)
         if (localStorage.theme) {
             theme.value = localStorage.theme;
         }
