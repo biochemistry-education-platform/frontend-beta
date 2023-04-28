@@ -33,7 +33,7 @@ const fileDownload = require('js-file-download')
 
 
 export default {
-    name: 'Article',
+    name: 'ArticleStudentPage',
     data() {
         return {
             isSelected: false,

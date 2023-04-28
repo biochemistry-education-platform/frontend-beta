@@ -42,7 +42,7 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import ArticleForm from '@/components/ArticleForm.vue'
 
 export default {
-    name: 'AddArticle',
+    name: 'StudentAddArticle',
     components: {
         ArticleForm, 
         QuillEditor

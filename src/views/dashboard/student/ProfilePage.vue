@@ -74,7 +74,7 @@ import axios from 'axios'
 import store from '@/store'
 
 export default {
-    name: 'MyAccount',
+    name: 'StudentProfile',
     async mounted() {
         await this.getMyInfo()
     },
