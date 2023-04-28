@@ -11,7 +11,7 @@
 </template>
   
 <script setup>
-    import NavMenu from '@/layouts/TeacherNavMenu.vue'
+    import NavMenu from '@/layouts/teacher/TeacherNavMenu.vue'
     import { ref, onMounted, watchEffect } from 'vue'
     import { useI18n } from 'vue-i18n'
 

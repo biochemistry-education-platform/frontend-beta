@@ -1,0 +1,3 @@
+<template>
+    Student Layout
+</template>

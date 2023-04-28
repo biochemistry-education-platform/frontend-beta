@@ -12,7 +12,7 @@
 </template>
   
 <script setup>
-    import InitialMenu from '@/layouts/InitialMenu.vue'
+    import InitialMenu from '@/layouts/initial/InitialMenu.vue'
     import { ref, onMounted, watchEffect } from 'vue'
     import { useI18n } from 'vue-i18n'
 

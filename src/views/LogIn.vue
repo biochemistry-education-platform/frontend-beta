@@ -69,7 +69,7 @@ export default {
                     localStorage.setItem('username', response.data.username)
                     localStorage.setItem('userid', response.data.id)
 
-                    this.$router.push('/dashboard')
+                    this.$router.push('/teacher/articles')
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))

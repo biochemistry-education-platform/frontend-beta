@@ -1,0 +1,3 @@
+<template>
+    SSS navmenu
+</template>
