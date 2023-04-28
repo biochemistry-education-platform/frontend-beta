@@ -11,7 +11,7 @@
             </div>
             <div class="menu-item feed-block active">
                 <svg class="feed-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M140 936q-24.75 0-42.375-17.625T80 876V216l67 67 66-67 67 67 67-67 66 67 67-67 67 67 66-67 67 67 67-67 66 67 67-67v660q0 24.75-17.625 42.375T820 936H140Zm0-60h310V596H140v280Zm370 0h310V766H510v110Zm0-170h310V596H510v110ZM140 536h680V416H140v120Z"/></svg>
-                <router-link :to="{name: 'Articles'}" class="item-text feed-item-text">{{ $t('feed') }}</router-link>
+                <router-link :to="{name: 'ArticlesPageTeacher'}" class="item-text feed-item-text">{{ $t('feed') }}</router-link>
             </div>
             <div class="menu-item my-articles-block">
                 <svg class="my-article-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg>
@@ -66,9 +66,6 @@ function switchLanguage () {
     language.value = language.value === 'ru' ? 'en' : 'ru'
     emit('switchLanguage', language.value)
 }
-
-
-
 </script>
 
 <style>

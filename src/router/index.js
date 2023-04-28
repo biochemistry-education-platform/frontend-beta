@@ -37,8 +37,8 @@ const routes = [
       },
       {
         path: '/teacher/articles',
-        name: 'Articles',
-        component: () => import('../views/dashboard/ArticlesList.vue'),
+        name: 'ArticlesPageTeacher',
+        component: () => import('../views/dashboard/teacher/ArticlesList.vue'),
         meta: {
           requireLogin: true
         }
@@ -101,84 +101,84 @@ const routes = [
       },
     ]
   },
-  // {
-  //   path: '/student',
-  //   component: StudentLayout,
-  //   children: [
-  //     {
-  //       path: '/student/me',
-  //       name: 'StudentProfile',
-  //       component: () => import('../views/dashboard/student/ProfilePage.vue'),
-  //       meta: {
-  //         requireLogin: true
-  //       }
-  //     },
-  //     {
-  //       path: '/student/articles',
-  //       name: 'Articles',
-  //       component: () => import('../views/dashboard/ArticlesList.vue'),
-  //       meta: {
-  //         requireLogin: true
-  //       }
-  //     },
-  //     {
-  //       path: '/student/articles/:id',
-  //       name: 'ArticleStudentPage',
-  //       component: () => import('../views/dashboard/student/Article.vue'),
-  //       meta: {
-  //         requireLogin: true
-  //       }
-  //     },
-  //     {
-  //       path: '/student/articles/add',
-  //       name: 'StudentAddArticle',
-  //       component: () => import('../views/dashboard/student/AddArticle.vue'),
-  //       meta: {
-  //         requireLogin: true
-  //       }
-  //     },
-  //     {
-  //       path: '/student/my_articles',
-  //       name: 'StudentArticles',
-  //       component: () => import('../views/dashboard/student/MyArticles.vue'),
-  //       meta: {
-  //         requireLogin: true
-  //       }
-  //     },
-  //     {
-  //       path: '/student/my_articles/:id',
-  //       name: 'StudentArticle',
-  //       component: () => import('../views/dashboard/student/MyArticle.vue'),
-  //       meta: {
-  //         requireLogin: true
-  //       }
-  //     },
-  //     {
-  //       path: '/student/notes',
-  //       name: 'Notes',
-  //       component: () => import('../views/dashboard/student/NotesList.vue'),
-  //       meta: {
-  //         requireLogin: true
-  //       }
-  //     },
-  //     {
-  //       path: '/student/notes/:id',
-  //       name: 'Note',
-  //       component: () => import('../views/dashboard/student/Note.vue'),
-  //       meta: {
-  //         requireLogin: true
-  //       }
-  //     },
-  //     {
-  //       path: '/student/favourites',
-  //       name: 'Favourites',
-  //       component: () => import('../views/dashboard/Favourites.vue'),
-  //       meta: {
-  //         requireLogin: true
-  //       }
-  //     }
-  //   ]
-  // },
+  {
+    path: '/student',
+    component: StudentLayout,
+    children: [
+      {
+        path: '/student/me',
+        name: 'StudentProfile',
+        component: () => import('../views/dashboard/student/ProfilePage.vue'),
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: '/student/articles',
+        name: 'ArticlesPageStudent',
+        component: () => import('../views/dashboard/student/ArticlesList.vue'),
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: '/student/articles/:id',
+        name: 'ArticleStudentPage',
+        component: () => import('../views/dashboard/student/Article.vue'),
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: '/student/articles/add',
+        name: 'StudentAddArticle',
+        component: () => import('../views/dashboard/student/AddArticle.vue'),
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: '/student/my_articles',
+        name: 'StudentArticles',
+        component: () => import('../views/dashboard/student/MyArticles.vue'),
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: '/student/my_articles/:id',
+        name: 'StudentArticle',
+        component: () => import('../views/dashboard/student/MyArticle.vue'),
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: '/student/notes',
+        name: 'Notes',
+        component: () => import('../views/dashboard/student/NotesList.vue'),
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: '/student/notes/:id',
+        name: 'Note',
+        component: () => import('../views/dashboard/student/Note.vue'),
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: '/student/favourites',
+        name: 'Favourites',
+        component: () => import('../views/dashboard/Favourites.vue'),
+        meta: {
+          requireLogin: true
+        }
+      }
+    ]
+  },
   // {
   //   path: '/science',
   //   component: ScienceLayout,
