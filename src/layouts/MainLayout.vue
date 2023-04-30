@@ -83,6 +83,7 @@
     --text-color:#45666D;
     --text-extra: #81A3AA;
     --lines-color: #E0E0E0;
+    --danger: #F65151;
 }
 
 .dark-theme {
@@ -97,6 +98,7 @@
     --text-color:#EBFFFD;
     --text-extra: #81A3AA;
     --lines-color: #81A3AA;
+    --danger: #F65151;
 }
 </style>
   

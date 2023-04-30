@@ -2,7 +2,7 @@
     <div class="my-account-page">
         <div class="my-account__header">
             <h1 class="my-account__title">{{ $t('profileTitle') }}</h1>
-            <button @click="logout()" class="button is-danger">{{ $t('logOut') }}</button>
+            <button @click="logout()" class="logout-btn">{{ $t('logOut') }}</button>
         </div>
         <hr class="my-account__hr">
         <div class="my-account__content">
@@ -53,7 +53,7 @@
                                     <p class="subscription-author-role">{{ author.role == 'Преподаватель' ? $t('roleTeacher') : (author.role == 'СНО' ? $t('roleSSS') : $t('roleStudent')) }}</p>
                                 </div>
                                 <hr class="vertical-hr">
-                                <p class="delete-subscription-author">delete</p>
+                                <div class="delete-subscription-author"><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
                             </div>
                             <hr class="authors-subscription-hr">
                         </div>
@@ -75,7 +75,7 @@
                                     <p>{{ user.surname }} {{ user.name }} {{ user.patronymic }}</p>
                                 </div>
                                 <hr class="vertical-hr">
-                                <p class="my-account-delete-sss-user">delete</p>
+                                <p class="my-account-delete-sss-user"><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></p>
                             </div>
                             <hr class="my-account-sss-hr">
                         </div>
@@ -428,7 +428,12 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--text-color);
+}
+
+.delete-subscription-author svg, .my-account-delete-sss-user svg{
+    fill: var(--danger);
+    width: 24px;
+    height: auto;
 }
 
 .authors-subscription-hr, .my-account-sss-hr {
@@ -444,5 +449,16 @@ export default {
 .add-author-subscription svg, .my-account-sss-add-user svg{
     fill: var(--pages-color);
     transform: translateY(-20%);
+}
+
+.logout-btn {
+    background: var(--danger);
+    border-radius: 10px;
+    padding: 0px 16px;
+    font-size: 16px;
+    color: #FFFFFF;
+    border: none;
+    line-height: 40px;
+    height: 40px;
 }
 </style>

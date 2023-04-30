@@ -1,7 +1,7 @@
 <template>
     <div class="note-page">
         <div class="columns is-multiline">
-            <h1 class="title">{{ note.based_on_article }}</h1>
+            <h1 class="title">Конспект «{{ note.based_on_article }}»</h1>
         </div>
 
         <div class="column is-12">

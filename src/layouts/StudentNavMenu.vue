@@ -13,10 +13,10 @@
                 <svg class="feed-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M140 936q-24.75 0-42.375-17.625T80 876V216l67 67 66-67 67 67 67-67 66 67 67-67 67 67 66-67 67 67 67-67 66 67 67-67v660q0 24.75-17.625 42.375T820 936H140Zm0-60h310V596H140v280Zm370 0h310V766H510v110Zm0-170h310V596H510v110ZM140 536h680V416H140v120Z"/></svg>
                 <div class="item-text feed-item-text">{{ $t('feed') }}</div>
             </router-link>
-            <div class="menu-item my-notes-block">
+            <router-link :to="{name: 'Notes'}" class="menu-item my-notes-block" :class="current_item == 'Notes' ? 'active' : ''">
                 <svg class="my-article-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg>
-                <p class="item-text my-article-item-text">{{ $t('myNotes') }}</p>
-            </div>
+                <div class="item-text my-article-item-text">{{ $t('myNotes') }}</div>
+            </router-link>
             <div class="menu-item check-articles-block">
                 <svg class="check-articles-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M517 525 353 361l43-43 121 122 234-233 42 41-276 277Zm49 469-311-89v57H40V568h309l255 96q27 10 45.5 32.5T668 761h114q42 0 70 30t28 81v26l-314 96Zm-466-92h94V628h-94v274Zm462 30 256-78q-6-19-15-26t-21-7H575q-30 0-55.5-4T471 806l-81-25 22-58 73 24q25 8 47.5 11t71.5 3q0-12-4.5-23.5T584 721l-245-93h-84v214l307 90ZM194 765Zm410-4Zm-410 4Zm61 0Z"/></svg>
                 <p class="item-text check-articles-item-text">{{ $t('myArticles') }}</p>

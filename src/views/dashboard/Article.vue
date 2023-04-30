@@ -63,7 +63,6 @@ async function getArticle() {
             article.publish_date = response.data.publish_date
             date = (new Date(Date.parse(article.publish_date.slice(0,19)))).toLocaleString('en-GB')
             let text = JSON.parse(article.text)
-            console.log(text)
             Object.entries(text).forEach(entry => {
                 const [key, value] = entry
                 let place = document.getElementById('articleText')

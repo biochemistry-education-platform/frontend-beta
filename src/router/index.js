@@ -49,6 +49,22 @@ const routes = [
           requireLogin: true
         }
       },
+      {
+        path: '/notes',
+        name: 'Notes',
+        component: () => import('../views/dashboard/NotesList.vue'),
+        meta: {
+          requireLogin: true
+        }
+      },
+      {
+        path: '/notes/:id',
+        name: 'Note',
+        component: () => import('../views/dashboard/Note.vue'),
+        meta: {
+          requireLogin: true
+        }
+      },
       // {
       //   path: '/teacher/articles/add',
       //   name: 'TeacherAddArticle',
