@@ -1,17 +1,17 @@
 <template>
     <div class="my-account-page">
         <div class="my-account__header">
-            <h1 class="my-account__title">My account</h1>
-            <button @click="logout()" class="button is-danger">Log out</button>
+            <h1 class="my-account__title">{{ $t('profileTitle') }}</h1>
+            <button @click="logout()" class="button is-danger">{{ $t('logOut') }}</button>
         </div>
         <hr class="my-account__hr">
         <div class="my-account__content">
             <div class="my-account__info">
                 <img class="my-account__img" src="@/assets/icons/profile_img.png">
                 <h2 class="my-account-name">{{ $store.state.user.surname }} {{ $store.state.user.name }} {{ $store.state.user.patronymic }}</h2>
-                <p class="my-account-role">{{ $store.state.user.role }}</p>
+                <p class="my-account-role">{{ $store.state.user.role == 'Преподаватель' ? $t('roleTeacher') : ($store.state.user.role == 'СНО' ? $t('roleSSS') : $t('roleStudent')) }}</p>
                 <p class="my-account-mail">{{ $store.state.user.username }}</p>
-                <button class="my-account-password-btn">Изменить пароль</button>
+                <button class="my-account-password-btn">{{ $t('changePassword') }}</button>
                 <hr class="my-account-info-hr">
                 <div class="my-account-channels">
                     <div class="my-account-channel">
@@ -30,7 +30,7 @@
             </div>
             <div class="my-account__subscriptions">                    
                 <div class="tags-subscriptions">
-                    <h2 class="subscription-title">Подписки на теги</h2>
+                    <h2 class="subscription-title">{{ $t('tagsSubscriptions') }}</h2>
                     <div class="tags-subscriptions-content">
                         <div v-for="tag, index in tags" :key="index" class="subscription-tag"><p>{{ tag }}</p><svg class="delete-tag-sub-btn" xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 96 960 960" width="18"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
                         <svg class="add-tag-subscription" xmlns="http://www.w3.org/2000/svg" height="27" viewBox="0 96 960 960" width="27"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="authors-subscriptions">
-                    <h2 class="subscription-title">Подписки на авторов</h2>
+                    <h2 class="subscription-title">{{ $t('authorsSubscriptions') }}</h2>
                     <div class="authors-subscriptions-content">
                         <div v-for="author, index in authors" :key="index">
                             <div class="subscription-author">
@@ -50,7 +50,7 @@
                                         <p>{{ author.surname }} {{ author.name }} {{ author.patronymic }}</p>
                                     </div>
                                     
-                                    <p class="subscription-author-role">{{ author.role }}</p>
+                                    <p class="subscription-author-role">{{ author.role == 'Преподаватель' ? $t('roleTeacher') : (author.role == 'СНО' ? $t('roleSSS') : $t('roleStudent')) }}</p>
                                 </div>
                                 <hr class="vertical-hr">
                                 <p class="delete-subscription-author">delete</p>
@@ -64,15 +64,15 @@
                 </div>
                 
                 <div v-if="this.$store.state.user.role == 'Преподаватель'" class="my-account-sss">
-                    <h2 class="my-account-sss-title">Председатели СНО</h2>
+                    <h2 class="my-account-sss-title">{{ $t('sssLeads') }}</h2>
                     <div class="my-account-sss-content">
-                        <div v-for="author, index in authors" :key="index">
+                        <div v-for="user, index in sss" :key="index">
                             <div class="my-account-sss-user">
                                 <p class="my-account-sss-user-number">{{ index + 1 }}</p>
                                 <hr class="vertical-hr">
                                 <div class="my-account-sss-user-name">
                                     <img src="@/assets/icons/profile_img.png">
-                                    <p>{{ author.surname }} {{ author.name }} {{ author.patronymic }}</p>
+                                    <p>{{ user.surname }} {{ user.name }} {{ user.patronymic }}</p>
                                 </div>
                                 <hr class="vertical-hr">
                                 <p class="my-account-delete-sss-user">delete</p>
@@ -118,7 +118,23 @@ export default {
                 surname: 'Фамилия',
                 name: 'Имя',
                 patronymic: 'Отчество',
-                role: 'Студент'}]
+                role: 'Студент'
+            }],
+            sss: [{
+                surname: 'Иванов',
+                name: 'Иван',
+                patronymic: 'Иванович',
+            },
+            {
+                surname: 'Константинопольская',
+                name: 'Анастасия',
+                patronymic: 'Александровна',
+            },
+            {
+                surname: 'Фамилия',
+                name: 'Имя',
+                patronymic: 'Отчество',
+            }]
         }
     },
     methods: {

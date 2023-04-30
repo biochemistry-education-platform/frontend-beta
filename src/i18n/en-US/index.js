@@ -20,4 +20,19 @@ export default {
     toLogIn: 'Log in',
     logIn: 'Log in',
     dontSigned: "Don't have an account? ",
+
+    profileTitle: 'My account',
+    logOut: 'Log out',
+    changePassword: 'Change password',
+    tagsSubscriptions:'Tags subscriptions',
+    authorsSubscriptions:'Authors subscriptions',
+    sssLeads: 'Responsible for SSS',
+    roleTeacher: 'Teacher',
+    roleStudent: 'Student',
+    roleSSS: 'Responsible for SSS',
+
+    toFavorites: 'Add to favorites',
+    toNote: 'To the note',
+    download: 'Download',
+    writeToNote: 'Write to the note'
 }

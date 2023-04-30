@@ -9,23 +9,21 @@
                 <div><img class="article-author-img" src="@/assets/icons/profile_img.png"></div>
                 <div class="article-author-info">
                     <p class="article-author-name">{{ article.author }}</p>
-                    <p class="article-author-extra">{{ role }}</p>
+                    <p class="article-author-extra">{{ role == 'Преподаватель' ? $t('roleTeacher') : (role == 'СНО' ? $t('roleSSS') : $t('roleStudent')) }}</p>
                     <p class="article-author-extra">{{ date }}</p>
                 </div>
             </div>
 
             <div class="article-actions">
-                <div class="article-action"><p>В избранное</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg></div>
-                <div v-if="this.$store.state.user.role != 'Преподаватель'" class="article-action"><p>К конспекту</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg></div>
-                <div class="article-action" v-on:click="getPdf"><p>Скачать</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M220 896q-24 0-42-18t-18-42V693h60v143h520V693h60v143q0 24-18 42t-42 18H220Zm260-153L287 550l43-43 120 120V256h60v371l120-120 43 43-193 193Z"/></svg></div>
+                <div class="article-action"><p>{{ $t('toFavorites') }}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg></div>
+                <div v-if="this.$store.state.user.role != 'Преподаватель'" class="article-action"><p>{{ $t('toNote') }}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg></div>
+                <div class="article-action" v-on:click="getPdf"><p>{{ $t('download')}}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M220 896q-24 0-42-18t-18-42V693h60v143h520V693h60v143q0 24-18 42t-42 18H220Zm260-153L287 550l43-43 120 120V256h60v371l120-120 43 43-193 193Z"/></svg></div>
             </div>
         </div>
         
         <hr>
         <div class="article-text" id="articleText" @mouseup="showButton"></div>
-        <button v-show="isSelected" id="add-selected-text-btn" v-on:click="getSelectedText">
-            <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
-        </button>
+        <button v-show="isSelected" id="add-selected-text-btn" v-on:click="getSelectedText">{{ $t('writeToNote') }}</button>
     </div>
 </template>
 
@@ -340,18 +338,18 @@ hr {
 #add-selected-text-btn {
     display: flex;
     position: absolute;
-    background: #66D9D3;
+    background: var(--menu-accent);
     border-radius: 6px;
     z-index: 10;
-    padding: 4px;
-    width: 28px;
-    justify-content: center;
-    align-items: center;
+    padding: 4px 12px;
+    color: var(--card-color);
+    font-size: 14px;
     border: none;
 }
 
 #add-selected-text-btn:hover {
     cursor: pointer;
+    background: var(--menu-accent-darker);
 }
 
 #add-selected-text-btn svg {

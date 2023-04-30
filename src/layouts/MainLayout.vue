@@ -75,6 +75,7 @@
     --background:#F5F5F5;
     --menu-background: #EBFFFD;
     --menu-accent: #66D9D3;
+    --menu-accent-darker: #44afaa;
     --card-color: #FFFFFF;
     --pages-color: #66D9D3; 
     --tags-color: #CDFFFA;
@@ -88,6 +89,7 @@
     --background:#1C464F;
     --menu-background: #185461;
     --menu-accent: #66D9D3;
+    --menu-accent-darker: #44afaa;
     --card-color: #34565D;
     --pages-color: #66D9D3; 
     --tags-color: #34D9D3;
