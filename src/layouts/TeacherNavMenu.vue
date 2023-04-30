@@ -7,11 +7,11 @@
         <div class="menu-items">
             <div class="menu-item profile-block">
                 <svg class="profile-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M480 575q-66 0-108-42t-42-108q0-66 42-108t108-42q66 0 108 42t42 108q0 66-42 108t-108 42ZM160 896v-94q0-38 19-65t49-41q67-30 128.5-45T480 636q62 0 123 15.5t127.921 44.694q31.301 14.126 50.19 40.966Q800 764 800 802v94H160Zm60-60h520v-34q0-16-9.5-30.5T707 750q-64-31-117-42.5T480 696q-57 0-111 11.5T252 750q-14 7-23 21.5t-9 30.5v34Zm260-321q39 0 64.5-25.5T570 425q0-39-25.5-64.5T480 335q-39 0-64.5 25.5T390 425q0 39 25.5 64.5T480 515Zm0-90Zm0 411Z"/></svg>
-                <router-link :to="{name: 'TeacherProfile'}" class="item-text profile-item-text">{{ $t('profile') }}</router-link>
+                <router-link :to="{name: 'Profile'}" class="item-text profile-item-text">{{ $t('profile') }}</router-link>
             </div>
             <div class="menu-item feed-block active">
                 <svg class="feed-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M140 936q-24.75 0-42.375-17.625T80 876V216l67 67 66-67 67 67 67-67 66 67 67-67 67 67 66-67 67 67 67-67 66 67 67-67v660q0 24.75-17.625 42.375T820 936H140Zm0-60h310V596H140v280Zm370 0h310V766H510v110Zm0-170h310V596H510v110ZM140 536h680V416H140v120Z"/></svg>
-                <router-link :to="{name: 'ArticlesPageTeacher'}" class="item-text feed-item-text">{{ $t('feed') }}</router-link>
+                <router-link :to="{name: 'Articles'}" class="item-text feed-item-text">{{ $t('feed') }}</router-link>
             </div>
             <div class="menu-item my-articles-block">
                 <svg class="my-article-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg>
@@ -23,7 +23,8 @@
             </div>
             <div class="menu-item create-article-block">
                 <svg class="create-article-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
-                <router-link :to="{name: 'TeacherAddArticle'}" class="item-text create-article-item-text">{{ $t('createArticle') }}</router-link>
+                <!-- <router-link :to="{name: 'TeacherAddArticle'}" class="item-text create-article-item-text">{{ $t('createArticle') }}</router-link> -->
+                <p class="item-text create-article-item-text">{{ $t('createArticle') }}</p>
             </div>
             <div class="menu-item favorite-block">
                 <svg class="favorite-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg>
@@ -107,13 +108,13 @@ function switchLanguage () {
 .menu-items {
     display: flex;
     flex-direction: column;
-    margin-top: calc((100vh - 450px - 240px - 40px) / 7);
+    margin-top: calc((100vh - 149px - (97px * 6)) / 7);
     align-items: center;
     text-align: center;
 }
 
 .menu-item{
-    margin-bottom: calc((100vh - 450px - 240px - 40px) / 7);
+    margin-bottom: calc((100vh - 149px - (97px * 6)) / 7);
     width: calc(100% - 32px);
     padding-top: 20px;
     padding-bottom: 20px;
@@ -123,6 +124,7 @@ function switchLanguage () {
 .menu-item.active {
     background: var(--menu-accent);
     border-radius: 20px;
+    color: var(--card-color);
 }
 
 .menu-item.active .item-text:visited, .item-text:link {

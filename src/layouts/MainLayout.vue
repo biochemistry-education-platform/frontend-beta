@@ -1,6 +1,8 @@
 <template>
     <div :class="theme === 'light' ? 'light-theme' : 'dark-theme'">
-        <NavMenu @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <StudentNavMenu v-if="this.$store.state.user.role == 'Студент'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <SSSNavMenu v-if="this.$store.state.user.role == 'СНО'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <TeacherNavMenu v-if="this.$store.state.user.role == 'Преподаватель'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
         <div id="wrapper">  
             <section>
                 <router-view/>
@@ -11,7 +13,9 @@
 </template>
   
 <script setup>
-    import NavMenu from '@/layouts/teacher/TeacherNavMenu.vue'
+    import TeacherNavMenu from './TeacherNavMenu.vue'
+    import StudentNavMenu from './StudentNavMenu.vue'
+    import SSSNavMenu from './SSSNavMenu.vue'
     import { ref, onMounted, watchEffect } from 'vue'
     import { useI18n } from 'vue-i18n'
 

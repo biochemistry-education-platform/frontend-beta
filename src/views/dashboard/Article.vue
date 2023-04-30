@@ -16,7 +16,7 @@
 
             <div class="article-actions">
                 <div class="article-action"><p>В избранное</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg></div>
-                <div class="article-action"><p>К конспекту</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg></div>
+                <div v-if="this.$store.state.user.role != 'Преподаватель'" class="article-action"><p>К конспекту</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg></div>
                 <div class="article-action" v-on:click="getPdf"><p>Скачать</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M220 896q-24 0-42-18t-18-42V693h60v143h520V693h60v143q0 24-18 42t-42 18H220Zm260-153L287 550l43-43 120 120V256h60v371l120-120 43 43-193 193Z"/></svg></div>
             </div>
         </div>
@@ -31,7 +31,7 @@
 
 <script>
 export default {
-    name: 'ArticleStudentPage',
+    name: 'Article',
 }
 </script>
 
@@ -39,6 +39,7 @@ export default {
 import axios from 'axios'
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import store from '@/store'
 
 const fileDownload = require('js-file-download')
 let isSelected = ref(false)
@@ -155,7 +156,7 @@ function getPdf(event) {
 
 async function showButton() {
     let select = window.getSelection()
-    if (select != '') {
+    if (select != '' && store.state.user.role != 'Преподаватель') {
         await (isSelected = true)
         let rect = select.getRangeAt(0).getBoundingClientRect()
         let menu = document.getElementById('add-selected-text-btn')

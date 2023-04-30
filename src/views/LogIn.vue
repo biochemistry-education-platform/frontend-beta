@@ -62,19 +62,34 @@ export default {
                     }
                 })
             
-            axios
+            await axios
                 .get('/api/v1/users/me')
                 .then(response => {
                     this.$store.commit('setUser', {'username': response.data.username, 'id': response.data.id})
                     localStorage.setItem('username', response.data.username)
                     localStorage.setItem('userid', response.data.id)
-
-                    this.$router.push('/teacher/articles')
                 })
                 .catch(error => {
                     console.log(JSON.stringify(error))
                 })
-        }   
+
+            axios
+                .get('/api/v1/clients')
+                .then(response => {
+                    for (const property in response.data) {
+                        if (response.data[property].email == this.$store.state.user.username) {
+                            this.$store.state.user.surname = response.data[property].surname
+                            this.$store.state.user.name = response.data[property].name
+                            this.$store.state.user.patronymic = response.data[property].patronymic
+                            this.$store.state.user.role = response.data[property].role
+                        }
+                    }
+                    this.$router.push('/articles')
+                })
+                .catch(error => {
+                    console.log(JSON.stringify(error))
+                })
+        }  
     }
 }
 </script>

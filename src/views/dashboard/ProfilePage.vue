@@ -34,10 +34,9 @@
                     <div class="tags-subscriptions-content">
                         <div v-for="tag, index in tags" :key="index" class="subscription-tag"><p>{{ tag }}</p><svg class="delete-tag-sub-btn" xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 96 960 960" width="18"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
                         <svg class="add-tag-subscription" xmlns="http://www.w3.org/2000/svg" height="27" viewBox="0 96 960 960" width="27"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
-                    </div>
-
-                    
+                    </div>    
                 </div>
+
                 <div class="authors-subscriptions">
                     <h2 class="subscription-title">Подписки на авторов</h2>
                     <div class="authors-subscriptions-content">
@@ -60,11 +59,33 @@
                         </div>
                         <div class="add-author-subscription">
                             <svg xmlns="http://www.w3.org/2000/svg" height="36" viewBox="0 96 960 960" width="36"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
+                        </div>  
+                    </div>
+                </div>
+                
+                <div v-if="this.$store.state.user.role == 'Преподаватель'" class="my-account-sss">
+                    <h2 class="my-account-sss-title">Председатели СНО</h2>
+                    <div class="my-account-sss-content">
+                        <div v-for="author, index in authors" :key="index">
+                            <div class="my-account-sss-user">
+                                <p class="my-account-sss-user-number">{{ index + 1 }}</p>
+                                <hr class="vertical-hr">
+                                <div class="my-account-sss-user-name">
+                                    <img src="@/assets/icons/profile_img.png">
+                                    <p>{{ author.surname }} {{ author.name }} {{ author.patronymic }}</p>
+                                </div>
+                                <hr class="vertical-hr">
+                                <p class="my-account-delete-sss-user">delete</p>
+                            </div>
+                            <hr class="my-account-sss-hr">
                         </div>
-                       
+                        <div class="my-account-sss-add-user">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="36" viewBox="0 96 960 960" width="36"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
+                        </div>  
                     </div>
                 </div>
             </div>
+            
         </div>
     </div>
 </template>
@@ -74,7 +95,7 @@ import axios from 'axios'
 import store from '@/store'
 
 export default {
-    name: 'StudentProfile',
+    name: 'Profile',
     async mounted() {
         await this.getMyInfo()
     },
@@ -110,7 +131,7 @@ export default {
                     localStorage.removeItem('userid')
                     localStorage.removeItem('token')
                     this.$store.commit('removeToken')
-                    this.$router.push('/')
+                    this.$router.push('/log-in')
                 })
                 .catch(error => {
                         if (error.response) {
@@ -165,7 +186,7 @@ export default {
     font-weight: 500;
 }
 
-.my-account__hr {
+.my-account-info-hr, .my-account__hr {
     background: var(--lines-color);
     height: 2px;
     width: 80%;
@@ -174,6 +195,7 @@ export default {
 
 .my-account__content {
     width: 80%;
+    height: calc(100vh - 170px);
     margin: 40px auto;
     display: flex;
     flex-direction: row;
@@ -181,6 +203,7 @@ export default {
 
 .my-account__info {
     width: 500px;
+    height: 628px;
     background: var(--card-color);
     box-shadow: 0px 3.2375px 3.2375px rgba(0, 0, 0, 0.25);
     display: flex;
@@ -265,19 +288,29 @@ export default {
 
 .my-account__subscriptions {
     width: calc(100% - 500px - 40px);
+    margin-left: 40px;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
-.subscription-title {
+.my-account__subscriptions::-webkit-scrollbar {
+  display: none;
+}
+ .my-account__subscriptions {
+  scrollbar-width: none;
+}
+
+.subscription-title, .my-account-sss-title {
     font-size: 28px;
     color: var(--text-color);
     padding: 20px 0 0 40px;
 }
 
-.tags-subscriptions, .authors-subscriptions {
+.tags-subscriptions, .authors-subscriptions, .my-account-sss {
     width: 100%;
     background: var(--card-color);
     box-shadow: 0px 3.2375px 3.2375px rgba(0, 0, 0, 0.25);
-    margin-left: 40px;
     margin-bottom: 40px;
 }
 
@@ -308,18 +341,18 @@ export default {
 .add-tag-subscription {
     fill: var(--pages-color);
 }
-.authors-subscriptions-content {
+.authors-subscriptions-content, .my-account-sss-content {
     width: calc(100% - 80px);
     margin: auto;
     padding-top: 20px;
 }
 
-.subscription-author {
+.subscription-author, .my-account-sss-user {
     display: flex;
     flex-direction: row;
 }
 
-.subscription-author-number {
+.subscription-author-number, .my-account-sss-user-number {
     width: 80px;
     display: flex;
     justify-content: center;
@@ -352,7 +385,18 @@ export default {
     align-items: center;
 }
 
-.subscription-author-name img {
+.my-account-sss-user-name {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    justify-content: flex-start;
+    padding: 0 34px 0 12px;
+    align-items: center;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.subscription-author-name img, .my-account-sss-user-name img{
     width: 40px;
     height: 40px;
     margin-right: 12px;
@@ -363,7 +407,7 @@ export default {
     color: var(--text-extra);
 }
 
-.delete-subscription-author {
+.delete-subscription-author, .my-account-delete-sss-user {
     width: 80px;
     display: flex;
     justify-content: center;
@@ -371,17 +415,17 @@ export default {
     color: var(--text-color);
 }
 
-.authors-subscription-hr {
+.authors-subscription-hr, .my-account-sss-hr {
     width: 100%;
     height: 1px;
     background: var(--lines-color);
 }
 
-.add-author-subscription {
+.add-author-subscription, .my-account-sss-add-user {
     text-align: center;
 }
 
-.add-author-subscription svg{
+.add-author-subscription svg, .my-account-sss-add-user svg{
     fill: var(--pages-color);
     transform: translateY(-20%);
 }

@@ -2,6 +2,7 @@ export default {
     profile: 'Profile',    
     feed: 'Feed',
     myArticles: 'My articles',
+    myNotes: 'My notes',
     forChecking: 'For checking',
     createArticle: 'Create article',
     favorites: 'Favorites',

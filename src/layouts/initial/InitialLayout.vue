@@ -81,6 +81,7 @@
     --background:#F5F5F5;
     --menu-background: #EBFFFD;
     --menu-accent: #66D9D3;
+    --menu-accent-darker: #44afaa;
     --card-color: #FFFFFF;
     --pages-color: #66D9D3; 
     --tags-color: #CDFFFA;
@@ -94,6 +95,7 @@
     --background:#1C464F;
     --menu-background: #185461;
     --menu-accent: #66D9D3;
+    --menu-accent-darker: #44afaa;
     --card-color: #34565D;
     --pages-color: #66D9D3; 
     --tags-color: #34D9D3;
@@ -125,7 +127,7 @@
     font-size: 28px;
     color: var(--text-color);
     text-align: center;
-    padding-bottom: 20px;
+    padding-bottom: 30px;
     font-weight: 500;
 }
 
@@ -169,17 +171,24 @@
 
 .initial-btn {
     width: 400px;
-    height: 44px;
+    height: 60px;
     color: var(--card-color);
     background: var(--menu-accent);
-    font-size: 20px;
+    font-size: 24px;
     border: none;
     border-radius: 16px;    
     margin-bottom: 12px;
     text-align: center;
-    line-height: 20px;
-    padding: 12px 0;
+    line-height: 56px;
+    transition: 0.3s;
+    margin-top: 24px;
 }
+
+.initial-btn:hover{
+    cursor: pointer;
+    background: var(--menu-accent-darker);
+}
+
 .initial-link {
     font-size: 16px;
     color: var(--text-extra);

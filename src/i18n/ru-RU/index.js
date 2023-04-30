@@ -2,6 +2,7 @@ export default {
     profile: 'Кабинет',    
     feed: 'Лента',
     myArticles: 'Мои статьи',
+    myNotes: 'Мои конспекты',
     forChecking: 'На проверку',
     createArticle: 'Создать статью',
     favorites: 'Избранное',
