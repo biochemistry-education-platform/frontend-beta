@@ -32,7 +32,7 @@
 
 <script>
 import gql from 'graphql-tag'
-import apolloClient from '@/vue-apollo'
+import { apolloClient } from '@/vue-apollo'
 
 
 export default {
