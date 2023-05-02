@@ -1,6 +1,4 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core'
-import Vue from 'vue'
-import VueApollo from 'vue-apollo'
 
 // HTTP connection to the API
 const httpLink = createHttpLink({

@@ -32,26 +32,10 @@
 
 <script>
 import gql from 'graphql-tag'
-import { ApolloClient } from 'apollo-boost'
-import { HttpLink } from 'apollo-link-http'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import VueApollo from 'vue-apollo'
+import apolloClient from '@/vue-apollo'
 
-const httpLink = new HttpLink({
-  uri: 'https://adselina20.fvds.ru/graphql/',
-})
-
-const apolloClient = new ApolloClient({
-  link: httpLink,
-  cache: new InMemoryCache(),
-})
-
-const apolloProvider = new VueApollo({
-  defaultClient: apolloClient,
-})
 
 export default {
-  apolloProvider,
 
   data() {
     return {
