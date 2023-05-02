@@ -66,7 +66,7 @@ export default {
 
   methods: {
     addUser() {
-      this.$apollo
+        apolloClient
         .mutate({
           mutation: gql`
             mutation AddUser($email: String!, $username: String!, $password: String!, $role: String!) {
