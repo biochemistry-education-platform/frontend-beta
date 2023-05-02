@@ -2,10 +2,10 @@
     <div class="initial-page">
         <div class="initial-form">
             <h1 class="initial-title">{{ $t('signUp') }}</h1>
-            <form @submit.prevent="create_user">
+            <form @submit.prevent="addUser">
                 <div class="initial-field">
                     <label class="initial-field-label">{{ $t('email') }}</label>
-                    <input type="email" name="username" class="initial-input" v-model="username" placeholder="example@mail.ru">
+                    <input type="email" name="email" class="initial-input" v-model="email" placeholder="example@mail.ru">
                 </div>
                 <div class="initial-field">
                     <label class="initial-field-label">{{ $t('surname') }}</label>
@@ -31,178 +31,69 @@
 </template>
 
 <script>
-import axios from 'axios'
 import gql from 'graphql-tag'
+import { ApolloClient } from 'apollo-boost'
+import { HttpLink } from 'apollo-link-http'
+import { InMemoryCache } from 'apollo-cache-inmemory'
+import VueApollo from 'vue-apollo'
 
-const UserCreate = gql`mutation addUser($email:String, $username: String, $password: String, $role:String) {
-      addUser(email: $email, username: $username, password: $password, role: $role) {
-        user {
-            id
-            email
-            username
-            password
-            role
-        }
-        ok
-    }
- }`
+const httpLink = new HttpLink({
+  uri: 'https://adselina20.fvds.ru/graphql/',
+})
+
+const apolloClient = new ApolloClient({
+  link: httpLink,
+  cache: new InMemoryCache(),
+})
+
+const apolloProvider = new VueApollo({
+  defaultClient: apolloClient,
+})
 
 export default {
-    name: 'SignUp',
-    data() {
-        return {
-            username: '',
-            surname: '',
-            name: '',
-            password: '',
-            student: true,
-            errors: []
-        }
-    },
-    methods: {
-        // async submitForm(e) {
-        //     const formData = {
-        //         username: this.username,
-        //         surname: this.surname,
-        //         name: this.name,
-        //         patronymic: this.patronymic,
-        //         password: this.password,
-        //         student: this.student
-        //     }
+  apolloProvider,
 
-        //     const client = {
-        //         email: this.username, 
-        //         surname: this.surname,
-        //         name: this.name,
-        //         patronymic: this.patronymic,
-        //         role: this.student === true ? 'Студент' : 'Преподаватель'
-        //     }
-
-        //     await axios
-        //         .post('/api/v1/users/', formData)
-        //         .then(response => {
-        //             console.log(response)
-        //         })
-        //         .catch(error => {
-        //             if (error.response) {
-        //                 for (const property in error.response.data) {
-        //                     this.errors.push(`${property}: ${error.response.data[property]}`)
-        //                 }
-        //                 console.log(JSON.stringify(error.response.data))
-        //             } else if (error.message) {
-        //                 console.log(JSON.stringify(error.message))
-        //             } else {
-        //                 console.log(JSON.stringify(error))
-        //             }
-        //         })
-            
-        //     axios.defaults.headers.common["Authorization"] = ""
-
-        //     localStorage.removeItem('token')
-
-        //     const logInData = {
-        //         username: this.username,
-        //         password: this.password
-        //     }
-
-        //     await axios
-        //         .post('/api/v1/token/login/', logInData)
-        //         .then(response => {
-        //             const token = response.data.auth_token
-        //             this.$store.commit('setToken', token)
-        //             axios.defaults.headers.common["Authorization"] = "Token " + token
-        //             localStorage.setItem('token', token)
-        //         })
-        //         .catch(error => {
-        //             if (error.response) {
-        //                 for (const property in error.response.data) {
-        //                     this.errors.push(`${property}: ${error.response.data[property]}`)
-        //                 }
-        //                 console.log(JSON.stringify(error.response.data))
-        //             } else if (error.message) {
-        //                 console.log(JSON.stringify(error.message))
-        //             } else {
-        //                 console.log(JSON.stringify(error))
-        //             }
-        //         })
-                
-        //     await axios
-        //         .get('/api/v1/users/me')
-        //         .then(response => {
-        //             this.$store.commit('setUser', {'username': response.data.username, 'id': response.data.id})                    
-        //             localStorage.setItem('username', response.data.username)
-        //             localStorage.setItem('userid', response.data.id)
-        //         })
-        //         .catch(error => {
-        //             console.log(JSON.stringify(error))
-        //         })
-
-        //     axios
-        //         .post('/api/v1/clients/', client)
-        //         .then(response => {
-        //             toast({
-        //                 message: 'The client has been created',
-        //                 type: 'is-success',
-        //                 dismissible: true,
-        //                 pauseOnHover: true,
-        //                 duration: 2000,
-        //                 position: 'top-right',
-        //             })
-
-        //         })
-        //         .catch(error => {
-        //             console.log(JSON.stringify(error))
-        //         })
-            
-        //     this.$router.push('/dashboard/articles')
-        // },
-
-        async create_user() {
-            const email = this.username
-            const username = `${this.surname} ${this.name}`
-            const password = this.password
-            const role = this.student === true ? 'Student' : 'Teacher'
-
-            // Call to the graphql mutation
-            let data = await this.$apollo.mutate({
-                // Query
-                mutation: UserCreate,
-                // Parameters
-                variables: {
-                    email: email,
-                    username: username,
-                    password: password,
-                    role: role,
-                },
-                // update: (store, { data: { addUser } }) => {
-                //     // Add to All users list
-                //     const data = store.readQuery({ query: allUsers })
-                //     data.users.push(addUser.user)
-                //     store.writeQuery({ query: allUsers, data })
-                // },
-                // optimisticResponse: {
-                //       __typename: 'Mutation',
-                //       createTask: {
-                //         __typename: 'CreateTask',
-                //         task: {
-                //           __typename: "TaskType",
-                //           id: -1,
-                //           isDone: false,
-                //           name: name,
-                //           description: description                 
-                //         },
-                //         ok: false
-                //       }
-                // },
-            })
-            // var t = data.data.addUser.user
-            // console.log('Added: ' , t)
-            this.username = ''
-            this.surname = ''
-            this.name = ''
-            this.password = ''
-            this.student = true
-        }
+  data() {
+    return {
+      email: '',
+      surname: '',
+      name: '',
+      username: '',
+      password: '',
+      role: true,
     }
+  },
+
+  methods: {
+    addUser() {
+      this.$apollo
+        .mutate({
+          mutation: gql`
+            mutation AddUser($email: String!, $username: String!, $password: String!, $role: String!) {
+              addUser(email: $email, username: $username, password: $password, role: $role) {
+                user {
+                  email
+                  id
+                  password
+                  username
+                }
+              }
+            }
+          `,
+          variables: {
+            email: this.email,
+            username: `${this.surname} ${this.name}`,
+            password: this.password,
+            role: this.role === true ? 'Student' : 'Teacher',
+          },
+        })
+        .then(result => {
+          console.log(result)
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+  },
 }
 </script>
