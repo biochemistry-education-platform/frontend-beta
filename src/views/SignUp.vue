@@ -34,13 +34,12 @@
 import axios from 'axios'
 import gql from 'graphql-tag'
 
-const UserCreate = gql`mutation createUser($username:String, $surname: String, $name:String, $password: String, $role:String) {
-      createUser(username: $username, surname: $surname, name: $name, password: $password, role: $role) {
+const UserCreate = gql`mutation addUser($email:String, $username: String, $password: String, $role:String) {
+      addUser(email: $email, username: $username, password: $password, role: $role) {
         user {
             id
+            email
             username
-            surname
-            name
             password
             role
         }
@@ -160,10 +159,9 @@ export default {
 
         async create_user() {
             const email = this.username
-            const surname = this.surname
-            const name = this.name
+            const username = `${this.surname} ${this.name}`
             const password = this.password
-            const role = this.student === true ? 'student' : 'teacher'
+            const role = this.student === true ? 'Student' : 'Teacher'
 
             // Call to the graphql mutation
             let data = await this.$apollo.mutate({
@@ -171,18 +169,17 @@ export default {
                 mutation: UserCreate,
                 // Parameters
                 variables: {
-                    username: email,
-                    surname: surname,
-                    name: name,
+                    email: email,
+                    username: username,
                     password: password,
                     role: role,
                 },
-                update: (store, { data: { createUser } }) => {
-                    // Add to All users list
-                    const data = store.readQuery({ query: UserQuery })
-                    data.users.push(createUser.user)
-                    store.writeQuery({ query: UserQuery, data })
-                },
+                // update: (store, { data: { addUser } }) => {
+                //     // Add to All users list
+                //     const data = store.readQuery({ query: allUsers })
+                //     data.users.push(addUser.user)
+                //     store.writeQuery({ query: allUsers, data })
+                // },
                 // optimisticResponse: {
                 //       __typename: 'Mutation',
                 //       createTask: {
@@ -198,8 +195,8 @@ export default {
                 //       }
                 // },
             })
-            var t = data.data.createUser.user
-            console.log('Added: ' , t)
+            // var t = data.data.addUser.user
+            // console.log('Added: ' , t)
             this.username = ''
             this.surname = ''
             this.name = ''
