@@ -32,6 +32,7 @@
 
 <script>
 import axios from 'axios'
+import gql from 'graphql-tag'
 
 const UserCreate = gql`mutation createUser($username:String, $surname: String, $name:String, $password: String, $role:String) {
       createUser(username: $username, surname: $surname, name: $name, password: $password, role: $role) {
