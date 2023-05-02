@@ -6,14 +6,14 @@ import store from '../store'
 
 const routes = [
   {
+    path: '/',
+    name: 'SignUp',
+    component: () => import('../views/SignUp.vue')
+  },
+  {
     path: '/initial',
     component: InitialLayout,
     children: [
-      {
-        path: '/sign-up',
-        name: 'SignUp',
-        component: () => import('../views/SignUp.vue')
-      },
       {
         path: '/log-in',
         name: 'LogIn',
