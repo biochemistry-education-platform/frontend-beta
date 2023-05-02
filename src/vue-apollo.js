@@ -1,4 +1,6 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core'
+import Vue from 'vue'
+import VueApollo from 'vue-apollo'
 
 // HTTP connection to the API
 const httpLink = createHttpLink({
@@ -10,7 +12,16 @@ const httpLink = createHttpLink({
 const cache = new InMemoryCache()
 
 // Create the apollo client
-export const apolloClient = new ApolloClient({
+const apolloClient = new ApolloClient({
     link: httpLink,
     cache,
 })
+
+const apolloProvider = new VueApollo({
+    defaultClient: apolloClient,
+})
+  
+  // Install the vue plugin
+Vue.use(VueApollo)
+  
+export default apolloProvider
