@@ -34,5 +34,10 @@ export default {
     toFavorites: 'В избранное',
     toNote: 'К конспекту',
     download: 'Скачать',
-    writeToNote: 'Записать в конспект'
+    writeToNote: 'Записать в конспект',
+
+    articleTitle: 'Название статьи',
+    tags: 'Теги',
+    tag: 'Тег',
+    addArticlePlaceholder: 'Текст статьи. Для форматирования выделите текст и выберите нужный вариант во всплывающем меню.'
 }

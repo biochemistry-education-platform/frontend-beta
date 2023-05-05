@@ -50,37 +50,57 @@ export default {
         this.getNotes()
     },
     methods: {
-        async getNotes() {
-            await axios
-                .get('/api/v1/notes/')
-                .then(response => {
-                    for (let i = 0; i < response.data.length; i++) {
-                        this.notes.push(response.data[i])
-                        this.filteredNotes.push(response.data[i])
-                    }
-                    this.filteredNotes = this.filteredNotes.reverse()
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
-            axios
-                .get('/api/v1/articles/')
-                .then(response => {
-                    Array.from(response.data).forEach(article => {
-                        for (let i = 0; i < this.filteredNotes.length; i++) {
-                            if (this.filteredNotes[i].based_on_article == article.title) {
-                                // нашла соответствующую статью
-                                this.filteredNotes[i].article_author = article.author
-                                this.filteredNotes[i].article_publish_date = article.publish_date
-                                this.filteredNotes[i].article_tags = article.tags
-                            }
-                        }
-                    })
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
+        getNotes() {
+            this.notes = [
+                {
+                    id: 1,
+                    based_on_article: 'Name of the article',
+                    article_author: 'Author Name',
+                    article_publish_date: (new Date('06 October 2011 16:48 UTC')).toISOString(),
+                    article_tags: ['елки']
+                },
+                {
+                    id: 2,
+                    based_on_article: 'Article name',
+                    article_author: 'Author Name',
+                    article_publish_date: (new Date('16 October 2011 10:28 UTC')).toISOString(),
+                    article_tags: ['ежики']
+                }
+
+            ]
+            this.filteredNotes = this.notes.reverse()
         },
+        // async getNotes() {
+        //     await axios
+        //         .get('/api/v1/notes/')
+        //         .then(response => {
+        //             for (let i = 0; i < response.data.length; i++) {
+        //                 this.notes.push(response.data[i])
+        //                 this.filteredNotes.push(response.data[i])
+        //             }
+        //             this.filteredNotes = this.filteredNotes.reverse()
+        //         })
+        //         .catch(error => {
+        //             console.log(JSON.stringify(error))
+        //         })
+        //     axios
+        //         .get('/api/v1/articles/')
+        //         .then(response => {
+        //             Array.from(response.data).forEach(article => {
+        //                 for (let i = 0; i < this.filteredNotes.length; i++) {
+        //                     if (this.filteredNotes[i].based_on_article == article.title) {
+        //                         // нашла соответствующую статью
+        //                         this.filteredNotes[i].article_author = article.author
+        //                         this.filteredNotes[i].article_publish_date = article.publish_date
+        //                         this.filteredNotes[i].article_tags = article.tags
+        //                     }
+        //                 }
+        //             })
+        //         })
+        //         .catch(error => {
+        //             console.log(JSON.stringify(error))
+        //         })
+        // },
         filterit(newNotes) {
             this.filteredNotes = newNotes
         }

@@ -34,5 +34,10 @@ export default {
     toFavorites: 'Add to favorites',
     toNote: 'To the note',
     download: 'Download',
-    writeToNote: 'Write to the note'
+    writeToNote: 'Write to the note',
+
+    articleTitle: 'Article title',
+    tags: 'Tags',
+    tag: 'Tag',
+    addArticlePlaceholder: 'Article text. For formatting select the text and choose an option in a popup menu.'
 }

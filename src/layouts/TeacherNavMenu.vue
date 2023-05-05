@@ -26,10 +26,10 @@
                 <!-- <router-link :to="{name: 'TeacherAddArticle'}" class="item-text create-article-item-text">{{ $t('createArticle') }}</router-link> -->
                 <p class="item-text create-article-item-text">{{ $t('createArticle') }}</p>
             </div>
-            <div class="menu-item favorite-block">
+            <router-link :to="{name: 'Favourites'}" class="menu-item favorite-block" :class="current_item == 'Favourites' ? 'active' : ''">
                 <svg class="favorite-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg>
                 <p class="item-text favorite-item-text">{{ $t('favorites') }}</p>
-            </div>
+            </router-link>
         </div>
         <div class="menu-switches">
             <div class="language-block" @click="switchLanguage">

@@ -1,8 +1,8 @@
 <template>
     <div :class="theme === 'light' ? 'light-theme' : 'dark-theme'">
-        <StudentNavMenu v-if="this.$store.state.user.role == 'Студент'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-        <SSSNavMenu v-if="this.$store.state.user.role == 'СНО'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-        <TeacherNavMenu v-if="this.$store.state.user.role == 'Преподаватель'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <StudentNavMenu v-if="this.$store.state.user.role == 'Student'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <SSSNavMenu v-if="this.$store.state.user.role == 'Sno_student'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <TeacherNavMenu v-if="this.$store.state.user.role == 'Teacher'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
         <div id="wrapper">  
             <section>
                 <router-view/>
@@ -58,6 +58,8 @@
   
 <style lang="scss">
 @import '@/../node_modules/bulma';
+@import '@/assets/css/articles.css';
+
 @font-face {
     font-family: "RalewayLight";
     font-weight: 200;

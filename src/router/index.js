@@ -29,50 +29,58 @@ const routes = [
         path: '/me',
         name: 'Profile',
         component: () => import('../views/dashboard/ProfilePage.vue'),
-        meta: {
-          requireLogin: true
-        }
+        // meta: {
+        //   requireLogin: true
+        // }
       },
       {
         path: '/articles',
         name: 'Articles',
         component: () => import('../views/dashboard/ArticlesList.vue'),
-        meta: {
-          requireLogin: true
-        }
+        // meta: {
+        //   requireLogin: true
+        // }
       },
       {
         path: '/articles/:id',
         name: 'Article',
         component: () => import('../views/dashboard/Article.vue'),
-        meta: {
-          requireLogin: true
-        }
+        // meta: {
+        //   requireLogin: true
+        // }
       },
       {
         path: '/notes',
         name: 'Notes',
         component: () => import('../views/dashboard/NotesList.vue'),
-        meta: {
-          requireLogin: true
-        }
+        // meta: {
+        //   requireLogin: true
+        // }
       },
       {
         path: '/notes/:id',
         name: 'Note',
         component: () => import('../views/dashboard/Note.vue'),
+        // meta: {
+        //   requireLogin: true
+        // }
+      },
+      {
+        path: '/favourites',
+        name: 'Favourites',
+        component: () => import('../views/dashboard/Favourites.vue'),
+        // meta: {
+        //   requireLogin: true
+        // }
+      },
+      {
+        path: '/articles/add',
+        name: 'AddArticle',
+        component: () => import('../views/dashboard/AddArticle.vue'),
         meta: {
           requireLogin: true
         }
       },
-      // {
-      //   path: '/teacher/articles/add',
-      //   name: 'TeacherAddArticle',
-      //   component: () => import('../views/dashboard/teacher/AddArticle.vue'),
-      //   meta: {
-      //     requireLogin: true
-      //   }
-      // },
       // {
       //   path: '/teacher/for_checking',
       //   name: 'TeacherArticlesForChecking',
@@ -101,14 +109,6 @@ const routes = [
       //   path: '/teacher/my_articles/:id',
       //   name: 'TeacherArticle',
       //   component: () => import('../views/dashboard/teacher/MyArticle.vue'),
-      //   meta: {
-      //     requireLogin: true
-      //   }
-      // },
-      // {
-      //   path: '/teacher/favourites',
-      //   name: 'Favourites',
-      //   component: () => import('../views/dashboard/Favourites.vue'),
       //   meta: {
       //     requireLogin: true
       //   }

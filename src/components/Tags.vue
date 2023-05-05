@@ -1,10 +1,12 @@
 <template>
     <div class="tags-inputs">
-        <input list="tags-options" id="tag-choice" name="tag-choice" class="tag-input" v-on:change="saveTag" v-model="currentTag">
-        <div class="delete-tag-btn" @click="deleteTag">-</div>
-        <datalist id="tags-options" >>
-            <option v-for="tag in tags" v-bind:key="tag.id">{{ tag }}</option>
-        </datalist>
+        <div v-if="!finished">
+            <input list="tags-options" id="tag-choice" name="tag-choice" class="tag-input" v-on:change="saveTag" v-model="currentTag" :placeholder="$t('tag')">
+            <datalist id="tags-options" >>
+                <option v-for="tag in tags" v-bind:key="tag.id">{{ tag }}</option>
+            </datalist>
+        </div>
+        <div v-else class="finished-tag">{{ currentTag }}<svg @click="deleteTag" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
     </div>        
 
 </template>
@@ -21,23 +23,18 @@ export default {
     data() {
         return {
             tags: this.initialTags,
-            chosenTags: [],
-            currentTag: ''
+            currentTag: '',
+            finished: false
         }
     },
     methods: {
         saveTag(event) {
-            this.chosenTags.push(this.currentTag)
-            this.$emit('addTag', this.chosenTags)
+            this.finished = true
+            this.$emit('addTag', this.currentTag)
 
             //TODO сохранять не при изминении, а собирать значения из инпутов при сохранении всей формы (родителя)
         },
         deleteTag(event) {
-            if (this.currentTag != '') {
-                if (this.chosenTags.includes(this.currentTag)) {
-                    this.chosenTags.splice(this.chosenTags.indexOf(this.currentTag))
-                }
-            }
             this.$emit('deleteTag', this.currentTag)
         }
     }
@@ -51,24 +48,32 @@ export default {
     position: relative;
 }
 
-.delete-tag-btn {
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    right: -8px;
-    top: -8px;
-    background-color: red;
-    color: white;
-    border-radius: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    transition: 0.5s;
-    z-index: 5;
+.tag-input {
+    background: none;
+    outline: none;
+    border: none;
+    font-size: 18px;
+    color: var(--text-color);
+    width: 160px;
 }
 
-.delete-tag-btn:hover {
-    opacity: 1;
+.tag-input::placeholder {
+    font-size: 18px;
+    color: var(--text-extra);
+}
+
+.finished-tag {
+    padding: 6px 12px;
+    background: var(--tags-color);
+    color: var(--tags-text);
+    font-size: 18px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.finished-tag svg {
+    fill: var(--tags-text);
+    margin-left: 6px;
 }
 </style>

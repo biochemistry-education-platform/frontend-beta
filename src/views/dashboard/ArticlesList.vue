@@ -1,8 +1,8 @@
 <template>
-    <div class="articles-page">
-        <h1 class="articles__title">{{ $t('feed') }}</h1>
+    <div class="biochemistry-page">
+        <h1 class="biochemistry-page-title">{{ $t('feed') }}</h1>
         <!-- <SearchForm v-bind:items="articles" v-on:filterit="filterit"/> -->
-        <hr class="articles__hr">
+        <hr class="biochemistry-page-hr">
         <div class="articles-list">
             <div class="articles__article" v-for="article in filteredArticles" v-bind:key="article.id">
                 <div class="article-type">
@@ -26,8 +26,9 @@
                     </div>
                 </div>
                 <hr class="article-separator">
-                <div class="article-favorite">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg>
+                <div class="article-favorite" @click="article.isSaved = !article.isSaved">
+                    <svg v-if="article.isSaved" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m233 976 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Z"/></svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg>
                 </div>
             </div>
         </div>
@@ -56,141 +57,54 @@ export default {
     },
     methods: {
         getArticles() {
-            axios
-                .get('/api/v1/articles/')
-                .then(response => {
-                    for (let i = 0; i < response.data.length; i++) {
-                        this.articles.push(response.data[i])
-                        this.filteredArticles.push(response.data[i])
-                    }
-                    this.filteredArticles = this.filteredArticles.reverse()
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
+            this.articles = [
+                {
+                    id: 1,
+                    title: 'article title',
+                    type: 'text_article',
+                    author: 'author name',
+                    tags: [],
+                    publish_date: (new Date('05 October 2011 14:48 UTC')).toISOString(),
+                    isSaved: false
+                },
+                {
+                    id: 2,
+                    title: 'article title2',
+                    type: 'text_article',
+                    author: 'author name2',
+                    tags: ['белки', 'липиды'],
+                    publish_date: (new Date('06 October 2011 16:48 UTC')).toISOString(),
+                    isSaved: true
+                },
+                {
+                    id: 3,
+                    title: 'article title3',
+                    type: 'text_article',
+                    author: 'author name3',
+                    tags: ['гормоны'],
+                    publish_date: (new Date('07 October 2011 12:40 UTC')).toISOString(),
+                    isSaved: false
+                }
+            ]
+            this.filteredArticles = this.articles.reverse()
         },
+        // getArticles() {
+        //     axios
+        //         .get('/api/v1/articles/')
+        //         .then(response => {
+        //             for (let i = 0; i < response.data.length; i++) {
+        //                 this.articles.push(response.data[i])
+        //                 this.filteredArticles.push(response.data[i])
+        //             }
+        //             this.filteredArticles = this.filteredArticles.reverse()
+        //         })
+        //         .catch(error => {
+        //             console.log(JSON.stringify(error))
+        //         })
+        // },
         filterit(newArticles) {
             this.filteredArticles = newArticles
         }
     }
 }
 </script>
-
-<style>
-.articles-page {
-    width: 100%;
-    height: 100vh;
-    background: var(--background);
-}
-
-.articles__title {
-    padding-left: 10%;
-    padding-top: 30px;
-    font-size: 32px;
-    color: var(--text-color);
-    font-weight: 500;
-}
-
-.articles__hr {
-    background: var(--lines-color);
-    height: 2px;
-    width: 80%;
-    margin: 20px auto;
-}
-
-.articles-list {
-    width: 80%;
-    margin: auto;
-    height: calc(100vh - 120px - 20px);
-    margin-bottom: 20px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-}
-
-.articles-list::-webkit-scrollbar {
-  display: none;
-}
-
-.articles-list {
-  scrollbar-width: none;
-}
-
-.articles__article {    
-    width: 100%;
-    background: var(--card-color);
-    box-shadow: 0px 3.2375px 3.2375px rgba(0, 0, 0, 0.25);
-    margin-bottom: 12px;
-    height: 158px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.article-type, .article-favorite {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.article-type svg, .article-favorite svg {
-    fill: var(--text-color);
-    margin-left: 40px;
-    margin-right: 40px;
-    width: 33px;
-    height: auto;
-}
-
-.article-separator {
-    border: none;
-    border-right: 1px solid var(--lines-color);
-    height: 79px;
-    width: 1px;
-}
-
-.article__content {
-    padding-left: 40px;
-    padding-right: 40px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.article__title {
-    color: var(--text-color);
-    font-size: 28px;
-}
-
-.article__info {
-    color: var(--text-extra);
-    display: flex;
-}
-
-.article-info-item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-right: 20px;
-    font-size: 16px;
-}
-
-.article__info svg {
-    width: 13px;
-    height: auto;
-    fill: var(--text-extra);
-    margin-right: 5px;
-}
-
-.article__tags-list {
-    display: flex;
-    flex-direction: row;
-    margin-top: 12px;
-}
-.article__tag {
-    background: var(--tags-color);
-    padding: 6px 12px;
-    border-radius: 16px;
-    margin-right: 20px;
-    color: var(--tags-text);
-    font-size: 18px;
-}
-</style>

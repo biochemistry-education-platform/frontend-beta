@@ -33,50 +33,50 @@
 <script>
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
-
+let REGISTER_QUERY = gql`
+mutation ($email: String!, $username: String!, $password1: String!, $password2: String!) {
+    register(email: $email, username: $username, password1: $password1, password2: $password2) {
+            success,
+            errors,
+            token,
+            refreshToken
+        }
+    }
+`
 
 export default {
 
-  data() {
+data() {
     return {
-      email: '',
-      surname: '',
-      name: '',
-      username: '',
-      password: '',
-      role: true,
+        email: '',
+        surname: '',
+        name: '',
+        username: '',
+        password: '',
+        role: true,
     }
-  },
+},
 
-  methods: {
+methods: {
     addUser() {
         apolloClient
-        .mutate({
-          mutation: gql`
-            mutation AddUser($email: String!, $username: String!, $password: String!, $role: String!) {
-              addUser(email: $email, username: $username, password: $password, role: $role) {
-                user {
-                  email
-                  id
-                  password
-                  username
-                }
-              }
-            }
-          `,
-          variables: {
-            email: this.email,
-            username: `${this.surname} ${this.name}`,
-            password: this.password,
-            role: this.role === true ? 'Student' : 'Teacher',
-          },
-        })
-        .then(result => {
-          console.log(result)
-        })
-        .catch(error => {
-          console.log(error)
-        })
+            .mutate({
+                mutation: REGISTER_QUERY,
+                variables: {
+                    email: this.email,
+                    username: this.email,
+                    // username: `${this.surname} ${this.name}`,
+                    password1: this.password,
+                    password2: this.password,
+                    // role: this.role === true ? 'Student' : 'Teacher',
+                },
+            })
+            .then(result => {
+                console.log(result)
+            })
+            .catch(error => {
+                console.log(error)
+            })
     },
   },
 }

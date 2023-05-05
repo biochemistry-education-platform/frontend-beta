@@ -9,7 +9,7 @@
             <div class="my-account__info">
                 <img class="my-account__img" src="@/assets/icons/profile_img.png">
                 <h2 class="my-account-name">{{ $store.state.user.surname }} {{ $store.state.user.name }} {{ $store.state.user.patronymic }}</h2>
-                <p class="my-account-role">{{ $store.state.user.role == 'Преподаватель' ? $t('roleTeacher') : ($store.state.user.role == 'СНО' ? $t('roleSSS') : $t('roleStudent')) }}</p>
+                <p class="my-account-role">{{ $store.state.user.role == 'Teacher' ? $t('roleTeacher') : ($store.state.user.role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
                 <p class="my-account-mail">{{ $store.state.user.username }}</p>
                 <button class="my-account-password-btn">{{ $t('changePassword') }}</button>
                 <hr class="my-account-info-hr">
@@ -50,7 +50,7 @@
                                         <p>{{ author.surname }} {{ author.name }} {{ author.patronymic }}</p>
                                     </div>
                                     
-                                    <p class="subscription-author-role">{{ author.role == 'Преподаватель' ? $t('roleTeacher') : (author.role == 'СНО' ? $t('roleSSS') : $t('roleStudent')) }}</p>
+                                    <p class="subscription-author-role">{{ author.role == 'Teacher' ? $t('roleTeacher') : (author.role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
                                 </div>
                                 <hr class="vertical-hr">
                                 <div class="delete-subscription-author"><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
@@ -63,7 +63,7 @@
                     </div>
                 </div>
                 
-                <div v-if="this.$store.state.user.role == 'Преподаватель'" class="my-account-sss">
+                <div v-if="this.$store.state.user.role == 'Teacher'" class="my-account-sss">
                     <h2 class="my-account-sss-title">{{ $t('sssLeads') }}</h2>
                     <div class="my-account-sss-content">
                         <div v-for="user, index in sss" :key="index">
@@ -106,19 +106,19 @@ export default {
                 surname: 'Иванов',
                 name: 'Иван',
                 patronymic: 'Иванович',
-                role: 'Преподаватель'
+                role: 'Teacher'
             },
             {
                 surname: 'Константинопольская',
                 name: 'Анастасия',
                 patronymic: 'Александровна',
-                role: 'Преподаватель'
+                role: 'Teacher'
             },
             {
                 surname: 'Фамилия',
                 name: 'Имя',
                 patronymic: 'Отчество',
-                role: 'Студент'
+                role: 'Student'
             }],
             sss: [{
                 surname: 'Иванов',

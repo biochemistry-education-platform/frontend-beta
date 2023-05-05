@@ -5,7 +5,7 @@
             <form @submit.prevent="submitForm">
                 <div class="initial-field">
                     <label class="initial-field-label">{{ $t('email') }}</label>
-                    <input type="email" name="username" class="initial-input" v-model="username" placeholder="example@mail.ru">
+                    <input type="email" name="email" class="initial-input" v-model="email" placeholder="example@mail.ru">
                 </div>
                 <div class="initial-field">
                     <label class="initial-field-label">{{ $t('password') }}</label>
@@ -21,16 +21,72 @@
 <script>
 import axios from 'axios'
 
+// я передаю username и password
+// хочу проверить: если такое существует, то мне бы хотелось получить ФИО, роль, емейл, айдишник (какой, из какой таблички? по какому айдишнику
+// я смогу потом забирать статьи пользователя, его конспекты и т.д.?)
+// import gql from 'graphql-tag'
+// import { apolloClient } from '@/vue-apollo'
+
+
 export default {
     name: 'LogIn',
     data() {
         return {
-            username: '',
+            email: '',
             password: '',
             errors: []
         }
     },
     methods: {
+        // getUserInfo() {
+        //     apolloClient
+        //         .mutate({
+        //             mutation: gql`
+        //                 mutation GetUserInfo($email: String!, $password: String!) {
+        //                     getUserInfo(email: $email, password: $password) {
+        //                         user {
+        //                             id
+        //                             email
+        //                             name
+        //                             role
+        //                         }
+        //                     }
+        //                 }
+        //             `,
+        //             variables: {
+        //                 email: this.email,
+        //                 password: this.password,
+        //             },
+        //         })
+        //         .then(result => {
+        //             console.log(result)
+        //             let fullname = result.name.split(' ')
+        //             let surname = ''
+        //             let name = ''
+        //             let patronymic = ''
+        //             if (fullname.length > 1) {
+        //                 surname = fullname[0]
+        //                 name = fullname[1]
+        //                 if (fullname.length == 3) {
+        //                     patronymic = fullname[2]
+        //                 }
+        //             }
+
+        //             this.$store.state.user.surname = surname
+        //             this.$store.state.user.name = name
+        //             this.$store.state.user.patronymic = patronymic
+        //             this.$store.state.user.role = result.role
+        //             this.$store.state.user.email = result.email
+
+        //             this.$router.push('/articles')
+        //         })
+        //         .catch(error => {
+        //             console.log(error)
+        //         })
+        // },
+
+
+
         async submitForm(e) {
             axios.defaults.headers.common["Authorization"] = ""
 
