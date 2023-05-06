@@ -39,5 +39,7 @@ export default {
     articleTitle: 'Article title',
     tags: 'Tags',
     tag: 'Tag',
-    addArticlePlaceholder: 'Article text. For formatting select the text and choose an option in a popup menu.'
+    addArticlePlaceholder: 'Article text. For formatting select the text and choose an option in a popup menu.',
+    attachFile: 'Attach file',
+    publish: 'Publish'
 }

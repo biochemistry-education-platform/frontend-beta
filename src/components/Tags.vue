@@ -52,13 +52,13 @@ export default {
     background: none;
     outline: none;
     border: none;
-    font-size: 18px;
+    font-size: 16px;
     color: var(--text-color);
     width: 160px;
 }
 
 .tag-input::placeholder {
-    font-size: 18px;
+    font-size: 16px;
     color: var(--text-extra);
 }
 
@@ -66,7 +66,7 @@ export default {
     padding: 6px 12px;
     background: var(--tags-color);
     color: var(--tags-text);
-    font-size: 18px;
+    font-size: 16px;
     border-radius: 16px;
     display: flex;
     align-items: center;
