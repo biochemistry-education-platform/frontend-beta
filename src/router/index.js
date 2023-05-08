@@ -6,35 +6,28 @@ import store from '../store'
 
 const routes = [
   {
-    path: '/initial',
+    path: '/login/',
     component: InitialLayout,
-    children: [  
+    children: [       
       {
-        path: '/',
+        path: '',
+        name: 'LogIn',
+        component: () => import('../views/LogIn.vue')
+      }, 
+      {
+        path: 'signup',
         name: 'SignUp',
         component: () => import('../views/SignUp.vue')
       },
-      {
-        path: '/log-in',
-        name: 'LogIn',
-        component: () => import('../views/LogIn.vue')
-      },
+
     ]
   },
   {
-    path: '/main',
+    path: '/',
     component: MainLayout,
-    children: [
+    children: [      
       {
-        path: '/me',
-        name: 'Profile',
-        component: () => import('../views/dashboard/ProfilePage.vue'),
-        // meta: {
-        //   requireLogin: true
-        // }
-      },
-      {
-        path: '/articles',
+        path: '',
         name: 'Articles',
         component: () => import('../views/dashboard/ArticlesList.vue'),
         // meta: {
@@ -42,15 +35,33 @@ const routes = [
         // }
       },
       {
-        path: '/articles/:id',
-        name: 'Article',
-        component: () => import('../views/dashboard/Article.vue'),
+        path: 'me',
+        name: 'Profile',
+        component: () => import('../views/dashboard/ProfilePage.vue'),
+        // meta: {
+        //   requireLogin: true
+        // }
+      },
+
+      {
+        path: 'articles/add',
+        name: 'AddArticle',
+        component: () => import('../views/dashboard/AddArticle.vue'),
         // meta: {
         //   requireLogin: true
         // }
       },
       {
-        path: '/notes',
+        path: 'articles/:id',
+        name: 'Article',
+        component: () => import('../views/dashboard/Article.vue'),
+        // meta: {
+        //   requireLogin: true
+        // }
+      },      
+
+      {
+        path: 'notes/',
         name: 'Notes',
         component: () => import('../views/dashboard/NotesList.vue'),
         // meta: {
@@ -58,7 +69,7 @@ const routes = [
         // }
       },
       {
-        path: '/notes/:id',
+        path: 'notes/:id',
         name: 'Note',
         component: () => import('../views/dashboard/Note.vue'),
         // meta: {
@@ -66,21 +77,14 @@ const routes = [
         // }
       },
       {
-        path: '/favourites',
+        path: 'favourites',
         name: 'Favourites',
         component: () => import('../views/dashboard/Favourites.vue'),
         // meta: {
         //   requireLogin: true
         // }
       },
-      {
-        path: '/articles/add',
-        name: 'AddArticle',
-        component: () => import('../views/dashboard/AddArticle.vue'),
-        meta: {
-          requireLogin: true
-        }
-      },
+
       // {
       //   path: '/teacher/for_checking',
       //   name: 'TeacherArticlesForChecking',

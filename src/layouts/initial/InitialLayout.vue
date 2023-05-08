@@ -4,11 +4,9 @@
             <div class="content-block">
                 <InitialMenu @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
                 <router-view/>
-            </div>  
-                
+            </div>      
         </div>
     </div>
-    
 </template>
   
 <script setup>
@@ -49,8 +47,6 @@
             i18n.locale.value = 'en-US'
         }
   }
-
-
 </script>
   
 <style lang="scss">
@@ -71,8 +67,8 @@
 }
 
 .content-block {
-    width: 60%;
-    height: 60%;
+    width: 1152px;
+    height: 648px;
     background: var(--card-color);
     position: relative;
 }

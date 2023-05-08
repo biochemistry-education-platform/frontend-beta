@@ -1,12 +1,12 @@
 <template>
     <div class="notes-page">
-        <h1 class="notes__title">Notes</h1>
+        <h1 class="notes__title">{{ $t('notes') }}</h1>
         <!-- <SearchForm v-bind:items="notes" v-on:filterit="filterit"/> -->
         <hr class="notes__hr">
         <div class="notes-list">
             <div class="notes__note" v-for="note in filteredNotes" v-bind:key="note.id">
                 <div class="note__content">
-                    <router-link :to="{ name: 'Note', params: { id: note.id }}" class="note__title">Конспект «{{ note.based_on_article }}»</router-link>
+                    <router-link :to="{ name: 'Note', params: { id: note.id }}" class="note__title">{{ $t('note') }} «{{ note.based_on_article }}»</router-link>
                     <div class="note__info">
                         <div class="note-info-item note-info__author">
                             <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M480 575q-66 0-108-42t-42-108q0-66 42-108t108-42q66 0 108 42t42 108q0 66-42 108t-108 42ZM160 896v-94q0-38 19-65t49-41q67-30 128.5-45T480 636q62 0 123 15.5t127.921 44.694q31.301 14.126 50.19 40.966Q800 764 800 802v94H160Zm60-60h520v-34q0-16-9.5-30.5T707 750q-64-31-117-42.5T480 696q-57 0-111 11.5T252 750q-14 7-23 21.5t-9 30.5v34Zm260-321q39 0 64.5-25.5T570 425q0-39-25.5-64.5T480 335q-39 0-64.5 25.5T390 425q0 39 25.5 64.5T480 515Zm0-90Zm0 411Z"/></svg>
@@ -56,15 +56,15 @@ export default {
                     id: 1,
                     based_on_article: 'Name of the article',
                     article_author: 'Author Name',
-                    article_publish_date: (new Date('06 October 2011 16:48 UTC')).toISOString(),
-                    article_tags: ['елки']
+                    article_publish_date: (new Date('16 April 2023 16:48 UTC')).toISOString(),
+                    article_tags: ['белки']
                 },
                 {
                     id: 2,
                     based_on_article: 'Article name',
                     article_author: 'Author Name',
-                    article_publish_date: (new Date('16 October 2011 10:28 UTC')).toISOString(),
-                    article_tags: ['ежики']
+                    article_publish_date: (new Date('06 May 2023 10:28 UTC')).toISOString(),
+                    article_tags: ['липиды']
                 }
 
             ]

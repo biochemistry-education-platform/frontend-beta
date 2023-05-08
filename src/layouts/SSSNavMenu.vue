@@ -25,11 +25,11 @@
                 <svg class="check-articles-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M517 525 353 361l43-43 121 122 234-233 42 41-276 277Zm49 469-311-89v57H40V568h309l255 96q27 10 45.5 32.5T668 761h114q42 0 70 30t28 81v26l-314 96Zm-466-92h94V628h-94v274Zm462 30 256-78q-6-19-15-26t-21-7H575q-30 0-55.5-4T471 806l-81-25 22-58 73 24q25 8 47.5 11t71.5 3q0-12-4.5-23.5T584 721l-245-93h-84v214l307 90ZM194 765Zm410-4Zm-410 4Zm61 0Z"/></svg>
                 <p class="item-text check-articles-item-text">{{ $t('forChecking') }}</p>
             </div>
-            <div class="sss-menu-item create-article-block">
+            <router-link :to="{name: 'AddArticle'}" class="sss-menu-item create-article-block" :class="current_item == 'AddArticle' ? 'active' : ''">
                 <svg class="create-article-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
                 <!-- <router-link :to="{name: 'StudentAddArticle'}" class="item-text create-article-item-text">{{ $t('createArticle') }}</router-link> -->
                 <p class="item-text create-article-item-text">{{ $t('createArticle') }}</p>
-            </div>
+            </router-link>
             <div class="sss-menu-item favorite-block">
                 <svg class="favorite-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg>
                 <p class="item-text favorite-item-text">{{ $t('favorites') }}</p>

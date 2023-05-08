@@ -16,7 +16,7 @@
                 <div class="my-account-channels">
                     <div class="my-account-channel">
                         <img src="@/assets/icons/mail-icon.png">
-                        <p class="my-account-channel-filled">{{ $store.state.user.username }}</p>
+                        <p class="my-account-channel-filled">{{ $store.state.user.email }}</p>
                     </div>
                     <div class="my-account-channel">
                         <img src="@/assets/icons/vk-icon.png">

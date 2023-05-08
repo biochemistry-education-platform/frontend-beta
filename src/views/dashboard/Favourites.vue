@@ -105,8 +105,7 @@ export default {
                     index = this.filteredArticles.indexOf(article)
                 }
             })
-            this.filteredArticles.splice(index, 1)
-            // и отправить запрос на удаление статьи из избранного
+            // отправить запрос на удаление статьи из избранного
         },
         filterit(newArticles) {
             this.filteredArticles = newArticles

@@ -1,15 +1,14 @@
 <template>
-    <div :class="theme === 'light' ? 'light-theme' : 'dark-theme'">
-        <StudentNavMenu v-if="this.$store.state.user.role == 'Student'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-        <SSSNavMenu v-if="this.$store.state.user.role == 'Sno_student'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-        <TeacherNavMenu v-if="this.$store.state.user.role == 'Teacher'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+    <div :class="theme === 'light' ? 'light-theme' : 'dark-theme'" class="theme">
+        <StudentNavMenu v-if="$store.state.user.role == 'Student'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <SSSNavMenu v-if="$store.state.user.role == 'Sno_student'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <TeacherNavMenu v-if="$store.state.user.role == 'Teacher'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
         <div id="wrapper">  
             <section>
                 <router-view/>
             </section> 
         </div>
-    </div>
-    
+    </div>    
 </template>
   
 <script setup>
@@ -18,6 +17,7 @@
     import SSSNavMenu from './SSSNavMenu.vue'
     import { ref, onMounted, watchEffect } from 'vue'
     import { useI18n } from 'vue-i18n'
+    import store from '@/store'
 
     const i18n = useI18n()
     
@@ -64,6 +64,10 @@
     font-family: "RalewayLight";
     font-weight: 200;
     src: url(@/assets/fonts/Raleway-ExtraLight.ttf) fomat("truetype");
+}
+
+::-webkit-scrollbar {
+    width: 0;
 }
 
 #wrapper {

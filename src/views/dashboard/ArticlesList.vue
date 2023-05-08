@@ -18,7 +18,7 @@
                         </div>
                         <div class="article-info-item article-info__date">
                             <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m627 769 45-45-159-160V363h-60v225l174 181ZM480 976q-82 0-155-31.5t-127.5-86Q143 804 111.5 731T80 576q0-82 31.5-155t86-127.5Q252 239 325 207.5T480 176q82 0 155 31.5t127.5 86Q817 348 848.5 421T880 576q0 82-31.5 155t-86 127.5Q708 913 635 944.5T480 976Zm0-400Zm0 340q140 0 240-100t100-240q0-140-100-240T480 236q-140 0-240 100T140 576q0 140 100 240t240 100Z"/></svg>
-                            <p>{{ (new Date(Date.parse(article.publish_date.slice(0,19)))).toLocaleString('en-GB') }}</p>
+                            <p>{{ (new Date(Date.parse(article.publish_date.slice(0,19)))).toLocaleString('ru-RU') }}</p>
                         </div>
                     </div>
                     <div class="article__tags-list" v-if="article.tags.length > 0">
@@ -63,8 +63,8 @@ export default {
                     title: 'article title',
                     type: 'text_article',
                     author: 'author name',
-                    tags: [],
-                    publish_date: (new Date('05 October 2011 14:48 UTC')).toISOString(),
+                    tags: ['СНО'],
+                    publish_date: (new Date((new Date('05 May 2023 14:48 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
                     isSaved: false
                 },
                 {
@@ -73,7 +73,7 @@ export default {
                     type: 'text_article',
                     author: 'author name2',
                     tags: ['белки', 'липиды'],
-                    publish_date: (new Date('06 October 2011 16:48 UTC')).toISOString(),
+                    publish_date: (new Date((new Date('06 May 2023 16:48 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
                     isSaved: true
                 },
                 {
@@ -82,7 +82,7 @@ export default {
                     type: 'text_article',
                     author: 'author name3',
                     tags: ['гормоны'],
-                    publish_date: (new Date('07 October 2011 12:40 UTC')).toISOString(),
+                    publish_date: (new Date((new Date('07 May 2023 12:40 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
                     isSaved: false
                 }
             ]

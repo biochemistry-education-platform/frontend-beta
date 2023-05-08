@@ -24,11 +24,11 @@ export default createStore({
         state.user.id = localStorage.getItem('userid')
       } else {
         state.user.id = ''
-        state.user.email = ''
-        state.user.role = ''
-        state.user.surname = ''
-        state.user.name = ''
-        state.user.patronymic = ''
+        state.user.email = 'example@mail.ru'
+        state.user.role = 'Student'
+        state.user.surname = 'Фамилия'
+        state.user.name = 'Имя'
+        state.user.patronymic = 'Отчество'
         state.token = ''
         state.isAuthenticated = false
       }

@@ -2,7 +2,7 @@ export default {
     profile: 'Profile',    
     feed: 'Feed',
     myArticles: 'My articles',
-    myNotes: 'My notes',
+    myNotes: 'My abstracts',
     forChecking: 'For checking',
     createArticle: 'Create article',
     favorites: 'Favorites',
@@ -32,14 +32,19 @@ export default {
     roleSSS: 'Responsible for SSS',
 
     toFavorites: 'Add to favorites',
-    toNote: 'To the note',
+    toNote: 'To the abstract',
     download: 'Download',
-    writeToNote: 'Write to the note',
+    writeToNote: 'Write to the abstract',
+    noteCreated: 'The abstract has been created',
+    noteEdited: 'The abstract has been edited',
 
     articleTitle: 'Article title',
     tags: 'Tags',
     tag: 'Tag',
     addArticlePlaceholder: 'Article text. For formatting select the text and choose an option in a popup menu.',
     attachFile: 'Attach file',
-    publish: 'Publish'
+    publish: 'Publish',
+
+    notes: 'Abstracts',
+    note: 'Abstract of',
 }
