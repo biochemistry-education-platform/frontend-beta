@@ -23,7 +23,7 @@
         </div>
         
         <hr>
-        
+
         <div class="article-text" id="articleText"></div>
         <button v-show="isSelected" id="add-selected-text-btn" v-on:click="getSelectedText">{{ $t('writeToNote') }}</button>
     </div>
@@ -250,133 +250,6 @@ onMounted(async () => {
 </script>
 
 <style>
-::-webkit-scrollbar {
-  width: 0;
-}
-
-.article-page {
-    padding: 50px 10% 0 10%;
-    background: var(--card-color);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.article-tags {
-    background: var(--tags-color);
-    width: fit-content;
-    border-radius: 16px;
-    padding: 4px 0 4px 12px;
-}
-
-.article-tag {
-    color: var(--tags-text);
-    font-size: 18px;
-    display: inline-block;
-    padding-right: 12px;
-    font-weight: 500;
-}
-
-.article-title {
-    font-size: 32px;
-    color: var(--text-color);
-    font-weight: 500;
-    padding: 20px 0;
-}
-
-.article-info {
-    width: 100%;
-    height: 120px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.article-author {
-    display: flex;
-}
-
-.article-author-img{
-    width: 120px;
-    height: 120px;
-}
-
-.article-author-info {
-    height: 120px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding-left: 26px;
-}
-
-.article-author-name {
-    font-size: 24px;
-    color: var(--text-color);
-}
-
-.article-author-extra {
-    font-size: 16px;
-    color: var(--text-extra);
-}
-
-.article-actions {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: flex-end;
-}
-
-.article-action {
-    color: var(--text-extra);
-    font-size: 16px;
-    display: flex;
-    margin-top: 20px;
-}
-
-.article-action:hover {
-    cursor: pointer;
-}
-
-.article-action svg {
-    fill: var(--text-extra);
-    margin-left: 10px;
-}
-
-hr {
-    background: var(--lines-color);
-}
-
-.article-text {
-    width: 100%;
-    color: var(--text-color);
-    flex: 1;
-    flex-direction: column;
-}
-
-*::selection {
-    background: var(--tags-color);
-}
-
-#add-selected-text-btn {
-    display: flex;
-    position: absolute;
-    background: var(--menu-accent);
-    border-radius: 6px;
-    z-index: 10;
-    padding: 4px 12px;
-    color: var(--card-color);
-    font-size: 14px;
-    border: none;
-}
-
-#add-selected-text-btn:hover {
-    cursor: pointer;
-    background: var(--menu-accent-darker);
-}
-
-#add-selected-text-btn svg {
-    fill: white;
-}
-
 .notification-success {
     background-color: #66D9D3;
     border-radius: 16px;
@@ -388,5 +261,4 @@ hr {
     border-radius: 16px;
     color: white;
 }
-
 </style>

@@ -253,6 +253,36 @@ hr {
     color: white;
 }
 
+.note-main {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.note-main-actions {
+    display: flex;
+}
+
+.note-green-btn, .note-red-btn {
+    color: var(--card-color);
+    font-size: 18px;
+    line-height: 22px;
+    height: 46px;
+    padding: 12px 20px;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+}
+
+.note-green-btn {
+    background: var(--menu-accent);
+}
+
+.note-red-btn {
+    background: var(--danger);
+    margin-left: 20px;
+}
+
 .note-delete {
     display: flex;
     justify-content: center;

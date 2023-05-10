@@ -3,8 +3,15 @@
         <div v-if="article.tags.length > 0" class="article-tags">
             <div v-for="tag in article.tags" class="article-tag">#{{ tag }}</div>
         </div>
-        <h1 class="note-title">{{ $t('note') }} «{{ note.based_on_article }}»</h1>
-
+        <div class="note-main">
+            <h1 class="note-title">{{ $t('note') }} «{{ note.based_on_article }}»</h1>
+            <div class="note-main-actions">
+                <button v-if="!isEditMode" class="note-green-btn" @click="editNote">{{ $t('edit') }}</button>
+                <button v-if="isEditMode" class="note-green-btn" @click="saveNote">{{ $t('save') }}</button>
+                <button class="note-red-btn" @click="deleteNote">{{ $t('delete') }}</button>
+            </div>
+        </div>
+        
         <div class="article-info">
             <div class="article-author">
                 <div><img class="article-author-img" src="@/assets/icons/profile_img.png"></div>
@@ -16,13 +23,11 @@
             </div>
 
             <div class="note-actions">
-                <div v-if="!isEditMode" class="note-action" @click="editNote"><p>{{ $t('editNote') }}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M180 876h44l443-443-44-44-443 443v44Zm614-486L666 262l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L248 936H120V808l504-504 128 128Zm-107-21-22-22 44 44-22-22Z"/></svg></div>
-                <div v-if="isEditMode" class="note-action" @click="saveNote"><p>{{ $t('saveNote') }}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M180 876h44l443-443-44-44-443 443v44Zm614-486L666 262l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L248 936H120V808l504-504 128 128Zm-107-21-22-22 44 44-22-22Z"/></svg></div>
                 <div class="note-action"><p>{{ $t('toArticle') }}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg></div>
                 <div class="note-action" v-on:click="getPdf"><p>{{ $t('download')}}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M220 896q-24 0-42-18t-18-42V693h60v143h520V693h60v143q0 24-18 42t-42 18H220Zm260-153L287 550l43-43 120 120V256h60v371l120-120 43 43-193 193Z"/></svg></div>
             </div>
         </div>
-        <!-- ДОБАВИТЬ ОПЦИЮ УДАЛЕНИЯ КОНСПЕКТА! -->
+        
         <hr>
 
         <div class="note-text" id="noteText"></div>
@@ -303,6 +308,10 @@ function getPdf(event) {
         })
 }
 
+function deleteNote(event) {
+    const noteID = route.params.id
+    // axios.delete(`/api/v1/notes/${noteID}`)
+}
 
 onMounted(async () => {
     const colorVars = getComputedStyle(document.getElementsByClassName('theme')[0])
