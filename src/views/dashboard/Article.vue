@@ -4,6 +4,7 @@
             <div v-for="tag in article.tags" class="article-tag">#{{ tag }}</div>
         </div>
         <h1 class="article-title">{{ article.title }}</h1>
+
         <div class="article-info">
             <div class="article-author">
                 <div><img class="article-author-img" src="@/assets/icons/profile_img.png"></div>
@@ -22,6 +23,7 @@
         </div>
         
         <hr>
+        
         <div class="article-text" id="articleText"></div>
         <button v-show="isSelected" id="add-selected-text-btn" v-on:click="getSelectedText">{{ $t('writeToNote') }}</button>
     </div>

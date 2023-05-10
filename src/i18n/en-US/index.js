@@ -47,4 +47,7 @@ export default {
 
     notes: 'Abstracts',
     note: 'Abstract of',
+    toArticle: 'To the article',
+    editNote: 'Edit note', 
+    saveNote: 'Save changes'
 }

@@ -1,0 +1,268 @@
+.biochemistry-page {
+    width: 100%;
+    height: 100vh;
+    background: var(--background);
+    position: relative;
+}
+
+.biochemistry-page-title {
+    padding-left: 10%;
+    padding-top: 30px;
+    font-size: 32px;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.biochemistry-page-hr {
+    background: var(--lines-color);
+    height: 2px;
+    width: 80%;
+    margin: 20px auto;
+}
+
+.articles-list, .notes-list {
+    width: 80%;
+    margin: auto;
+    height: calc(100vh - 120px - 20px);
+    margin-bottom: 20px;
+    overflow-y: scroll;
+    overflow-x: hidden;  
+    scrollbar-width: none;
+}
+
+.articles-list::-webkit-scrollbar, .notes-list::-webkit-scrollbar {
+  display: none;
+}
+
+.articles__article, .notes__note {    
+    width: 100%;
+    background: var(--card-color);
+    box-shadow: 0px 3.2375px 3.2375px rgba(0, 0, 0, 0.25);
+    margin-bottom: 12px;
+    height: 158px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.article-type, .article-favorite {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.article-favorite:hover {
+    cursor: pointer;
+}
+
+.article-type svg, .article-favorite svg {
+    fill: var(--text-color);
+    margin-left: 40px;
+    margin-right: 40px;
+    width: 33px;
+    height: auto;
+}
+
+.article-separator, .note-separator {
+    border: none;
+    border-right: 1px solid var(--lines-color);
+    height: 79px;
+    width: 1px;
+}
+
+.article__content, .note__content {
+    padding-left: 40px;
+    padding-right: 40px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.article__title, .note__title {
+    color: var(--text-color);
+    font-size: 28px;
+}
+
+.article__info {
+    color: var(--text-extra);
+    display: flex;
+}
+
+.article-info-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: 20px;
+    font-size: 16px;
+}
+
+.article__info svg {
+    width: 13px;
+    height: auto;
+    fill: var(--text-extra);
+    margin-right: 5px;
+}
+
+.article__tags-list {
+    display: flex;
+    flex-direction: row;
+    margin-top: 12px;
+}
+
+.article__tag {
+    background: var(--tags-color);
+    padding: 6px 12px;
+    border-radius: 16px;
+    margin-right: 20px;
+    color: var(--tags-text);
+    font-size: 18px;
+}
+
+.article-page, .note-page {
+    padding: 50px 10% 0 10%;
+    background: var(--card-color);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.article-tags {
+    background: var(--tags-color);
+    width: fit-content;
+    border-radius: 16px;
+    padding: 4px 0 4px 12px;
+}
+
+.article-tag {
+    color: var(--tags-text);
+    font-size: 18px;
+    display: inline-block;
+    padding-right: 12px;
+    font-weight: 500;
+}
+
+.article-title, .note-title {
+    font-size: 32px;
+    color: var(--text-color);
+    font-weight: 500;
+    padding: 20px 0;
+}
+
+.article-info {
+    width: 100%;
+    height: 120px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.article-author {
+    display: flex;
+}
+
+.article-author-img{
+    width: 120px;
+    height: 120px;
+}
+
+.article-author-info {
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-left: 26px;
+}
+
+.article-author-name {
+    font-size: 24px;
+    color: var(--text-color);
+}
+
+.article-author-extra {
+    font-size: 16px;
+    color: var(--text-extra);
+}
+
+.article-actions, .note-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.article-action, .note-action {
+    color: var(--text-extra);
+    font-size: 16px;
+    display: flex;
+    margin-top: 20px;
+}
+
+.article-action:hover, .note-action:hover {
+    cursor: pointer;
+}
+
+.article-action svg, .note-action svg {
+    fill: var(--text-extra);
+    margin-left: 10px;
+}
+
+hr {
+    background: var(--lines-color);
+}
+
+.article-text, .note-text {
+    width: 100%;
+    color: var(--text-color);
+    flex: 1;
+    flex-direction: column;
+}
+
+*::selection {
+    background: var(--tags-color);
+}
+
+#add-selected-text-btn {
+    display: flex;
+    position: absolute;
+    background: var(--menu-accent);
+    border-radius: 6px;
+    z-index: 10;
+    padding: 4px 12px;
+    color: var(--card-color);
+    font-size: 14px;
+    border: none;
+}
+
+#add-selected-text-btn:hover {
+    cursor: pointer;
+    background: var(--menu-accent-darker);
+}
+
+#add-selected-text-btn svg {
+    fill: white;
+}
+
+.notification-success {
+    background-color: #66D9D3;
+    border-radius: 16px;
+    color: white;
+}
+
+.notification-danger {
+    background-color: #F65151;
+    border-radius: 16px;
+    color: white;
+}
+
+.note-delete {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.note-delete svg {
+    fill: var(--danger);
+    margin-left: 40px;
+    margin-right: 40px;
+    width: 30px;
+    height: auto;
+}

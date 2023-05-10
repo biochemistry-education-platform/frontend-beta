@@ -47,4 +47,7 @@ export default {
 
     notes: 'Конспекты',
     note: 'Конспект',
+    toArticle: 'К статье',
+    editNote: 'Редактировать конспект',
+    saveNote: 'Сохранить изменения'
 }

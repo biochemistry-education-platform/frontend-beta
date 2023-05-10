@@ -58,7 +58,7 @@
   
 <style lang="scss">
 @import '@/../node_modules/bulma';
-@import '@/assets/css/articles.css';
+@import '@/assets/css/articlesAndNotes.css';
 
 @font-face {
     font-family: "RalewayLight";
