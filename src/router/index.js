@@ -84,15 +84,23 @@ const routes = [
         //   requireLogin: true
         // }
       },
-
-      // {
-      //   path: '/teacher/for_checking',
-      //   name: 'TeacherArticlesForChecking',
-      //   component: () => import('../views/dashboard/teacher/ArticlesForChecking.vue'),
-      //   meta: {
-      //     requireLogin: true
-      //   }
-      // },
+      {
+        path: 'my_articles',
+        name: 'MyArticles',
+        component: () => import('../views/dashboard/MyArticles.vue')
+        ,
+        // meta: {
+        //   requireLogin: true
+        // }
+      },
+      {
+        path: '/for_checking',
+        name: 'ArticlesForChecking',
+        component: () => import('../views/dashboard/ArticlesForChecking.vue'),
+        // meta: {
+        //   requireLogin: true
+        // }
+      },
       // {
       //   path: '/teacher/for_checking/:id',
       //   name: 'TeacherArticleForChecking',

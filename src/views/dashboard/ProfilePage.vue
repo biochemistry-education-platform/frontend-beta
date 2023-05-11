@@ -10,7 +10,7 @@
                 <img class="my-account__img" src="@/assets/icons/profile_img.png">
                 <h2 class="my-account-name">{{ $store.state.user.surname }} {{ $store.state.user.name }} {{ $store.state.user.patronymic }}</h2>
                 <p class="my-account-role">{{ $store.state.user.role == 'Teacher' ? $t('roleTeacher') : ($store.state.user.role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
-                <p class="my-account-mail">{{ $store.state.user.username }}</p>
+                <p class="my-account-mail">{{ $store.state.user.email }}</p>
                 <button class="my-account-password-btn">{{ $t('changePassword') }}</button>
                 <hr class="my-account-info-hr">
                 <div class="my-account-channels">
@@ -139,42 +139,43 @@ export default {
     },
     methods: {
         logout() {
-            axios
-                .post('/api/v1/token/logout/')
-                .then(response => {
-                    axios.defaults.headers.common["Authorization"] = ""
-                    localStorage.removeItem('username')
-                    localStorage.removeItem('userid')
-                    localStorage.removeItem('token')
-                    this.$store.commit('removeToken')
-                    this.$router.push('/log-in')
-                })
-                .catch(error => {
-                        if (error.response) {
-                            console.log(JSON.stringify(error.response.data))
-                        } else if (error.message) {
-                            console.log(JSON.stringify(error.message))
-                        } else {
-                            console.log(JSON.stringify(error))
-                        }
-                    })
+            // axios
+            //     .post('/api/v1/token/logout/')
+            //     .then(response => {
+            //         axios.defaults.headers.common["Authorization"] = ""
+            //         localStorage.removeItem('email')
+            //         localStorage.removeItem('userid')
+            //         localStorage.removeItem('token')
+            //         this.$store.commit('removeToken')
+            //         this.$router.push('/log-in')
+            //     })
+            //     .catch(error => {
+            //             if (error.response) {
+            //                 console.log(JSON.stringify(error.response.data))
+            //             } else if (error.message) {
+            //                 console.log(JSON.stringify(error.message))
+            //             } else {
+            //                 console.log(JSON.stringify(error))
+            //             }
+            //         })
         },
         getMyInfo() {
-            axios
-                .get('/api/v1/clients')
-                .then(response => {
-                    for (const property in response.data) {
-                        if (response.data[property].email == store.state.user.username) {
-                            store.state.user.surname = response.data[property].surname
-                            store.state.user.name = response.data[property].name
-                            store.state.user.patronymic = response.data[property].patronymic
-                            store.state.user.role = response.data[property].role
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
+            console.log(store.state.user)
+            // axios
+            //     .get('/api/v1/clients')
+            //     .then(response => {
+            //         for (const property in response.data) {
+            //             if (response.data[property].email == store.state.user.email) {
+            //                 store.state.user.surname = response.data[property].surname
+            //                 store.state.user.name = response.data[property].name
+            //                 store.state.user.patronymic = response.data[property].patronymic
+            //                 store.state.user.role = response.data[property].role
+            //             }
+            //         }
+            //     })
+            //     .catch(error => {
+            //         console.log(JSON.stringify(error))
+            //     })
         }
     }
 }

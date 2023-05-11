@@ -1,5 +1,5 @@
 <template>
-    <div v-if="this.$store.state.user.role != 'Teacher'" class="note-page">
+    <div v-if="store.state.user.role != 'Teacher'" class="note-page">
         <div v-if="article.tags.length > 0" class="article-tags">
             <div v-for="tag in article.tags" class="article-tag">#{{ tag }}</div>
         </div>
@@ -27,7 +27,7 @@
                 <div class="note-action" v-on:click="getPdf"><p>{{ $t('download')}}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M220 896q-24 0-42-18t-18-42V693h60v143h520V693h60v143q0 24-18 42t-42 18H220Zm260-153L287 550l43-43 120 120V256h60v371l120-120 43 43-193 193Z"/></svg></div>
             </div>
         </div>
-        
+
         <hr>
 
         <div class="note-text" id="noteText"></div>
@@ -94,7 +94,7 @@ async function getArticle() {
     article.author = 'Фамилия Имя Отчество'
     article.tags = ['сердце', 'человек']
     note.based_on_article = 'Сердце человека'
-    note.text = '[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"Роль сердца в организме человекаЧто значит сердце для человека? Очень много! Например:Качает кровьСнабжает что-то чем-тоБьетсяimages"}]}]'
+    note.text = '[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"Роль сердца в организме человека\\nЧто значит сердце для человека? Очень много! Например:\\nКачает кровь\\nСнабжает что-то чем-то\\nБьется"}]}]'
     var tzoffset = (new Date()).getTimezoneOffset() * 72000;
     var pdate = new Date('05 May 2023 14:48 UTC')
     article.publish_date = (new Date(pdate - tzoffset)).toISOString()

@@ -4,11 +4,11 @@ export default createStore({
   state: {
     user: {
       id: '',
-      email: '',
-      role: 'Student',
-      surname: '',
-      name: '',
-      patronymic: ''
+      email: 'example@mail.ru',
+      role: 'Teacher',
+      surname: 'Фамилия',
+      name: 'Имя',
+      patronymic: 'Отчество'
     },
     isAuthenticated: false,
     token: ''
@@ -20,12 +20,12 @@ export default createStore({
       if (localStorage.getItem('token')) {
         state.token = localStorage.getItem('token')
         state.isAuthenticated = true
-        state.user.email = localStorage.getItem('email')
+        state.user.email = localStorage.getItem('username')
         state.user.id = localStorage.getItem('userid')
       } else {
         state.user.id = ''
         state.user.email = 'example@mail.ru'
-        state.user.role = 'Student'
+        state.user.role = 'Teacher'
         state.user.surname = 'Фамилия'
         state.user.name = 'Имя'
         state.user.patronymic = 'Отчество'

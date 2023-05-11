@@ -274,6 +274,10 @@ hr {
     border-radius: 10px;
 }
 
+.note-green-btn:hover, .note-red-btn:hover {
+    cursor: pointer;
+}
+
 .note-green-btn {
     background: var(--menu-accent);
 }
