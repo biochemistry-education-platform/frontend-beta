@@ -2,7 +2,7 @@
     <div class="search-form">
         <div class="search-field">
             <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M796 935 533 672q-30 26-69.959 40.5T378 727q-108.162 0-183.081-75Q120 577 120 471t75-181q75-75 181.5-75t181 75Q632 365 632 471.15 632 514 618 554q-14 40-42 75l264 262-44 44ZM377 667q81.25 0 138.125-57.5T572 471q0-81-56.875-138.5T377 275q-82.083 0-139.542 57.5Q180 390 180 471t57.458 138.5Q294.917 667 377 667Z"/></svg>
-            <input type="text" v-model="name" @input="filterByName" placeholder="Найти статью по названию">
+            <input type="text" v-model="name" @input="filterArticles" placeholder="Найти статью по названию">
         </div>
         
         <div class="extra-search">
@@ -54,16 +54,6 @@
                 </TransitionGroup>
                 
             </label>
-            <!-- <div class="oneline">
-                <div class="field tag-field" v-for="index in numberOfTags" :key="index">
-                    <div class="tags-inputs">
-                        <input list="tags-options" id="tag-choice" name="tag-choice" class="tag-input" v-on:change="filterTag">
-                        <datalist id="tags-options" >
-                            <option v-for="tag in tags" v-bind:key="tag.id">{{ tag }}</option>
-                        </datalist>
-                    </div>
-                </div>
-            </div> -->
         </div>
     </div>
     
@@ -80,7 +70,8 @@ import { split } from 'apollo-boost'
         },
         data() {
             return {
-                filteredItems: this.items.reverse(),
+                allItems: this.items,
+                filteredItems: this.items,
                 name: '',
                 tags: ['белки', 'липиды', 'гормоны'],
                 chosenTags: [],
@@ -107,67 +98,127 @@ import { split } from 'apollo-boost'
                 else {
                     newName = splitted[0] + ' ' + splitted[1].charAt(0) + '.'
                 }
-                // let newName = author.split(' ')[0] + ' ' + author.split(' ')[1].charAt(0) + '.' + (author.split(' ').length == 3 ? (' ' + author.split[2].charAt(0) + '.') : '')
                 this.shortAuthors.push(newName)
-                console.log(this.shortAuthors)
             })
+            this.filteredItems = this.items
         },
         methods: {
-            filterByName(event) {
-                if (this.filteredItems[0].title) {
-                    this.filteredItems = this.filteredItems.filter(item => item.title.toLowerCase().includes(this.name.toLowerCase()))
-                } else {
-                    this.filteredItems = this.filteredItems.filter(item => item.based_on_article.toLowerCase().includes(this.name.toLowerCase()))
-                }
-                this.$emit('filterit', this.filteredItems)
-                this.filteredItems = this.items.reverse()
-            },
-            filterByTags() {
+            filterArticles(event) {                
                 let result = []
-                this.filteredItems = this.items.reverse()
-                if (this.chosenTags.length > 0) {
-                    this.chosenTags.forEach(tag => { 
-                        let current_res = this.filteredItems.filter(item => item.tags.includes(tag))
-                        console.log(current_res)
-                        console.log('it was current res')
-                        current_res.forEach(element => result.push(element))
-                    })
-                    let uniquie = result.filter((value, index, array) => array.indexOf(value) === index)
-                    
-                    this.$emit('filterit', uniquie)
-                    
-                } else {
-                    this.filteredItems = this.items.reverse()
-                    this.$emit('filterit', this.filteredItems)
+                let nameIDs = []
+                let tagsIDs = []
+                let authorsIDs = []
+                if (this.name != '') {
+                    let nameFiltered = this.items.filter(item => item.title.toLowerCase().includes(this.name.toLowerCase()))
+                    nameFiltered.forEach(item => result.push(item))
+                    nameFiltered.forEach(item => nameIDs.push(item.id))
                 }
-                
+
+                this.chosenTags.forEach(tag => {
+                    let tagsFiltered = this.items.filter(item => item.tags.includes(tag))
+                    tagsFiltered.forEach(item => result.push(item))
+                    tagsFiltered.forEach(item => tagsIDs.push(item.id))
+                })
+
+
+                this.chosenAuthors.forEach(author => {
+                    let fullName = this.authors[this.shortAuthors.indexOf(author)]
+                    let authorsFiltered = this.items.filter(item => item.author == fullName)
+                    authorsFiltered.forEach(item => result.push(item))
+                    authorsFiltered.forEach(item => authorsIDs.push(item.id))
+                })
+
+                if (this.chosenTags.length > 0 && this.chosenAuthors.length > 0 && this.name != '') {
+                    let temp = []
+                    nameIDs.forEach(id => {if (tagsIDs.includes(id) && authorsIDs.includes(id)) {temp.push(id)}} )
+                    result = result.filter(item => temp.includes(item.id))
+                } else { 
+                    if (this.chosenTags.length > 0 && this.chosenAuthors.length > 0) {
+                        let temp = []
+                        tagsIDs.forEach(id => {if (authorsIDs.includes(id)) {temp.push(id)}} )
+                        result = result.filter(item => temp.includes(item.id))
+                    }
+                    else { 
+                        if (this.chosenTags.length > 0 && this.name != '') {
+                            let temp = []
+                            tagsIDs.forEach(id => {if (nameIDs.includes(id)) {temp.push(id)}} )
+                            result = result.filter(item => temp.includes(item.id)) 
+                        }
+                        else {
+                            if (this.chosenAuthors.length > 0 && this.name != '') {
+                                let temp = []
+                                authorsIDs.forEach(id => {if (nameIDs.includes(id)) {temp.push(id)}} )
+                                result = result.filter(item => temp.includes(item.id))
+                            }
+                            else {
+                                if (this.chosenTags.length > 0) {
+                                    result = result.filter(item => tagsIDs.includes(item.id))
+                                }
+                                else {
+                                    if (this.chosenAuthors.length > 0) {
+                                        result = result.filter(item => authorsIDs.includes(item.id))
+                                    }
+                                    else {
+                                        if (this.name != '') {
+                                            result = result.filter(item => nameIDs.includes(item.id))
+                                        }
+                                        else {
+                                            result = this.items //return all the list
+                                            console.log(this.items)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                let unique = result.filter((value, index, array) => array.indexOf(value) === index)
+                this.filteredArticles = unique
+                this.$emit('filterit', unique)
             },
-            deleteTag(event) {
-                event.target.parentElement.parentElement.remove()
-                this.filterTag()
-            },
-            filterTag() {
-                // получить все теги из инпутов, фильтровать filteredItems и показать только те где есть ВСЕ (соединяем через ИЛИ) ??
-            },
-            addNewTag() {
-                this.numberOfTags += 1
+            
+            sortArticles() { 
+                if (this.filteredItems.length == 0) { this.filteredItems = this.items }
+
+                if (this.chosenSorting[0] == this.sortingOptions[0]) {
+                    this.filteredItems.sort((a,b) => new Date(b.publish_date) - new Date(a.publish_date))
+                }
+                if (this.chosenSorting[0] == this.sortingOptions[1]) {
+                    this.filteredItems.sort((a,b) => new Date(a.publish_date) - new Date(b.publish_date))
+                }
+                if (this.chosenSorting[0] == this.sortingOptions[2]) {
+                    this.filteredItems.sort((a,b) => {
+                        if (a.title < b.title) { return -1 }
+                        if (a.title > b.title) { return 1 }
+                        return 0
+                    })
+                }
+                if (this.chosenSorting[0] == this.sortingOptions[3]) {
+                    this.filteredItems.sort((a,b) => {
+                        if (a.title < b.title) { return 1 }
+                        if (a.title > b.title) { return -1 }
+                        return 0
+                    })
+                }
+
+                this.$emit('filterit', this.filteredItems)
             },
             switchChoosing(arr, element) {
                 let array
                 arr == 'tags' ? array = this.chosenTags : (arr == 'authors' ? array = this.chosenAuthors : array = this.chosenSorting)
                 if (array.includes(element)) {
-                    const index = array.indexOf(element);
-                    if (index > -1) { // only splice array when item is found
-                        array.splice(index, 1); // 2nd parameter means remove one item only
-                    }
+                    const index = array.indexOf(element)
+                    if (index > -1) { array.splice(index, 1) }
                 }
                 else {
-                    if (!(arr == 'sort' && array.length == 1)) { array.push(element) }
+                    if (arr == 'sort' && array.length == 1) { array.splice(0,1) }
+                    array.push(element)
                 }
-                if (arr == 'sort') { this.isSortShown = false }
-                if (arr == 'tags') { 
-                    this.filterByTags() 
+                if (arr == 'sort') { 
+                    this.isSortShown = false
+                    this.sortArticles()
                 }
+                this.filterArticles()
             }
         }
     }

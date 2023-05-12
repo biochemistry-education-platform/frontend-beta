@@ -60,33 +60,42 @@ export default {
             this.articles = [
                 {
                     id: 1,
-                    title: 'article title',
+                    title: 'Some title',
                     type: 'text_article',
-                    author: 'author name',
+                    author: 'Петров Петр Петрович',
                     tags: ['СНО', 'гормоны'],
                     publish_date: (new Date((new Date('05 May 2023 14:48 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
                     isSaved: false
                 },
                 {
                     id: 2,
-                    title: 'article title2',
+                    title: 'Another title',
                     type: 'text_article',
-                    author: 'author name2',
+                    author: 'Иванов Иван Иванович',
                     tags: ['белки', 'липиды'],
                     publish_date: (new Date((new Date('06 May 2023 16:48 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
                     isSaved: true
                 },
                 {
                     id: 3,
-                    title: 'article title3',
+                    title: 'Smth else',
                     type: 'text_article',
-                    author: 'author name3',
+                    author: 'Андреев Андрей',
                     tags: ['гормоны'],
                     publish_date: (new Date((new Date('07 May 2023 12:40 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
                     isSaved: false
+                },
+                {
+                    id: 4,
+                    title: 'Ok thats all',
+                    type: 'text_article',
+                    author: 'Андреев Андрей',
+                    tags: ['белки'],
+                    publish_date: (new Date((new Date('07 May 2023 16:21 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
+                    isSaved: false
                 }
             ]
-            this.filteredArticles = this.articles.reverse()
+            this.filteredArticles = this.articles.sort((a,b) => new Date(b.publish_date) - new Date(a.publish_date))
         },
         // getArticles() {
         //     axios

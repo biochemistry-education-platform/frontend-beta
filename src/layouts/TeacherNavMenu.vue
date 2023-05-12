@@ -78,6 +78,7 @@ function switchLanguage () {
 
 watch(() => route.name, () => {
     current_item.value = route.name
+    if (current_item.value != 'ChoosingType' && current_item.value != 'AddArticle') { articleTypes.value = false}
 })
 
 function showArticleTypes () {
