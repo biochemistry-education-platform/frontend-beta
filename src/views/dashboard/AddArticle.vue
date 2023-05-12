@@ -3,9 +3,9 @@
         <input type="text" class="add-article-title" :placeholder="$t('articleTitle')">
         <div class="tagline">        
             <p>{{ $t('tags') }}</p>
-            <div v-if="type == 'recommend'" class="required-tag">рекомендация</div>
-            <div v-if="type == 'notification'" class="required-tag">оповещение</div>
-            <div v-if="this.$store.state.user.role == 'Sno_student'" class="required-tag">СНО</div>
+            <div v-if="type == 'recommend'" class="required-tag">{{ $t('recommend') }}</div>
+            <div v-if="type == 'notification'" class="required-tag">{{ $t('notification') }}</div>
+            <div v-if="this.$store.state.user.role == 'Sno_student'" class="required-tag">{{ $t('sno') }}</div>
             <div class="tag-field" v-for="index in numberOfTags" :key="index">
                 <Tags :initialTags="tags" @addTag="addTag" @deleteTag="deleteTag" />
             </div>

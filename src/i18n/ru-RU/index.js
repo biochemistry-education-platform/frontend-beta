@@ -48,6 +48,12 @@ export default {
     attachFile: 'Прикрепить файл',
     publish: 'Опубликовать',
     send: 'Отправить',
+    recommend: 'рекомендация',
+    notification: 'оповещение',
+    sno: 'СНО',
+    textArticle: 'Текстовая статья',
+    notifArticle: 'Оповещение',
+    recomArticle: 'Рекомендация',
 
     notes: 'Конспекты',
     note: 'Конспект',

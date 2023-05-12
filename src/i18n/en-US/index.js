@@ -47,6 +47,13 @@ export default {
     addArticlePlaceholder: 'Article text. For formatting select the text and choose an option in a popup menu.',
     attachFile: 'Attach file',
     publish: 'Publish',
+    send: 'Send',
+    recommend: 'recommendation',
+    notification: 'notification',
+    sno: 'SSS',
+    textArticle: 'Text article',
+    notifArticle: 'Notification',
+    recomArticle: 'Recommendation',
 
     notes: 'Abstracts',
     note: 'Abstract of',
