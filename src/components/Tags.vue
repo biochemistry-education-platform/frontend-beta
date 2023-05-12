@@ -15,7 +15,7 @@
 export default {
     name: 'Tags',
     props: {
-        initialTags: Object
+        initialTags: Object,
     },
     mounted() {
         console.log(this.tags)

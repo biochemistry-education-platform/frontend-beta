@@ -3,6 +3,9 @@
         <input type="text" class="add-article-title" :placeholder="$t('articleTitle')">
         <div class="tagline">        
             <p>{{ $t('tags') }}</p>
+            <div v-if="type == 'recommend'" class="required-tag">рекомендация</div>
+            <div v-if="type == 'notification'" class="required-tag">оповещение</div>
+            <div v-if="this.$store.state.user.role == 'Sno_student'" class="required-tag">СНО</div>
             <div class="tag-field" v-for="index in numberOfTags" :key="index">
                 <Tags :initialTags="tags" @addTag="addTag" @deleteTag="deleteTag" />
             </div>
@@ -14,9 +17,6 @@
             <input type="text" class="add-article-extra-option" :placeholder="$t('choosePlace')">
             <input type="text" class="add-article-extra-option" :placeholder="$t('chooseDateTime')">
         </div>
-        <div v-if="this.$store.state.user.role == 'Student'" class="add-article-extra-options">
-            <input type="text" class="add-article-extra-option" :placeholder="$t('chooseReviewer')">
-        </div>
         <hr class="biochemistry-page-hr aftertags-hr">
         <div class="add-article-text" id="maineditor">
         </div>
@@ -24,7 +24,11 @@
             <hr class="biochemistry-page-hr">
             <div class="add-article-footer-actions">
                 <div class="attach-file"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>{{ $t('attachFile') }}</div>
-                <button class="publish-article-btn" @click="createArticle">{{ $t('publish') }}</button>
+                <div class="add-article-sending">
+                    <input v-if="this.$store.state.user.role == 'Student'" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
+                    <button class="publish-article-btn" @click="createArticle">{{ store.state.user.role == 'Student' ? $t('send') : $t('publish') }}</button>
+                </div>
+                
             </div>
         </div>
     </div>
@@ -248,6 +252,18 @@ function toJSON(element) {
     margin-bottom: 12px;
 }
 
+.required-tag {
+    padding: 6px 12px;
+    background: var(--tags-color);
+    color: var(--tags-text);
+    font-size: 16px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    margin-right: 12px;
+}
+
 .tag-field {
     padding-right: 12px;
     margin-bottom: 12px;
@@ -285,12 +301,21 @@ function toJSON(element) {
 }
 
 .attach-file {
+    width: 180px;
+    white-space: nowrap;
     color: var(--text-extra);
     font-size: 16px;
 }
 
 .attach-file svg {
     fill: var(--text-extra);
+}
+
+.add-article-sending {
+    display: flex;
+    flex-direction: row;
+    width: 80%;
+    justify-content: flex-end;
 }
 
 .publish-article-btn {
@@ -300,6 +325,13 @@ function toJSON(element) {
     border-radius: 10px;
     padding: 12px 24px;
     border: none;
+    justify-self: flex-end;
+    transition: 0.3s;
+}
+
+.publish-article-btn:hover {
+    cursor: pointer;
+    background: var(--menu-accent-darker);
 }
 
 .add-article-extra-options {
@@ -312,6 +344,16 @@ function toJSON(element) {
 
 .add-article-extra-option {
     width: 30%;
+    margin-right: 3%;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.add-article-reviewer {
+    width: 200px;
     margin-right: 3%;
     background: none;
     border: none;

@@ -25,10 +25,15 @@
                 <svg class="check-articles-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M517 525 353 361l43-43 121 122 234-233 42 41-276 277Zm49 469-311-89v57H40V568h309l255 96q27 10 45.5 32.5T668 761h114q42 0 70 30t28 81v26l-314 96Zm-466-92h94V628h-94v274Zm462 30 256-78q-6-19-15-26t-21-7H575q-30 0-55.5-4T471 806l-81-25 22-58 73 24q25 8 47.5 11t71.5 3q0-12-4.5-23.5T584 721l-245-93h-84v214l307 90ZM194 765Zm410-4Zm-410 4Zm61 0Z"/></svg>
                 <p class="item-text check-articles-item-text">{{ $t('forChecking') }}</p>
             </router-link>
-            <router-link :to="{name: 'AddArticle'}" class="sss-menu-item create-article-block" :class="current_item == 'AddArticle' ? 'active' : ''">
+            <div class="sss-menu-item create-article-block" :class="current_item == 'AddArticle' ? 'active' : (current_item == 'ChoosingType' ? 'choosing' : '')" @click="showArticleTypes">
                 <svg class="create-article-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
                 <p class="item-text create-article-item-text">{{ $t('createArticle') }}</p>
-            </router-link>
+                <div v-if="articleTypes" class="article-types-block">
+                    <router-link :to="{ name: 'AddArticle', params: { type: 'text' }}" class="article-type-item">Текстовая статья</router-link>
+                    <router-link :to="{ name: 'AddArticle', params: { type: 'notification' }}" class="article-type-item">Оповещение</router-link>
+                    <router-link :to="{ name: 'AddArticle', params: { type: 'recommend' }}" class="article-type-item">Рекомендация</router-link>
+                </div>
+            </div>
             <router-link :to="{name: 'Favourites'}" class="sss-menu-item favorite-block" :class="current_item == 'Favourites' ? 'active' : ''">
                 <svg class="favorite-icon menu-svg" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg>
                 <p class="item-text favorite-item-text">{{ $t('favorites') }}</p>
@@ -60,6 +65,7 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const theme = ref('light')
 const language = ref('ru')
+let articleTypes = ref(false)
 let current_item = ref(route.name)
 
 const emit = defineEmits(['switchTheme', 'switchLanguage'])
@@ -74,51 +80,25 @@ function switchLanguage () {
     emit('switchLanguage', language.value)
 }
 
+function showArticleTypes () {
+    if (articleTypes.value) {
+        articleTypes.value = !articleTypes.value
+        current_item.value = route.name
+    } 
+    else {
+        current_item.value = 'ChoosingType'
+        articleTypes.value = !articleTypes.value
+    }
+}
+
 watch(() => route.name, () => {
     current_item.value = route.name
+    if (current_item.value != 'ChoosingType' && current_item.value != 'AddArticle') { articleTypes.value = false}
 })
 </script>
 
 <style>
-.side-menu {
-    width: 200px;
-    height: 100vh;
-    background: var(--menu-background);
-    position: absolute;
-    left: 0;
-    top: 0;
-}
 
-.logo-block {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.logo-block img {
-    margin-top: 20px;
-    margin-bottom: 5px;
-}
-
-.logo-name {
-    font-family: "RalewayLight";
-    color: var(--menu-accent);
-    font-size: 24px;
-    font-weight: 200;
-    letter-spacing: 0.1em;
-}
-
-.menu-svg, .menu-switches-svg {
-    fill: var(--text-color);
-    width: 27px;
-    height: auto;
-}
-
-.menu-switches-svg:hover {
-    fill: var(--text-extra);
-    cursor: pointer;
-}
 
 .sss-menu-items {
     display: flex;
@@ -136,75 +116,73 @@ watch(() => route.name, () => {
     color: var(--text-color);
 }
 
-.sss-menu-item.active {
+.create-article-block {
+    position: relative;
+}
+
+.create-article-block.choosing {
+    width: calc(100% - 16px) !important;
+    margin-left: 16px;
     background: var(--menu-accent);
     border-radius: 20px;
     color: var(--card-color);
 }
 
-.sss-menu-item.active .item-text:visited, .item-text:link {
+.create-article-block.choosing svg {
+    fill: var(--card-color);
+}
+
+ .article-types-block {
+    position: absolute;
+    white-space: nowrap;
+    top: -21px;
+    left: 184px;
+    background: var(--menu-accent);
+    color: var(--card-color);
+    border-radius: 20px;
+    z-index: 5;
+    text-align: left;
+    padding: 20px 16px;
+}
+
+.article-types-block::before {
+    content: '';
+    width: 36px;
+    height: 36px;
+    top: -15.4px;
+    background: var(--menu-background);
+    position: absolute;
+    left: -32px;
+    border-radius: 50%;
+    box-shadow: 13px 25px 0 var(--menu-accent);
+}
+.article-types-block::after {
+    content: '';
+    width: 36px;
+    height: 36px;
+    background: var(--menu-background);
+    position: absolute;
+    bottom: -13.5px;
+    left: -32.4px;
+    border-radius: 50%;
+    box-shadow: 13px -25px 0 var(--menu-accent);
+}
+
+.article-type-item {
+    display: block;
+    padding-bottom: 20px;
+    font-size: 16px;
+    line-height: 20px;
+    transition: 0.3s;
     color: var(--card-color);
 }
 
-.sss-menu-item.active svg{
-    fill: var(--card-color);
-    width: 27px;
-    height: auto;
+.article-type-item:hover {
+    cursor: pointer;
+    color: var(--text-extra)
 }
 
-.item-text {
-    font-size: 16px;
-    display: block;
-}
-
-.item-text:visited, .item-text:link {
-    color: var(--text-color);
-}
-
-.menu-switches {
-    width: calc(100% - 40px);
-    margin: auto;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.language-block {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.language-block:hover {
-    cursor: pointer;    
-}
-
-.language-block:hover svg{
-    fill: var(--text-extra);
-}
-
-.language-block:hover .language-name{
-    color: var(--text-extra);
-}
-
-.language-name{
-    padding-left: 5px;
-    font-size: 16px;
-    color: var(--text-color);
-}
-
-.themes-block {
-    position: relative;
-}
-
-.theme-checkbox {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    right: -10px;
-    bottom: -10px;
-    opacity: 0;
-    z-index: -1;
-    /* z-index обязательно изменить на большое значение */
+.article-type-item:last-child {
+    padding-bottom: 0px;
 }
 </style>

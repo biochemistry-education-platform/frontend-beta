@@ -76,45 +76,7 @@ watch(() => route.name, () => {
 </script>
 
 <style>
-.side-menu {
-    width: 200px;
-    height: 100vh;
-    background: var(--menu-background);
-    position: absolute;
-    left: 0;
-    top: 0;
-}
 
-.logo-block {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.logo-block img {
-    margin-top: 20px;
-    margin-bottom: 5px;
-}
-
-.logo-name {
-    font-family: "RalewayLight";
-    color: var(--menu-accent);
-    font-size: 24px;
-    font-weight: 200;
-    letter-spacing: 0.1em;
-}
-
-.menu-svg, .menu-switches-svg {
-    fill: var(--text-color);
-    width: 27px;
-    height: auto;
-}
-
-.menu-switches-svg:hover {
-    fill: var(--text-extra);
-    cursor: pointer;
-}
 
 .menu-items {
     display: flex;
@@ -130,77 +92,5 @@ watch(() => route.name, () => {
     padding-top: 20px;
     padding-bottom: 20px;
     color: var(--text-color);
-}
-
-.menu-item.active {
-    background: var(--menu-accent);
-    border-radius: 20px;
-    color: var(--card-color);
-}
-
-.menu-item.active .item-text:visited, .item-text:link {
-    color: var(--card-color);
-}
-
-.menu-item.active svg{
-    fill: var(--card-color);
-    width: 27px;
-    height: auto;
-}
-
-.item-text {
-    font-size: 16px;
-    display: block;
-}
-
-.item-text:visited, .item-text:link {
-    color: var(--text-color);
-}
-
-.menu-switches {
-    width: calc(100% - 40px);
-    margin: auto;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.language-block {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.language-block:hover {
-    cursor: pointer;    
-}
-
-.language-block:hover svg{
-    fill: var(--text-extra);
-}
-
-.language-block:hover .language-name{
-    color: var(--text-extra);
-}
-
-.language-name{
-    padding-left: 5px;
-    font-size: 16px;
-    color: var(--text-color);
-}
-
-.themes-block {
-    position: relative;
-}
-
-.theme-checkbox {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    right: -10px;
-    bottom: -10px;
-    opacity: 0;
-    z-index: -1;
-    /* z-index обязательно изменить на большое значение */
 }
 </style>
