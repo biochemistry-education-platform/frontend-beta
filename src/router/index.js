@@ -44,7 +44,7 @@ const routes = [
       },
 
       {
-        path: 'articles/add',
+        path: 'articles/add/:type',
         name: 'AddArticle',
         component: () => import('../views/dashboard/AddArticle.vue'),
         // meta: {

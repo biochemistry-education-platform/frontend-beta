@@ -10,6 +10,13 @@
                 <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
             </div>
         </div>
+        <div v-if="type == 'notification'" class="add-article-extra-options">
+            <input type="text" class="add-article-extra-option" :placeholder="$t('choosePlace')">
+            <input type="text" class="add-article-extra-option" :placeholder="$t('chooseDateTime')">
+        </div>
+        <div v-if="this.$store.state.user.role == 'Student'" class="add-article-extra-options">
+            <input type="text" class="add-article-extra-option" :placeholder="$t('chooseReviewer')">
+        </div>
         <hr class="biochemistry-page-hr aftertags-hr">
         <div class="add-article-text" id="maineditor">
         </div>
@@ -24,153 +31,162 @@
 </template>
 
 <script>
-import Tags from '@/components/Tags.vue'
-import { QuillEditor, Quill } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.bubble.css';
-
 export default {
     name: 'AddArticle',
-    data() {
-        return {
-            tags: ['липиды', 'белки'],
-            chosenTags: [],
-            numberOfTags: 1,
-            article: {
-                title: '',
-                text: '',
-                tags: []
-            }
-        }
-    },
-    components: {
-        Tags,
-        QuillEditor
-    },
-    mounted() {
-        let colorVars = getComputedStyle(document.getElementsByClassName('theme')[0])
-        let colors = [
-            colorVars.getPropertyValue('--card-color'),
-            colorVars.getPropertyValue('--background'),
-            colorVars.getPropertyValue('--lines-color'), 
-            colorVars.getPropertyValue('--text-extra'),                        
-            colorVars.getPropertyValue('--text-color'),
-            colorVars.getPropertyValue('--tags-color')
-        ]
+}
+</script>
 
-        var toolbarOptions = [            
-            [{ 'header': [1, 2, 3,  false] }],            
-            
-            [{ 'font': [] }],
+<script setup>
+import Tags from '@/components/Tags.vue'
+import { ref, reactive, onMounted } from 'vue'
+import { QuillEditor, Quill } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.bubble.css'
+import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import store from '@/store'
 
-            ['bold', 'italic', 'underline'],                  
-            
-            [{ 'list': 'ordered' }, { 'list': 'bullet' }],    
-            
-            [{ 'align': ['', 'center', 'right', 'justify'] }],            
-            
-            ['image', 'link'],      
+const i18n = useI18n()
 
-            [{ 'color': ['', colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
-                         '#47FDB0', '#40E3CC', '#52E4FA', '#40A2E3', '#4785FD', '#9359FF', '#A637E6', 
-                         '#73F2BC', '#6EE0D0', '#7AE1F0', '#6EB2E0', '#739EF2', '#A87FF3', '#B567E2', 
-                         '#FFF436', '#FFBF2E', '#FA7325', '#E63034', '#FF4F63', '#E62EA2', '#E82DFA',   
-                         '#F3EC67', '#F3C761', '#F0915B', '#E26365', '#F37886', '#E261B2', '#E360F0'] }, 
+const route = useRoute()
+let tags = ref(['липиды', 'белки'])
+let chosenTags = ref([])
+let numberOfTags = ref(1)
+let article = reactive({
+    title: '',
+    text: '',
+    tags: []
+})
+let type = ref('')
 
-             { 'background': ['', colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
-                             '#47FDB0', '#40E3CC', '#52E4FA', '#40A2E3', '#4785FD', '#9359FF', '#A637E6', 
-                             '#73F2BC', '#6EE0D0', '#7AE1F0', '#6EB2E0', '#739EF2', '#A87FF3', '#B567E2', 
-                             '#FFF436', '#FFBF2E', '#FA7325', '#E63034', '#FF4F63', '#E62EA2', '#E82DFA',   
-                             '#F3EC67', '#F3C761', '#F0915B', '#E26365', '#F37886', '#E261B2', '#E360F0'] }],
-        ];
-        var quill = new Quill('#maineditor', {
-            modules: {
-                toolbar: toolbarOptions
-            },
-            placeholder: this.$t('addArticlePlaceholder'),
-            theme: 'bubble'
-        });
-    },
-    methods: {
-        addTag(chosenTag) {
-            this.chosenTags.push(chosenTag)
+onMounted(() => {
+    type.value = route.params.type
+    let colorVars = getComputedStyle(document.getElementsByClassName('theme')[0])
+    let colors = [
+        colorVars.getPropertyValue('--card-color'),
+        colorVars.getPropertyValue('--background'),
+        colorVars.getPropertyValue('--lines-color'), 
+        colorVars.getPropertyValue('--text-extra'),                        
+        colorVars.getPropertyValue('--text-color'),
+        colorVars.getPropertyValue('--tags-color')
+    ]
+
+    var toolbarOptions = [            
+        [{ 'header': [1, 2, 3,  false] }],            
+        
+        [{ 'font': [] }],
+
+        ['bold', 'italic', 'underline'],                  
+        
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],    
+        
+        [{ 'align': ['', 'center', 'right', 'justify'] }],            
+        
+        ['image', 'link'],      
+
+        [{ 'color': ['', colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
+                        '#47FDB0', '#40E3CC', '#52E4FA', '#40A2E3', '#4785FD', '#9359FF', '#A637E6', 
+                        '#73F2BC', '#6EE0D0', '#7AE1F0', '#6EB2E0', '#739EF2', '#A87FF3', '#B567E2', 
+                        '#FFF436', '#FFBF2E', '#FA7325', '#E63034', '#FF4F63', '#E62EA2', '#E82DFA',   
+                        '#F3EC67', '#F3C761', '#F0915B', '#E26365', '#F37886', '#E261B2', '#E360F0'] }, 
+
+            { 'background': ['', colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
+                            '#47FDB0', '#40E3CC', '#52E4FA', '#40A2E3', '#4785FD', '#9359FF', '#A637E6', 
+                            '#73F2BC', '#6EE0D0', '#7AE1F0', '#6EB2E0', '#739EF2', '#A87FF3', '#B567E2', 
+                            '#FFF436', '#FFBF2E', '#FA7325', '#E63034', '#FF4F63', '#E62EA2', '#E82DFA',   
+                            '#F3EC67', '#F3C761', '#F0915B', '#E26365', '#F37886', '#E261B2', '#E360F0'] }],
+    ]
+    var quill = new Quill('#maineditor', {
+        modules: {
+            toolbar: toolbarOptions
         },
-        async addNewTag(event) {
-            await (this.numberOfTags += 1)
-            let inputsLength = document.getElementsByClassName('tag-input').length
-            let lastInput = document.getElementsByClassName('tag-input')[inputsLength - 1]
-            lastInput.focus()
-        },
-        deleteTag(tagToDelete) {
-            let inputs = document.getElementsByClassName('finished-tag')
-            for (let input of inputs) {
-                if (input.innerText == tagToDelete) {
-                    input.parentElement.parentElement.remove()
-                }
-            }
-        },
-        createArticle() {
-            const textarea = document.getElementsByClassName('ql-editor')[0]
-            const children = textarea.children;
+        placeholder: i18n.t('addArticlePlaceholder'),
+        theme: 'bubble'
+    })
+})
 
-            let arr = []
-            Array.from(children).forEach(element => {
-                arr.push(this.toJSON(element))
-            })
-            let jsonresult = JSON.stringify(arr)
-            this.article.title = this.article.title
-            this.article.text = jsonresult
-            this.article.tags = this.chosenTags
+function addTag(chosenTag) {
+    chosenTags.value.push(chosenTag)
+}
 
-            console.log(this.chosenTags)
-            console.log(this.article.text)
-        },
-        toJSON(element) {
-            let propFix = { for: 'htmlFor', class: 'className' };
-            let specialGetters = {
-                style: (node) => node.style.cssText,
-            }
-            let attrDefaultValues = { style: '' }
-            let obj = {
-                nodeType: element.nodeType
-            }
-            if (element.tagName) {
-                obj.tagName = element.tagName.toLowerCase();
-            } else if (element.nodeName) {
-                obj.nodeName = element.nodeName;
-            }
-            if (element.nodeValue) {
-                obj.nodeValue = element.nodeValue;
-            }
-            let attrs = element.attributes;
-            if (attrs) {
-                let defaultValues = new Map()
-                for (let i = 0; i < attrs.length; i++) {
-                    let name = attrs[i].nodeName
-                    defaultValues.set(name, attrDefaultValues[name])
-                }
-                let arr = []
-                for (let [name, defaultValue] of defaultValues) {
-                    let propName = propFix[name] || name
-                    let specialGetter = specialGetters[propName]
-                    let value = specialGetter ? specialGetter(element) : element[propName]
-                    if (value !== defaultValue) {
-                        arr.push([name, value])
-                    }
-                }
-                if (arr.length) {
-                    obj.attributes = arr
-                }
-            }
-            let childNodes = element.childNodes
-            if (obj.tagName !== 'textarea' && childNodes && childNodes.length) {
-                let arr = (obj.childNodes = []);
-                for (let i = 0; i < childNodes.length; i++) {
-                    arr[i] = this.toJSON(childNodes[i])
-                }
-            }
-            return obj
+
+async function addNewTag(event) {
+    await (numberOfTags.value += 1)
+    let inputsLength = document.getElementsByClassName('tag-input').length
+    let lastInput = document.getElementsByClassName('tag-input')[inputsLength - 1]
+    lastInput.focus()
+}
+
+function deleteTag(tagToDelete) {
+    let inputs = document.getElementsByClassName('finished-tag')
+    for (let input of inputs) {
+        if (input.innerText == tagToDelete) {
+            input.parentElement.parentElement.remove()
         }
     }
+}
+
+function createArticle() {
+    const textarea = document.getElementsByClassName('ql-editor')[0]
+    const children = textarea.children;
+
+    let arr = []
+    Array.from(children).forEach(element => {
+        arr.push(toJSON(element))
+    })
+    let jsonresult = JSON.stringify(arr)
+    article.title = article.title
+    article.text = jsonresult
+    article.tags = chosenTags.value
+
+    console.log(chosenTags.value)
+    console.log(article.text)
+}
+
+function toJSON(element) {
+    let propFix = { for: 'htmlFor', class: 'className' };
+    let specialGetters = {
+        style: (node) => node.style.cssText,
+    }
+    let attrDefaultValues = { style: '' }
+    let obj = {
+        nodeType: element.nodeType
+    }
+    if (element.tagName) {
+        obj.tagName = element.tagName.toLowerCase();
+    } else if (element.nodeName) {
+        obj.nodeName = element.nodeName;
+    }
+    if (element.nodeValue) {
+        obj.nodeValue = element.nodeValue;
+    }
+    let attrs = element.attributes;
+    if (attrs) {
+        let defaultValues = new Map()
+        for (let i = 0; i < attrs.length; i++) {
+            let name = attrs[i].nodeName
+            defaultValues.set(name, attrDefaultValues[name])
+        }
+        let arr = []
+        for (let [name, defaultValue] of defaultValues) {
+            let propName = propFix[name] || name
+            let specialGetter = specialGetters[propName]
+            let value = specialGetter ? specialGetter(element) : element[propName]
+            if (value !== defaultValue) {
+                arr.push([name, value])
+            }
+        }
+        if (arr.length) {
+            obj.attributes = arr
+        }
+    }
+    let childNodes = element.childNodes
+    if (obj.tagName !== 'textarea' && childNodes && childNodes.length) {
+        let arr = (obj.childNodes = []);
+        for (let i = 0; i < childNodes.length; i++) {
+            arr[i] = toJSON(childNodes[i])
+        }
+    }
+    return obj
 }
 </script>
 
@@ -286,6 +302,27 @@ export default {
     border: none;
 }
 
+.add-article-extra-options {
+    display: flex;
+    flex-direction: row;
+    width: 80%;
+    margin: auto;
+    margin-bottom: 20px;
+}
+
+.add-article-extra-option {
+    width: 30%;
+    margin-right: 3%;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.add-article-extra-option::placeholder {
+    color: var(--text-extra);
+}
 /* .ql-bubble .ql-tooltip {
     background: var(--card-color);
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
