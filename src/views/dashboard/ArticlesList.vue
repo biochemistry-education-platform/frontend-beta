@@ -1,7 +1,7 @@
 <template>
     <div class="biochemistry-page">
         <h1 class="biochemistry-page-title">{{ $t('feed') }}</h1>
-        <!-- <SearchForm v-bind:items="articles" v-on:filterit="filterit"/> -->
+        <SearchForm v-bind:items="articles" v-on:filterit="filterit"/>
         <hr class="biochemistry-page-hr">
         <div class="articles-list">
             <div class="articles__article" v-for="article in filteredArticles" v-bind:key="article.id">
@@ -63,7 +63,7 @@ export default {
                     title: 'article title',
                     type: 'text_article',
                     author: 'author name',
-                    tags: ['СНО'],
+                    tags: ['СНО', 'гормоны'],
                     publish_date: (new Date((new Date('05 May 2023 14:48 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
                     isSaved: false
                 },
