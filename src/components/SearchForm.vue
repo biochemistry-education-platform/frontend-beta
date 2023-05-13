@@ -61,8 +61,6 @@
 </template>
 
 <script>
-import { split } from 'apollo-boost'
-
     export default {
         name: 'SearchForm',
         props: {
