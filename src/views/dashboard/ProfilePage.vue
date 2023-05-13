@@ -2,6 +2,7 @@
     <div class="my-account-page">
         <div class="my-account__header">
             <h1 class="my-account__title">{{ $t('profileTitle') }}</h1>
+            <router-link :to="{name: 'SignUp'}">Регистрация</router-link>
             <button @click="logout()" class="logout-btn">{{ $t('logOut') }}</button>
         </div>
         <hr class="my-account__hr">
