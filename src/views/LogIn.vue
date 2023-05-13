@@ -19,6 +19,92 @@
 </template>
 
 <script>
+export default {
+    name: 'LogIn',
+}
+</script>
+
+
+<script setup>
+import gql from 'graphql-tag'
+import { apolloClient } from '@/vue-apollo'
+import { ref } from 'vue'
+import { toast } from 'bulma-toast'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import store from '@/store'
+
+const i18n = useI18n()
+const router = useRouter()
+
+const AUTH_USER_MUTATION = gql`
+    mutation AuthUser($email: String!, $password: String!) {
+        authUser(email: $email, password: $password) {
+            profile {
+                id
+                user
+                role {
+                    id
+                    roleName
+                }
+                channels
+                photo
+                getNotification
+                name
+                surname
+                secondname
+            }
+        }
+    }`
+
+let email = ref('')
+let password = ref('')
+
+function submitForm() {
+    apolloClient
+        .mutate({
+            mutation: AUTH_USER_MUTATION,
+            variables: {
+                email: email.value,
+                password: password.value,
+            },
+        })
+        .then(result => {
+            router.push({ name: 'Articles' })
+            store.state.user.id = result.data.authUser.profile.id
+            store.state.user.role = result.data.authUser.profile.role.roleName
+            store.state.user.name = result.data.authUser.profile.name
+            store.state.user.surname = result.data.authUser.profile.surname
+            store.state.user.email = email.value
+        })
+        .catch(error => {
+            toast({
+                message: i18n.t('authFailed') + '\n' + error,
+                type: 'notification-danger',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 2000,
+                position: 'top-right',
+            })
+        })
+}
+</script>
+
+<style>
+.notification-success {
+    background-color: #66D9D3;
+    border-radius: 16px;
+    color: white;
+}
+
+.notification-danger {
+    background-color: #F65151;
+    border-radius: 16px;
+    color: white;
+}
+</style>
+
+<!-- <script>
 import axios from 'axios'
 
 // я передаю username и password
@@ -148,4 +234,4 @@ export default {
         }  
     }
 }
-</script>
+</script> -->

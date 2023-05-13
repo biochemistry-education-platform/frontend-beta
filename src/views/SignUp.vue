@@ -41,19 +41,49 @@ export default {
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import { ref } from 'vue'
+import { toast } from 'bulma-toast'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+
+const i18n = useI18n()
+const router = useRouter()
 
 const CREATE_PROFILE_MUTATION = gql`
-    mutation CreateProfile($email: String!, $password: String!, $role: String!, $name: String, $surname: String) {
+    mutation CreateProfile($email: String!, $password: String!, $role: String!, $name: String!, $surname: String!) {
         createProfile(email: $email, password: $password, role: $role, name: $name, surname: $surname) {
             profile {
                 id
+                user
+                role {
+                    id
+                    roleName
+                }
+                channels
+                photo
+                getNotification
                 name
                 surname
-                role
-                user {
+                secondname
+            }
+        }
+    }`
+
+const AUTH_USER_MUTATION = gql`
+    mutation AuthUser($email: String!, $password: String!) {
+        authUser(email: $email, password: $password) {
+            profile {
+                id
+                user
+                role {
                     id
-                    email
+                    roleName
                 }
+                channels
+                photo
+                getNotification
+                name
+                surname
+                secondname
             }
         }
     }`
@@ -66,28 +96,77 @@ let student = ref(true)
 let role = ref('')
 
 function addUser() {
-    if (student.value == true) {
-        role.value = 'Student'
-    }
-    else {
-        role.value = 'Teacher'
-    }
+    student.value == true ? role.value = 'Student' : role.value = 'Teacher'
     apolloClient
         .mutate({
             mutation: CREATE_PROFILE_MUTATION,
             variables: {
-                email: 'example@mail.ru',
-                password: 'jsdhsdfj3',
-                role: 'Student',
-                name: 'Sjdsd',
-                surname: 'SDFjsds'
+                email: email.value,
+                password: password.value,
+                role: role.value,
+                name: name.value,
+                surname: surname.value
             },
         })
         .then(result => {
-            console.log(result)
+            toast({
+                message: i18n.t('registrationSuccess'),
+                type: 'notification-success',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 2000,
+                position: 'top-right',
+            })
+            apolloClient
+                .mutate({
+                    mutation: AUTH_USER_MUTATION,
+                    variables: {
+                        email: email.value,
+                        password: password.value,
+                    },
+                })
+                .then(result => {
+                    router.push({ name: 'Articles' })
+                    store.state.user.id = result.data.authUser.profile.id
+                    store.state.user.role = result.data.authUser.profile.role.roleName
+                    store.state.user.name = result.data.authUser.profile.name
+                    store.state.user.surname = result.data.authUser.profile.surname
+                    store.state.user.email = email.value
+                })
+                .catch(error => {
+                    toast({
+                        message: i18n.t('authFailed') + '\n' + error,
+                        type: 'notification-danger',
+                        dismissible: true,
+                        pauseOnHover: true,
+                        duration: 2000,
+                        position: 'top-right',
+                    })
+                })
         })
         .catch(error => {
-            console.log(error)
+            toast({
+                message: i18n.t('registrationFailed') + '\n' + error,
+                type: 'notification-danger',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 2000,
+                position: 'top-right',
+            })
         })
 }
 </script>
+
+<style>
+.notification-success {
+    background-color: #66D9D3;
+    border-radius: 16px;
+    color: white;
+}
+
+.notification-danger {
+    background-color: #F65151;
+    border-radius: 16px;
+    color: white;
+}
+</style>

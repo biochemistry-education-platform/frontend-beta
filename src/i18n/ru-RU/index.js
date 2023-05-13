@@ -20,6 +20,9 @@ export default {
     toLogIn: 'Войти',
     logIn: 'Вход',
     dontSigned: 'Еще нет аккаунта? ',
+    registrationSuccess: 'Регистрация прошла успешно!',
+    registrationFailed: 'Произошла ошибка регистрации!',
+    authFailed: 'Произошла ошибка авторизации!',
 
     profileTitle: 'Кабинет',
     logOut: 'Выйти',

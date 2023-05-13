@@ -2,7 +2,6 @@
     <div class="my-account-page">
         <div class="my-account__header">
             <h1 class="my-account__title">{{ $t('profileTitle') }}</h1>
-            <router-link :to="{name: 'SignUp'}">Регистрация</router-link>
             <button @click="logout()" class="logout-btn">{{ $t('logOut') }}</button>
         </div>
         <hr class="my-account__hr">
@@ -92,18 +91,20 @@
 </template>
 
 <script>
-import axios from 'axios'
-import store from '@/store'
-
 export default {
     name: 'Profile',
-    async mounted() {
-        await this.getMyInfo()
-    },
-    data() {
-        return {
-            tags: ['белки', 'липиды', 'гормоны'],
-            authors: [{
+}
+</script>
+
+<script setup>
+import axios from 'axios'
+import store from '@/store'
+import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+
+const router = useRouter()
+let tags = ref(['белки', 'липиды', 'гормоны'])
+let authors = ref([{
                 surname: 'Иванов',
                 name: 'Иван',
                 patronymic: 'Иванович',
@@ -120,8 +121,8 @@ export default {
                 name: 'Имя',
                 patronymic: 'Отчество',
                 role: 'Student'
-            }],
-            sss: [{
+            }])
+let sss = ref([{
                 surname: 'Иванов',
                 name: 'Иван',
                 patronymic: 'Иванович',
@@ -135,50 +136,53 @@ export default {
                 surname: 'Фамилия',
                 name: 'Имя',
                 patronymic: 'Отчество',
-            }]
-        }
-    },
-    methods: {
-        logout() {
-            // axios
-            //     .post('/api/v1/token/logout/')
-            //     .then(response => {
-            //         axios.defaults.headers.common["Authorization"] = ""
-            //         localStorage.removeItem('email')
-            //         localStorage.removeItem('userid')
-            //         localStorage.removeItem('token')
-            //         this.$store.commit('removeToken')
-            //         this.$router.push('/log-in')
-            //     })
-            //     .catch(error => {
-            //             if (error.response) {
-            //                 console.log(JSON.stringify(error.response.data))
-            //             } else if (error.message) {
-            //                 console.log(JSON.stringify(error.message))
-            //             } else {
-            //                 console.log(JSON.stringify(error))
-            //             }
-            //         })
-        },
-        getMyInfo() {
-            console.log(store.state.user)
-            // axios
-            //     .get('/api/v1/clients')
-            //     .then(response => {
-            //         for (const property in response.data) {
-            //             if (response.data[property].email == store.state.user.email) {
-            //                 store.state.user.surname = response.data[property].surname
-            //                 store.state.user.name = response.data[property].name
-            //                 store.state.user.patronymic = response.data[property].patronymic
-            //                 store.state.user.role = response.data[property].role
-            //             }
-            //         }
-            //     })
-            //     .catch(error => {
-            //         console.log(JSON.stringify(error))
-            //     })
-        }
-    }
+            }])
+
+onMounted(async () => {
+    await getMyInfo()
+})
+
+function logout() {
+    // axios
+    //     .post('/api/v1/token/logout/')
+    //     .then(response => {
+    //         axios.defaults.headers.common["Authorization"] = ""
+    //         localStorage.removeItem('email')
+    //         localStorage.removeItem('userid')
+    //         localStorage.removeItem('token')
+    //         this.$store.commit('removeToken')
+    //         this.$router.push('/log-in')
+    //     })
+    //     .catch(error => {
+    //             if (error.response) {
+    //                 console.log(JSON.stringify(error.response.data))
+    //             } else if (error.message) {
+    //                 console.log(JSON.stringify(error.message))
+    //             } else {
+    //                 console.log(JSON.stringify(error))
+    //             }
+    //         })
+    store.commit('changeUser')
+    router.push({name: 'LogIn'})
+}
+
+function getMyInfo() {
+    console.log(store.state.user)
+    // axios
+    //     .get('/api/v1/clients')
+    //     .then(response => {
+    //         for (const property in response.data) {
+    //             if (response.data[property].email == store.state.user.email) {
+    //                 store.state.user.surname = response.data[property].surname
+    //                 store.state.user.name = response.data[property].name
+    //                 store.state.user.patronymic = response.data[property].patronymic
+    //                 store.state.user.role = response.data[property].role
+    //             }
+    //         }
+    //     })
+    //     .catch(error => {
+    //         console.log(JSON.stringify(error))
+    //     })
 }
 </script>
 

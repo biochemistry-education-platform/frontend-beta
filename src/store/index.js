@@ -4,11 +4,11 @@ export default createStore({
   state: {
     user: {
       id: '',
-      email: 'example@mail.ru',
-      role: 'Teacher',
-      surname: 'Фамилия',
-      name: 'Имя',
-      patronymic: 'Отчество'
+      email: '',
+      role: '',
+      surname: '',
+      name: '',
+      patronymic: ''
     },
     isAuthenticated: false,
     token: ''
@@ -17,21 +17,27 @@ export default createStore({
   },
   mutations: {
     initializeStore(state) {
-      if (localStorage.getItem('token')) {
-        state.token = localStorage.getItem('token')
-        state.isAuthenticated = true
-        state.user.email = localStorage.getItem('username')
-        state.user.id = localStorage.getItem('userid')
-      } else {
+      // if (localStorage.getItem('token')) {
+      //   state.token = localStorage.getItem('token')
+      //   state.isAuthenticated = true
+      //   state.user.email = localStorage.getItem('username')
+      //   state.user.id = localStorage.getItem('userid')
+      // } else {
+      //   state.user.id = ''
+      //   state.user.email = 'example@mail.ru'
+      //   state.user.role = 'Teacher'
+      //   state.user.surname = 'Фамилия'
+      //   state.user.name = 'Имя'
+      //   state.user.patronymic = 'Отчество'
+      //   state.token = ''
+      //   state.isAuthenticated = false
+      // }
         state.user.id = ''
-        state.user.email = 'example@mail.ru'
-        state.user.role = 'Teacher'
-        state.user.surname = 'Фамилия'
-        state.user.name = 'Имя'
-        state.user.patronymic = 'Отчество'
-        state.token = ''
-        state.isAuthenticated = false
-      }
+        state.user.email = ''
+        state.user.role = ''
+        state.user.surname = ''
+        state.user.name = ''
+        state.user.patronymic = ''
     },
     setToken(state, token) {
       state.token = token
@@ -42,6 +48,14 @@ export default createStore({
       state.user.email = ''
       state.token = ''
       state.isAuthenticated = false
+    },
+    changeUser(state) {
+      state.user.id = ''
+      state.user.email = ''
+      state.user.role = ''
+      state.user.surname = ''
+      state.user.name = ''
+      state.user.patronymic = ''
     },
     setUser(state, user) {
       state.user = user

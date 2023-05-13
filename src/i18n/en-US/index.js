@@ -20,6 +20,9 @@ export default {
     toLogIn: 'Log in',
     logIn: 'Log in',
     dontSigned: "Don't have an account? ",
+    registrationSuccess: 'Registration finished successfully',
+    registrationFailed: 'Registration error!',
+    authFailed: 'Authentication error!',
 
     profileTitle: 'My account',
     logOut: 'Log out',
