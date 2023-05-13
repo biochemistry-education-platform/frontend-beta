@@ -5,7 +5,7 @@
             <p>{{ $t('tags') }}</p>
             <div v-if="type == 'recommend'" class="required-tag">{{ $t('recommend') }}</div>
             <div v-if="type == 'notification'" class="required-tag">{{ $t('notification') }}</div>
-            <div v-if="this.$store.state.user.role == 'Sno_student'" class="required-tag">{{ $t('sno') }}</div>
+            <div v-if="user_role == 'Sno_student'" class="required-tag">{{ $t('sno') }}</div>
             <div class="tag-field" v-for="index in numberOfTags" :key="index">
                 <Tags :initialTags="tags" @addTag="addTag" @deleteTag="deleteTag" />
             </div>
@@ -25,8 +25,8 @@
             <div class="add-article-footer-actions">
                 <div class="attach-file"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>{{ $t('attachFile') }}</div>
                 <div class="add-article-sending">
-                    <input v-if="this.$store.state.user.role == 'Student'" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
-                    <button class="publish-article-btn" @click="createArticle">{{ store.state.user.role == 'Student' ? $t('send') : $t('publish') }}</button>
+                    <input v-if="user_role == 'Student'" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
+                    <button class="publish-article-btn" @click="createArticle">{{ user_role == 'Student' ? $t('send') : $t('publish') }}</button>
                 </div>
                 
             </div>
@@ -61,8 +61,10 @@ let article = reactive({
     tags: []
 })
 let type = ref('')
+let user_role = ref('')
 
 onMounted(() => {
+    user_role.value = store.state.user.role
     type.value = route.params.type
     let colorVars = getComputedStyle(document.getElementsByClassName('theme')[0])
     let colors = [
