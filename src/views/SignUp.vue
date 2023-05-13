@@ -31,51 +31,63 @@
 </template>
 
 <script>
+export default {
+    name: 'SignUp',
+}
+</script>
+
+
+<script setup>
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
+import { ref } from 'vue'
 
-export default {
+const CREATE_PROFILE_MUTATION = gql`
+    mutation CreateProfile($email: String!, $password: String!, $role: String!, $name: String, $surname: String) {
+        createProfile(email: $email, password: $password, role: $role, name: $name, surname: $surname) {
+            profile {
+                id
+                name
+                surname
+                role
+                user {
+                    id
+                    email
+                }
+            }
+        }
+    }`
 
-data() {
-    return {
-        email: '',
-        surname: '',
-        name: '',
-        username: '',
-        password: '',
-        role: true,
+let email = ref('')
+let surname = ref('')
+let name = ref('')
+let password = ref('')
+let student = ref(true)
+let role = ref('')
+
+function addUser() {
+    if (student.value == true) {
+        role.value = 'Student'
     }
-},
-methods: {
-    addUser() {
-        apolloClient
-            .mutate({
-                mutation: gql`
-                    mutation ($email: String!, $username: String!, $password1: String!, $password2: String!) {
-                        register(email: $email, username: $username, password1: $password1, password2: $password2) {
-                            success,
-                            errors,
-                            token,
-                            refreshToken
-                        }
-                    }
-                `,
-                variables: {
-                    email: this.email,
-                    username: this.email,
-                    // username: `${this.surname} ${this.name}`,
-                    password1: this.password,
-                    password2: this.password,
-                    // role: this.role === true ? 'Student' : 'Teacher',
-                },
-            })
-            .then(result => {
-                console.log(result)
-            })
-            .catch(error => {
-                console.log(error)
-            })
-    },
-  },
+    else {
+        role.value = 'Teacher'
+    }
+    apolloClient
+        .mutate({
+            mutation: CREATE_PROFILE_MUTATION,
+            variables: {
+                email: 'example@mail.ru',
+                password: 'jsdhsdfj3',
+                role: 'Student',
+                name: 'Sjdsd',
+                surname: 'SDFjsds'
+            },
+        })
+        .then(result => {
+            console.log(result)
+        })
+        .catch(error => {
+            console.log(error)
+        })
 }
 </script>
