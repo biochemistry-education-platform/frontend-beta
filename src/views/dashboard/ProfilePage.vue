@@ -100,7 +100,7 @@ export default {
 import axios from 'axios'
 import store from '@/store'
 import { useRouter } from 'vue-router'
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 
 const router = useRouter()
 
