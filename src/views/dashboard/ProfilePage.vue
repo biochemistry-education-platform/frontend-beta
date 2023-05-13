@@ -8,15 +8,15 @@
         <div class="my-account__content">
             <div class="my-account__info">
                 <img class="my-account__img" src="@/assets/icons/profile_img.png">
-                <h2 class="my-account-name">{{ $store.state.user.surname }} {{ $store.state.user.name }} {{ $store.state.user.patronymic }}</h2>
-                <p class="my-account-role">{{ $store.state.user.role == 'Teacher' ? $t('roleTeacher') : ($store.state.user.role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
-                <p class="my-account-mail">{{ $store.state.user.email }}</p>
+                <h2 class="my-account-name">{{ store.state.user.surname }} {{ store.state.user.name }} {{ store.state.user.patronymic }}</h2>
+                <p class="my-account-role">{{ store.state.user.role == 'Teacher' ? $t('roleTeacher') : (store.state.user.role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
+                <p class="my-account-mail">{{ store.state.user.email }}</p>
                 <button class="my-account-password-btn">{{ $t('changePassword') }}</button>
                 <hr class="my-account-info-hr">
                 <div class="my-account-channels">
                     <div class="my-account-channel">
                         <img src="@/assets/icons/mail-icon.png">
-                        <p class="my-account-channel-filled">{{ $store.state.user.email }}</p>
+                        <p class="my-account-channel-filled">{{ store.state.user.email }}</p>
                     </div>
                     <div class="my-account-channel">
                         <img src="@/assets/icons/vk-icon.png">
@@ -63,7 +63,7 @@
                     </div>
                 </div>
                 
-                <div v-if="this.$store.state.user.role == 'Teacher'" class="my-account-sss">
+                <div v-if="this.store.state.user.role == 'Teacher'" class="my-account-sss">
                     <h2 class="my-account-sss-title">{{ $t('sssLeads') }}</h2>
                     <div class="my-account-sss-content">
                         <div v-for="user, index in sss" :key="index">
