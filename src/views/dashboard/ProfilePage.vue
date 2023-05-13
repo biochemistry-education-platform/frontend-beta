@@ -8,15 +8,15 @@
         <div class="my-account__content">
             <div class="my-account__info">
                 <img class="my-account__img" src="@/assets/icons/profile_img.png">
-                <h2 class="my-account-name">{{ store.state.user.surname }} {{ store.state.user.name }} {{ store.state.user.patronymic }}</h2>
-                <p class="my-account-role">{{ store.state.user.role == 'Teacher' ? $t('roleTeacher') : (store.state.user.role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
-                <p class="my-account-mail">{{ store.state.user.email }}</p>
+                <h2 class="my-account-name">{{ user.surname }} {{ user.name }} {{ user.patronymic }}</h2>
+                <p class="my-account-role">{{ user.role == 'Teacher' ? $t('roleTeacher') : (user.role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
+                <p class="my-account-mail">{{ user.email }}</p>
                 <button class="my-account-password-btn">{{ $t('changePassword') }}</button>
                 <hr class="my-account-info-hr">
                 <div class="my-account-channels">
                     <div class="my-account-channel">
                         <img src="@/assets/icons/mail-icon.png">
-                        <p class="my-account-channel-filled">{{ store.state.user.email }}</p>
+                        <p class="my-account-channel-filled">{{ user.email }}</p>
                     </div>
                     <div class="my-account-channel">
                         <img src="@/assets/icons/vk-icon.png">
@@ -63,16 +63,16 @@
                     </div>
                 </div>
                 
-                <div v-if="this.store.state.user.role == 'Teacher'" class="my-account-sss">
+                <div v-if="user.role == 'Teacher'" class="my-account-sss">
                     <h2 class="my-account-sss-title">{{ $t('sssLeads') }}</h2>
                     <div class="my-account-sss-content">
-                        <div v-for="user, index in sss" :key="index">
+                        <div v-for="sss_user, index in sss" :key="index">
                             <div class="my-account-sss-user">
                                 <p class="my-account-sss-user-number">{{ index + 1 }}</p>
                                 <hr class="vertical-hr">
                                 <div class="my-account-sss-user-name">
                                     <img src="@/assets/icons/profile_img.png">
-                                    <p>{{ user.surname }} {{ user.name }} {{ user.patronymic }}</p>
+                                    <p>{{ sss_user.surname }} {{ sss_user.name }} {{ sss_user.patronymic }}</p>
                                 </div>
                                 <hr class="vertical-hr">
                                 <p class="my-account-delete-sss-user"><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></p>
@@ -103,6 +103,15 @@ import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
 
 const router = useRouter()
+
+let user = reactive({
+    id: '',
+    email: '',
+    role: '',
+    surname: '',
+    name: '',
+    patronymic: ''
+})
 let tags = ref(['белки', 'липиды', 'гормоны'])
 let authors = ref([{
                 surname: 'Иванов',
@@ -167,7 +176,12 @@ function logout() {
 }
 
 function getMyInfo() {
-    console.log(store.state.user)
+    user.id = store.state.user.id
+    user.email = store.state.user.email
+    user.name = store.state.user.name
+    user.surname = store.state.user.surname
+    user.patronymic = store.state.user.patronymic
+    user.role = store.state.user.role
     // axios
     //     .get('/api/v1/clients')
     //     .then(response => {
