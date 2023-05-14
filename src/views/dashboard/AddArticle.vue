@@ -1,6 +1,6 @@
 <template>
     <div class="biochemistry-page page-flex">
-        <input type="text" class="add-article-title" :placeholder="$t('articleTitle')">
+        <input type="text" class="add-article-title" v-on:change="saveTitle" v-model="articleTitle" :placeholder="$t('articleTitle')">
         <div class="tagline">        
             <p>{{ $t('tags') }}</p>
             <div v-if="type == 'recommend'" class="required-tag">{{ $t('recommend') }}</div>
@@ -14,8 +14,8 @@
             </div>
         </div>
         <div v-if="type == 'notification'" class="add-article-extra-options">
-            <input type="text" class="add-article-extra-option" :placeholder="$t('choosePlace')">
-            <input type="text" class="add-article-extra-option" :placeholder="$t('chooseDateTime')">
+            <input type="text" class="add-article-extra-option" v-model="place" :placeholder="$t('choosePlace')">
+            <input type="text" class="add-article-extra-option" v-model="eventDate" :placeholder="$t('chooseDateTime')">
         </div>
         <hr class="biochemistry-page-hr aftertags-hr">
         <div class="add-article-text" id="maineditor">
@@ -41,17 +41,21 @@ export default {
 </script>
 
 <script setup>
+import gql from 'graphql-tag'
+import { apolloClient } from '@/vue-apollo'
 import Tags from '@/components/Tags.vue'
 import { ref, reactive, onMounted } from 'vue'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { toast } from 'bulma-toast'
 import store from '@/store'
 
 const i18n = useI18n()
 
 const route = useRoute()
+const router = useRouter()
 let tags = ref(['липиды', 'белки'])
 let chosenTags = ref([])
 let numberOfTags = ref(1)
@@ -62,7 +66,48 @@ let article = reactive({
 })
 let type = ref('')
 let user_role = ref('')
+let articleTitle = ref('')
+let chosenTags2 = []
+let place = ref('')
+let eventDate = ref('')
 
+const CREATE_ARTICLE_MUTATION = gql`
+    mutation createArticle($name: String!, $articleText: JSONString!, $reviewer: Int!, $profileId: Int!, $tags: [String!]!) {
+        createArticle(name: $name, articleText: $articleText, reviewer: $reviewer, profileId: $profileId, tags: $tags) {
+            article {
+                id
+                name
+                articleText
+                publishDate
+                reviewer {
+                    id
+                }
+            }
+        }
+    }`
+
+const CREATE_NOTIF_ARTICLE_MUTATION = gql`
+    mutation($name: String, $notif_text: JSONString, $author: Int, $tags: [String]) {
+        createNotification(name: $name, notifText: $notif_text, author: $author, tags: $tags) {
+            notif {
+                id
+                name
+                notifText
+                author {
+                    id
+                    name
+                    surname
+                    secondname
+                }
+                creationDate
+                notificationtagSet {
+                    tagId {
+                        name
+                    }  
+                }
+            }
+        }
+    }`
 onMounted(() => {
     user_role.value = store.state.user.role
     type.value = route.params.type
@@ -108,12 +153,18 @@ onMounted(() => {
         placeholder: i18n.t('addArticlePlaceholder'),
         theme: 'bubble'
     })
+    if (type.value == 'recommend') {
+        chosenTags.value.push(i18n.t('recommend'))
+    } else if (type.value == 'notification') {
+        chosenTags.value.push(i18n.t('notification'))
+    } else if (user_role.value == 'Sno_student') {
+        chosenTags.value.push(i18n.t('sno'))
+    }
 })
 
 function addTag(chosenTag) {
     chosenTags.value.push(chosenTag)
 }
-
 
 async function addNewTag(event) {
     await (numberOfTags.value += 1)
@@ -140,12 +191,82 @@ function createArticle() {
         arr.push(toJSON(element))
     })
     let jsonresult = JSON.stringify(arr)
-    article.title = article.title
-    article.text = jsonresult
-    article.tags = chosenTags.value
 
-    console.log(chosenTags.value)
-    console.log(article.text)
+    JSON.parse(JSON.stringify(chosenTags.value)).forEach(value => chosenTags2.push(value))
+
+    if (type.value == 'text') {
+        apolloClient
+            .mutate({
+                mutation: CREATE_ARTICLE_MUTATION,
+                variables: {
+                    name: articleTitle.value,
+                    articleText: jsonresult,
+                    reviewer: store.state.user.id,
+                    profileId: store.state.user.id,
+                    tags: chosenTags2
+                },
+            })
+            .then(result => {
+                router.push({ name: 'Articles' })
+                toast({
+                    message: i18n.t('articleCreated'),
+                    type: 'notification-success',
+                    dismissible: true,
+                    pauseOnHover: true,
+                    duration: 2000,
+                    position: 'top-right',
+                })
+            })
+            .catch(error => {
+                toast({
+                    message: i18n.t('createArticleFailure') + '\n' + error,
+                    type: 'notification-danger',
+                    dismissible: true,
+                    pauseOnHover: true,
+                    duration: 2000,
+                    position: 'top-right',
+                })
+            })
+    } else if (type.value == 'notification') {
+        let notificationText = {}
+        notificationText.place = {}
+        notificationText.place.date = eventDate.value
+        notificationText.place.place = place.value
+        notificationText.text = jsonresult
+        let notifJson = JSON.stringify(notificationText)
+
+        apolloClient
+            .mutate({
+                mutation: CREATE_NOTIF_ARTICLE_MUTATION,
+                variables: {
+                    name: articleTitle.value, 
+                    notif_text: notifJson,
+                    author: store.state.user.id,
+                    tags: chosenTags2
+                },
+            })
+            .then(result => {
+                router.push({ name: 'Articles' })
+                toast({
+                    message: i18n.t('articleCreated'),
+                    type: 'notification-success',
+                    dismissible: true,
+                    pauseOnHover: true,
+                    duration: 2000,
+                    position: 'top-right',
+                })
+            })
+            .catch(error => {
+                toast({
+                    message: i18n.t('createArticleFailure') + '\n' + error,
+                    type: 'notification-danger',
+                    dismissible: true,
+                    pauseOnHover: true,
+                    duration: 2000,
+                    position: 'top-right',
+                })
+            })
+    }
 }
 
 function toJSON(element) {
@@ -367,6 +488,19 @@ function toJSON(element) {
 .add-article-extra-option::placeholder {
     color: var(--text-extra);
 }
+
+.notification-success {
+    background-color: #66D9D3;
+    border-radius: 16px;
+    color: white;
+}
+
+.notification-danger {
+    background-color: #F65151;
+    border-radius: 16px;
+    color: white;
+}
+
 /* .ql-bubble .ql-tooltip {
     background: var(--card-color);
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);

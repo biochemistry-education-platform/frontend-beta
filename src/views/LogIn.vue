@@ -83,7 +83,7 @@ function submitForm() {
                 type: 'notification-danger',
                 dismissible: true,
                 pauseOnHover: true,
-                duration: 2000,
+                duration: 20000,
                 position: 'top-right',
             })
         })

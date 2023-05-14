@@ -57,6 +57,8 @@ export default {
     textArticle: 'Текстовая статья',
     notifArticle: 'Оповещение',
     recomArticle: 'Рекомендация',
+    articleCreated: 'Статья создана',
+    createArticleFailure: 'Ошибка при создании статьи',
 
     notes: 'Конспекты',
     note: 'Конспект',

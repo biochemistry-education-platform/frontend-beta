@@ -18,7 +18,7 @@
                         </div>
                         <div class="article-info-item article-info__date">
                             <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m627 769 45-45-159-160V363h-60v225l174 181ZM480 976q-82 0-155-31.5t-127.5-86Q143 804 111.5 731T80 576q0-82 31.5-155t86-127.5Q252 239 325 207.5T480 176q82 0 155 31.5t127.5 86Q817 348 848.5 421T880 576q0 82-31.5 155t-86 127.5Q708 913 635 944.5T480 976Zm0-400Zm0 340q140 0 240-100t100-240q0-140-100-240T480 236q-140 0-240 100T140 576q0 140 100 240t240 100Z"/></svg>
-                            <p>{{ (new Date(Date.parse(article.publish_date.slice(0,19)))).toLocaleString('ru-RU') }}</p>
+                            <p>{{ article.publish_date }}</p>
                         </div>
                     </div>
                     <div class="article__tags-list" v-if="article.tags.length > 0">
@@ -37,83 +37,107 @@
 </template>
 
 <script>
-import axios from 'axios'
-import SearchForm from '@/components/SearchForm.vue'
-
-
 export default {
     name: 'Articles',
-    components: {
-        SearchForm,
-    },
-    data() {
-        return {
-            articles: [],
-            filteredArticles: []
+}
+</script>
+
+<script setup>
+import SearchForm from '@/components/SearchForm.vue'
+import { ref, onMounted } from 'vue'
+import gql from 'graphql-tag'
+import { apolloClient } from '@/vue-apollo'
+import { toast } from 'bulma-toast'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+
+const i18n = useI18n()
+const router = useRouter()
+
+let articles = []
+let filteredArticles = ref([])
+
+const ALL_ARTICLES_QUERY = gql`query {
+  allArticles {
+    id
+    name
+    author {
+      authorId {
+        id
+        name
+        surname
+        secondname
+        role {
+          roleName
         }
-    },
-    mounted() {
-        this.getArticles()
-    },
-    methods: {
-        getArticles() {
-            this.articles = [
-                {
-                    id: 1,
-                    title: 'Some title',
-                    type: 'text_article',
-                    author: 'Петров Петр Петрович',
-                    tags: ['СНО', 'гормоны'],
-                    publish_date: (new Date((new Date('05 May 2023 14:48 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
-                    isSaved: false
-                },
-                {
-                    id: 2,
-                    title: 'Another title',
-                    type: 'text_article',
-                    author: 'Иванов Иван Иванович',
-                    tags: ['белки', 'липиды'],
-                    publish_date: (new Date((new Date('06 May 2023 16:48 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
-                    isSaved: true
-                },
-                {
-                    id: 3,
-                    title: 'Smth else',
-                    type: 'text_article',
-                    author: 'Андреев Андрей',
-                    tags: ['гормоны'],
-                    publish_date: (new Date((new Date('07 May 2023 12:40 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
-                    isSaved: false
-                },
-                {
-                    id: 4,
-                    title: 'Ok thats all',
-                    type: 'text_article',
-                    author: 'Андреев Андрей',
-                    tags: ['белки'],
-                    publish_date: (new Date((new Date('07 May 2023 16:21 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
-                    isSaved: false
-                }
-            ]
-            this.filteredArticles = this.articles.sort((a,b) => new Date(b.publish_date) - new Date(a.publish_date))
-        },
-        // getArticles() {
-        //     axios
-        //         .get('/api/v1/articles/')
-        //         .then(response => {
-        //             for (let i = 0; i < response.data.length; i++) {
-        //                 this.articles.push(response.data[i])
-        //                 this.filteredArticles.push(response.data[i])
-        //             }
-        //             this.filteredArticles = this.filteredArticles.reverse()
-        //         })
-        //         .catch(error => {
-        //             console.log(JSON.stringify(error))
-        //         })
-        // },
-        filterit(newArticles) {
-            this.filteredArticles = newArticles
-        }
+      }
     }
+    reviewer {
+      id
+      name
+      surname
+      secondname
+      role {
+        roleName
+      }
+    }
+    publishDate
+    publishStatus
+    articletagSet {
+      tagId {
+        name
+      }
+    }
+  }
+}`
+
+onMounted(async () => {
+    await getArticles()
+})
+
+async function getArticles() {
+    await apolloClient
+        .query({
+            query: ALL_ARTICLES_QUERY
+        })
+        .then(result => {
+            result.data.allArticles.forEach(article => { 
+                let authorFullName = article.author.authorId.surname + ' ' + article.author.authorId.name.charAt(0) + '.'
+                if (article.author.authorId.secondname != "") { authorFullName += (' ' + article.author.authorId.secondname.charAt(0) + '.')}
+                let reviewerFullName = ''
+                if (article.author.authorId.id != article.reviewer.id) {
+                    //есть и автор, и проверяющий
+                    reviewerFullName = article.reviewer.surname + ' ' + article.reviewer.name.charAt(0) + '.'
+                    if (article.reviewer.secondname != "") { reviewerFullName += (' ' + article.reviewer.secondname.charAt(0) + '.')}
+                }
+                let tagList = []
+                article.articletagSet.forEach(tag => {
+                    tagList.push(tag.tagId.name)
+                })
+                let date = new Date(Date.parse(article.publishDate)).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                })
+                articles.push({
+                    id: article.id,
+                    title: article.name,
+                    type: 'text_article',
+                    author: authorFullName,
+                    reviewer: reviewerFullName,
+                    tags: tagList,
+                    publish_date: date,
+                    isSaved: false
+                })
+            })
+        })
+        .catch(error => console.log(error))
+
+        articles.forEach(article => filteredArticles.value.push(article))
+        filteredArticles.value.sort((a,b) => new Date(b.publish_date) - new Date(a.publish_date))
+}
+
+function filterit(newArticles) {
+    filteredArticles.value = newArticles
 }
 </script>

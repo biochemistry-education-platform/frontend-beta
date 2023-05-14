@@ -57,6 +57,8 @@ export default {
     textArticle: 'Text article',
     notifArticle: 'Notification',
     recomArticle: 'Recommendation',
+    articleCreated: 'Article created',
+    createArticleFailure: 'Error creating article',
 
     notes: 'Abstracts',
     note: 'Abstract of',
