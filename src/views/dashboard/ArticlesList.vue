@@ -114,7 +114,7 @@ async function getArticles() {
                 article.articletagSet.forEach(tag => {
                     tagList.push(tag.tagId.name)
                 })
-                let date = new Date(Date.parse(article.publishDate)).toLocaleDateString('en-US', {
+                let date = new Date(Date.parse(article.publishDate)).toLocaleDateString('ru-RU', {
                     year: 'numeric',
                     month: '2-digit',
                     day: '2-digit',

@@ -501,6 +501,9 @@ function toJSON(element) {
     color: white;
 }
 
+#maineditor {
+    color: var(--text-color);
+}
 /* .ql-bubble .ql-tooltip {
     background: var(--card-color);
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
