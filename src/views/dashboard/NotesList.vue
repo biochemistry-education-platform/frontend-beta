@@ -1,8 +1,13 @@
 <template>
     <div v-if="this.$store.state.user.role != 'Teacher'" class="biochemistry-page">
+        <div v-if="isMenuShown" class="darker-bg"></div>
+        <div v-if="isMobile" class="mobile-header">
+            <img src="@/assets/icons/logo_text.png">
+            <svg @click="switchMenuDisplay" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="M120 816v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/></svg>
+        </div>
         <h1 class="biochemistry-page-title">{{ $t('notes') }}</h1>
         <!-- <SearchForm v-bind:items="notes" v-on:filterit="filterit"/> -->
-        <hr class="biochemistry-page-hr">
+        <hr v-if="!isMobile" class="biochemistry-page-hr">
         <div class="notes-list">
             <div class="notes__note" v-for="note in filteredNotes" v-bind:key="note.id">
                 <div class="note__content">
@@ -14,14 +19,14 @@
                         </div>
                         <div class="article-info-item article-info__date">
                             <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m627 769 45-45-159-160V363h-60v225l174 181ZM480 976q-82 0-155-31.5t-127.5-86Q143 804 111.5 731T80 576q0-82 31.5-155t86-127.5Q252 239 325 207.5T480 176q82 0 155 31.5t127.5 86Q817 348 848.5 421T880 576q0 82-31.5 155t-86 127.5Q708 913 635 944.5T480 976Zm0-400Zm0 340q140 0 240-100t100-240q0-140-100-240T480 236q-140 0-240 100T140 576q0 140 100 240t240 100Z"/></svg>
-                            <p>{{ (new Date(Date.parse(note.article_publish_date.slice(0,19)))).toLocaleString('en-GB') }}</p>
+                            <p>{{ note.article_publish_date }}</p>
                         </div>
                     </div>
                     <div class="article__tags-list" v-if="note.article_tags.length > 0">
                         <div class="article__tag" v-for="tag in note.article_tags">{{ tag }}</div>
                     </div>
                 </div>
-                <hr class="note-separator">
+                <hr v-if="!isMobile" class="note-separator">
                 <div class="note-delete">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg>
                 </div>
@@ -31,79 +36,73 @@
 </template>
 
 <script>
-import axios from 'axios'
-import SearchForm from '@/components/SearchForm.vue'
-
 export default {
-    name: 'Notes',
-    components: {
-        SearchForm
-    },
-    data() {
-        return {
-            notes: [],
-            articles: [],
-            filteredNotes: []
-        }
-    },
-    mounted() {
-        this.getNotes()
-    },
-    methods: {
-        getNotes() {
-            this.notes = [
-                {
-                    id: 1,
-                    based_on_article: 'Name of the article',
-                    article_author: 'Author Name',
-                    article_publish_date: (new Date('16 April 2023 16:48 UTC')).toISOString(),
-                    article_tags: ['белки']
-                },
-                {
-                    id: 2,
-                    based_on_article: 'Article name',
-                    article_author: 'Author Name',
-                    article_publish_date: (new Date('06 May 2023 10:28 UTC')).toISOString(),
-                    article_tags: ['липиды']
-                }
+    name: 'Articles',
+}
+</script>
 
-            ]
-            this.filteredNotes = this.notes.reverse()
+<script setup>
+import SearchForm from '@/components/SearchForm.vue'
+import { ref, defineEmits, defineProps, onMounted } from 'vue'
+import gql from 'graphql-tag'
+import { apolloClient } from '@/vue-apollo'
+import { toast } from 'bulma-toast'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+
+const i18n = useI18n()
+const router = useRouter()
+
+const emit = defineEmits(['openMenu', 'closeMenu'])
+
+const props = defineProps({
+    isMenuShown: Boolean,
+    isMobile: Boolean
+})
+
+let articles = []
+let notes = []
+let filteredNotes = ref([])
+
+onMounted(async () => {
+    await getArticles()
+})
+
+async function getArticles() {
+    notes = [
+        {
+            id: 1,
+            based_on_article: 'Name of the article',
+            article_author: 'Author Name',
+            article_publish_date: new Date(Date.parse(new Date('16 April 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+            }),
+            article_tags: ['белки']
         },
-        // async getNotes() {
-        //     await axios
-        //         .get('/api/v1/notes/')
-        //         .then(response => {
-        //             for (let i = 0; i < response.data.length; i++) {
-        //                 this.notes.push(response.data[i])
-        //                 this.filteredNotes.push(response.data[i])
-        //             }
-        //             this.filteredNotes = this.filteredNotes.reverse()
-        //         })
-        //         .catch(error => {
-        //             console.log(JSON.stringify(error))
-        //         })
-        //     axios
-        //         .get('/api/v1/articles/')
-        //         .then(response => {
-        //             Array.from(response.data).forEach(article => {
-        //                 for (let i = 0; i < this.filteredNotes.length; i++) {
-        //                     if (this.filteredNotes[i].based_on_article == article.title) {
-        //                         // нашла соответствующую статью
-        //                         this.filteredNotes[i].article_author = article.author
-        //                         this.filteredNotes[i].article_publish_date = article.publish_date
-        //                         this.filteredNotes[i].article_tags = article.tags
-        //                     }
-        //                 }
-        //             })
-        //         })
-        //         .catch(error => {
-        //             console.log(JSON.stringify(error))
-        //         })
-        // },
-        filterit(newNotes) {
-            this.filteredNotes = newNotes
+        {
+            id: 2,
+            based_on_article: 'Article name',
+            article_author: 'Author Name',
+            article_publish_date: new Date(Date.parse(new Date('06 May 2023 10:28 UTC'))).toLocaleDateString('ru-RU', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+            }),
+            article_tags: ['липиды']
         }
+    ]
+    filteredNotes.value = notes.reverse()
+}
+
+function filterit(newArticles) {
+    filteredArticles.value = newArticles
+}
+
+function switchMenuDisplay() {
+    if (props.isMenuShown == false) {
+        emit('openMenu', true)
     }
 }
 </script>

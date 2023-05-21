@@ -130,3 +130,67 @@
     z-index: -1;
     /* z-index обязательно изменить на большое значение */
 }
+
+@media (max-width: 420px) {
+    .side-menu {
+        width: fit-content;
+        height: 100vh;
+        background: var(--menu-background);
+        position: absolute;
+        right: 0;
+        top: 0;
+        margin-left: auto;
+        padding: 20px 28px;
+        border-radius: 20px 0px 0px 20px;
+    }
+
+    .unauth-menu-items, .menu-items, .sss-menu-items {
+        display: flex;
+        flex-direction: column;
+        margin-top: 40px;
+        align-items: center;
+        text-align: center;
+    }
+
+    .unauth-menu-item, .menu-item, .sss-menu-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        margin-bottom: 0px;
+        width: 100%;
+    }
+
+    .unauth-menu-item svg, .menu-item svg, .sss-menu-item svg {
+        margin-right: 20px;
+        margin-left: 12px;
+    }
+
+    .menu-item.active svg, .sss-menu-item.active svg, .unauth-menu-item.active svg{
+        fill: var(--card-color);
+        width: 27px;
+        height: auto;
+        margin-right: 20px;
+        margin-left: 12px;
+    }
+
+    .menu-item.active, .sss-menu-item.active, .unauth-menu-item.active {
+        width: 100%;
+    }
+
+    .menu-switches {
+        justify-self: flex-end;
+        margin: 0;
+        margin-top: auto;
+        width: 100%;
+    }
+
+    .menu-switches svg {
+        width: 20px;
+        height: auto;
+    }
+
+    .item-text {
+        margin-right: 12px;
+    }
+}

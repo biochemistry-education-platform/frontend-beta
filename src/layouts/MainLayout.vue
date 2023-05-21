@@ -1,12 +1,12 @@
 <template>
     <div :class="theme === 'light' ? 'light-theme' : 'dark-theme'" class="theme">
-        <StudentNavMenu v-if="$store.state.user.role == 'Student'" :isMobile="isMobile" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-        <SSSNavMenu v-else-if="$store.state.user.role == 'Sno_student'" :isMobile="isMobile" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-        <TeacherNavMenu v-else-if="$store.state.user.role == 'Teacher'" :isMobile="isMobile" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <StudentNavMenu v-if="$store.state.user.role == 'Student'" :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <SSSNavMenu v-else-if="$store.state.user.role == 'Sno_student'" :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <TeacherNavMenu v-else-if="$store.state.user.role == 'Teacher'" :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
         <UnauthMenu v-else :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
         <div id="wrapper" :isMenuShown="isMenuShown" >  
             <section>
-                <router-view @openMenu="openMenu" :isMenuShown="isMenuShown" />
+                <router-view @openMenu="openMenu" :isMobile="isMobile" :isMenuShown="isMenuShown" />
             </section> 
         </div>
     </div>    
@@ -131,6 +131,13 @@
     --text-extra: #81A3AA;
     --lines-color: #81A3AA;
     --danger: #F65151;
+}
+
+@media (max-width: 420px) {
+    #wrapper {
+        width: 100%;
+        margin-left: 0;
+    }
 }
 </style>
   

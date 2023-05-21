@@ -1,7 +1,6 @@
 <template>
     <div class="biochemistry-page">
-        <div v-if="isMenuShown" class="darker-bg">
-        </div>
+        <div v-if="isMenuShown" class="darker-bg"></div>
         <div v-if="isMobile" class="mobile-header">
             <img src="@/assets/icons/logo_text.png">
             <svg @click="switchMenuDisplay" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="M120 816v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/></svg>
@@ -62,12 +61,12 @@ const router = useRouter()
 const emit = defineEmits(['openMenu', 'closeMenu'])
 
 const props = defineProps({
-    isMenuShown: Boolean
+    isMenuShown: Boolean,
+    isMobile: Boolean
 })
 
 let articles = []
 let filteredArticles = ref([])
-let isMobile = ref(false)
 
 const ALL_ARTICLES_QUERY = gql`query {
   allArticles {
@@ -104,16 +103,8 @@ const ALL_ARTICLES_QUERY = gql`query {
 }`
 
 onMounted(async () => {
-    await getDevice()
     await getArticles()
 })
-
-async function getDevice() {
-    if (screen.width > 420) {
-        isMobile.value = false
-    }
-    else { isMobile.value = true }
-}
 
 async function getArticles() {
     await apolloClient
@@ -167,155 +158,3 @@ function switchMenuDisplay() {
     }
 }
 </script>
-
-<style>
-.darker-bg {
-    position: absolute;
-    margin-left: -10%;
-    margin-top: -20px;
-    width: 110%;
-    height: 100vh;
-    z-index: 15;
-    background: rgba(0, 0, 0, 0.2);
-}
-@media (max-width: 420px) {
-    /* .side-menu {
-        display: none;
-        width: 0;
-    } */
-
-    .side-menu {
-        width: fit-content;
-        height: 100vh;
-        background: var(--menu-background);
-        position: absolute;
-        right: 0;
-        top: 0;
-        margin-left: auto;
-        padding: 20px 28px;
-        border-radius: 20px 0px 0px 20px;
-    }
-
-    #wrapper {
-        width: 100%;
-        margin-left: 0;
-    }
-
-    .biochemistry-page {
-        background: var(--phone-bg);
-        padding: 20px 20px 0 20px;
-    }
-
-    .biochemistry-page-title {
-        padding: 24px 0 0 0;
-        font-size: 24px;
-        letter-spacing: -0.05em;
-    }
-
-    .articles__article {
-        border-radius: 20px;
-        box-shadow: none;
-        margin-bottom: 8px;
-        height: auto;
-    }
-
-    .article-type svg {
-        width: 16px;
-        height: 16px;
-        margin-left: 16px;
-        margin-right: 16px;
-    }
-
-    .article__content {
-        padding: 0;
-    }
-
-    .article__title {
-        font-size: 16px;
-        margin-top: 16px;
-        letter-spacing: -0.05em;
-    }
-
-    .article-info-item {
-        font-size: 12px;
-        letter-spacing: -0.05em;
-    }
-
-    .article__tags-list {
-        margin-top: 8px;
-        margin-bottom: 12px;
-    }
-
-    .article__tag {
-        background: var(--tags-color);
-        padding: 4px 8px;
-        border-radius: 16px;
-        margin-right: 8px;
-        color: var(--tags-text);
-        font-size: 13px;
-    }
-
-    .article-favorite {
-        height: 100%;
-        display: flex;
-        justify-content: flex-end;
-        align-items: flex-start;
-        margin-bottom: auto;
-    }
-
-    .article-favorite svg {
-        margin-left: 0px;
-        margin-right: 10px;
-        margin-top: 10px;
-        margin-bottom: auto;
-        width: 16px;
-        height: auto;
-    }
-
-    .unauth-menu-items, .menu-items, .sss-menu-items {
-        display: flex;
-        flex-direction: column;
-        margin-top: 40px;
-        align-items: center;
-        text-align: center;
-    }
-
-    .unauth-menu-item, .menu-item, .sss-menu-item {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        text-align: left;
-        margin-bottom: 0px;
-        width: 100%;
-    }
-
-    .unauth-menu-item svg, .menu-item svg, .sss-menu-item svg {
-        margin-right: 20px;
-        margin-left: 12px;
-    }
-
-    .menu-item.active svg, .sss-menu-item.active svg, .unauth-menu-item.active svg{
-        fill: var(--card-color);
-        width: 27px;
-        height: auto;
-        margin-right: 20px;
-        margin-left: 12px;
-    }
-
-    .menu-item.active, .sss-menu-item.active, .unauth-menu-item.active {
-        width: 100%;
-    }
-
-    .menu-switches {
-        justify-self: flex-end;
-        margin: 0;
-        margin-top: auto;
-        width: 100%;
-    }
-
-    .menu-switches svg {
-        width: 20px;
-        height: auto;
-    }
-}
-</style>
