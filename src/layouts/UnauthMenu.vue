@@ -86,5 +86,6 @@ watch(() => route.name, () => {
     color: var(--text-color);
     display: flex;
     flex-direction: column;
+    text-align: center;
 }
 </style>

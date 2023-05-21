@@ -117,6 +117,7 @@ function showArticleTypes () {
     color: var(--text-color);
     display: flex;
     flex-direction: column;
+    text-align: center;
 }
 
 .create-article-block {

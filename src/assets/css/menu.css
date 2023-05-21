@@ -40,6 +40,7 @@
     fill: var(--text-color);
     width: 27px;
     height: auto;
+    margin: auto;
 }
 
 .menu-switches-svg:hover {
@@ -55,6 +56,7 @@
     background: var(--menu-accent);
     border-radius: 20px;
     color: var(--card-color);
+    text-align: center;
 }
 
 .menu-item.active .item-text:visited, .sss-menu-item.active .item-text:visited, .unauth-menu-item.active .item-text:visited {
@@ -65,6 +67,7 @@
     fill: var(--card-color);
     width: 27px;
     height: auto;
+    margin: auto;
 }
 
 .item-text {

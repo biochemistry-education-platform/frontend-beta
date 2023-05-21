@@ -294,6 +294,14 @@ function switchMenuDisplay() {
         margin-left: 12px;
     }
 
+    .menu-item.active svg, .sss-menu-item.active svg, .unauth-menu-item.active svg{
+        fill: var(--card-color);
+        width: 27px;
+        height: auto;
+        margin-right: 20px;
+        margin-left: 12px;
+    }
+
     .menu-item.active, .sss-menu-item.active, .unauth-menu-item.active {
         width: 100%;
     }
