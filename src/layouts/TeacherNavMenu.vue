@@ -1,5 +1,6 @@
 <template>
     <div class="side-menu">
+        <svg v-if="isMobile" class="close-menu" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg>
         <div class="logo-block">
             <img src="@/assets/icons/logo.png">
             <p class="logo-name">plateaumed</p>
@@ -55,7 +56,7 @@
 </template>
 
 <script setup>
-import { defineEmits, ref, watch } from 'vue'
+import { defineEmits, defineProps, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -63,6 +64,10 @@ const theme = ref('light')
 const language = ref('ru')
 let articleTypes = ref(false)
 let current_item = ref(route.name)
+
+const props = defineProps({
+  isMobile: Boolean
+})
 
 const emit = defineEmits(['switchTheme', 'switchLanguage'])
 
@@ -110,6 +115,8 @@ function showArticleTypes () {
     padding-top: 20px;
     padding-bottom: 20px;
     color: var(--text-color);
+    display: flex;
+    flex-direction: column;
 }
 
 .create-article-block {

@@ -1,14 +1,20 @@
 <template>
     <div class="biochemistry-page">
+        <div v-if="isMenuShown" class="darker-bg">
+        </div>
+        <div v-if="isMobile" class="mobile-header">
+            <img src="@/assets/icons/logo_text.png">
+            <svg @click="switchMenuDisplay" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="M120 816v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/></svg>
+        </div>
         <h1 class="biochemistry-page-title">{{ $t('feed') }}</h1>
-        <SearchForm v-bind:items="articles" v-on:filterit="filterit"/>
-        <hr class="biochemistry-page-hr">
+        <SearchForm :items="articles" :isMobile="isMobile" v-on:filterit="filterit"/>
+        <hr v-if="!isMobile" class="biochemistry-page-hr">
         <div class="articles-list">
-            <div class="articles__article" v-for="article in filteredArticles" v-bind:key="article.id">
+            <div class="articles__article" v-for="article in filteredArticles" :key="article.id">
                 <div class="article-type">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg>
                 </div>
-                <hr class="article-separator">
+                <hr v-if="!isMobile" class="article-separator">
                 <div class="article__content">
                     <router-link :to="{ name: 'Article', params: { id: article.id }}" class="article__title">{{ article.title }}</router-link>
                     <div class="article__info">
@@ -25,14 +31,13 @@
                         <div class="article__tag" v-for="tag in article.tags">{{ tag }}</div>
                     </div>
                 </div>
-                <hr class="article-separator">
+                <hr v-if="!isMobile" class="article-separator">
                 <div class="article-favorite" @click="article.isSaved = !article.isSaved">
                     <svg v-if="article.isSaved" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m233 976 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Z"/></svg>
                     <svg v-else xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg>
                 </div>
             </div>
-        </div>
-        
+        </div>  
     </div>
 </template>
 
@@ -44,7 +49,7 @@ export default {
 
 <script setup>
 import SearchForm from '@/components/SearchForm.vue'
-import { ref, onMounted } from 'vue'
+import { ref, defineEmits, defineProps, onMounted } from 'vue'
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import { toast } from 'bulma-toast'
@@ -54,8 +59,15 @@ import { useRouter } from 'vue-router'
 const i18n = useI18n()
 const router = useRouter()
 
+const emit = defineEmits(['openMenu', 'closeMenu'])
+
+const props = defineProps({
+    isMenuShown: Boolean
+})
+
 let articles = []
 let filteredArticles = ref([])
+let isMobile = ref(false)
 
 const ALL_ARTICLES_QUERY = gql`query {
   allArticles {
@@ -92,8 +104,16 @@ const ALL_ARTICLES_QUERY = gql`query {
 }`
 
 onMounted(async () => {
+    await getDevice()
     await getArticles()
 })
+
+async function getDevice() {
+    if (screen.width > 420) {
+        isMobile.value = false
+    }
+    else { isMobile.value = true }
+}
 
 async function getArticles() {
     await apolloClient
@@ -140,4 +160,154 @@ async function getArticles() {
 function filterit(newArticles) {
     filteredArticles.value = newArticles
 }
+
+function switchMenuDisplay() {
+    if (props.isMenuShown == false) {
+        emit('openMenu', true)
+    }
+}
 </script>
+
+<style>
+.darker-bg {
+    position: absolute;
+    margin-left: -10%;
+    margin-top: -20px;
+    width: 110%;
+    height: 100vh;
+    z-index: 15;
+    background: rgba(0, 0, 0, 0.2);
+}
+@media (max-width: 420px) {
+    /* .side-menu {
+        display: none;
+        width: 0;
+    } */
+
+    .side-menu {
+        width: fit-content;
+        height: 100vh;
+        background: var(--menu-background);
+        position: absolute;
+        right: 0;
+        top: 0;
+        margin-left: auto;
+        padding: 20px 28px;
+        border-radius: 20px 0px 0px 20px;
+    }
+
+    #wrapper {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .biochemistry-page {
+        background: var(--phone-bg);
+        padding: 20px 20px 0 20px;
+    }
+
+    .biochemistry-page-title {
+        padding: 24px 0 0 0;
+        font-size: 24px;
+        letter-spacing: -0.05em;
+    }
+
+    .articles__article {
+        border-radius: 20px;
+        box-shadow: none;
+        margin-bottom: 8px;
+        height: auto;
+    }
+
+    .article-type svg {
+        width: 16px;
+        height: 16px;
+        margin-left: 16px;
+        margin-right: 16px;
+    }
+
+    .article__content {
+        padding: 0;
+    }
+
+    .article__title {
+        font-size: 16px;
+        margin-top: 16px;
+        letter-spacing: -0.05em;
+    }
+
+    .article-info-item {
+        font-size: 12px;
+        letter-spacing: -0.05em;
+    }
+
+    .article__tags-list {
+        margin-top: 8px;
+        margin-bottom: 12px;
+    }
+
+    .article__tag {
+        background: var(--tags-color);
+        padding: 4px 8px;
+        border-radius: 16px;
+        margin-right: 8px;
+        color: var(--tags-text);
+        font-size: 13px;
+    }
+
+    .article-favorite {
+        height: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-start;
+        margin-bottom: auto;
+    }
+
+    .article-favorite svg {
+        margin-left: 0px;
+        margin-right: 10px;
+        margin-top: 10px;
+        margin-bottom: auto;
+        width: 16px;
+        height: auto;
+    }
+
+    .unauth-menu-items, .menu-items, .sss-menu-items {
+        display: flex;
+        flex-direction: column;
+        margin-top: 40px;
+        align-items: center;
+        text-align: center;
+    }
+
+    .unauth-menu-item, .menu-item, .sss-menu-item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        margin-bottom: 0px;
+        width: 100%;
+    }
+
+    .unauth-menu-item svg, .menu-item svg, .sss-menu-item svg {
+        margin-right: 20px;
+        margin-left: 12px;
+    }
+
+    .menu-item.active, .sss-menu-item.active, .unauth-menu-item.active {
+        width: 100%;
+    }
+
+    .menu-switches {
+        justify-self: flex-end;
+        margin: 0;
+        margin-top: auto;
+        width: 100%;
+    }
+
+    .menu-switches svg {
+        width: 20px;
+        height: auto;
+    }
+}
+</style>

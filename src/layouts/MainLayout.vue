@@ -1,12 +1,12 @@
 <template>
     <div :class="theme === 'light' ? 'light-theme' : 'dark-theme'" class="theme">
-        <StudentNavMenu v-if="$store.state.user.role == 'Student'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-        <SSSNavMenu v-else-if="$store.state.user.role == 'Sno_student'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-        <TeacherNavMenu v-else-if="$store.state.user.role == 'Teacher'" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-        <UnauthMenu v-else @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-        <div id="wrapper">  
+        <StudentNavMenu v-if="$store.state.user.role == 'Student'" :isMobile="isMobile" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <SSSNavMenu v-else-if="$store.state.user.role == 'Sno_student'" :isMobile="isMobile" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <TeacherNavMenu v-else-if="$store.state.user.role == 'Teacher'" :isMobile="isMobile" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <UnauthMenu v-else :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <div id="wrapper" :isMenuShown="isMenuShown" >  
             <section>
-                <router-view/>
+                <router-view @openMenu="openMenu" :isMenuShown="isMenuShown" />
             </section> 
         </div>
     </div>    
@@ -23,7 +23,8 @@
 
     const i18n = useI18n()
     
-    onMounted(() => {
+    onMounted(async () => {
+        await getDevice()
         if (localStorage.theme) {
             theme.value = localStorage.theme;
         }
@@ -34,11 +35,20 @@
     
     const theme = ref('light')
     const language = ref('ru')
+    let isMobile = ref(false)
+    let isMenuShown = ref(false)
 
     watchEffect(() => {
         localStorage.theme = theme.value
         localStorage.language = language.value
     })
+
+    async function getDevice() {
+        if (screen.width > 420) {
+            isMobile.value = false
+        }
+        else { isMobile.value = true }
+    }
 
     function switchTheme (newTheme) {
         theme.value = newTheme
@@ -53,7 +63,17 @@
         } else {
             i18n.locale.value = 'en-US'
         }
-  }
+    }
+
+    function closeMenu() {
+        isMenuShown.value = false
+        document.getElementsByClassName('side-menu')[0].style.zIndex = '0'
+    }
+
+    function openMenu() {
+        isMenuShown.value = true
+        document.getElementsByClassName('side-menu')[0].style.zIndex = '20'
+    }
 
 
 </script>
@@ -75,12 +95,14 @@
 
 #wrapper {
     width: calc(100% - 200px);
+    padding: 0;
     margin-left: 200px;
     height: 100vh;
     font-family: Montserrat;
 }
 
 .light-theme {
+    --phone-bg: #EBFFFD;
     --background:#F5F5F5;
     --menu-background: #EBFFFD;
     --menu-accent: #66D9D3;
@@ -96,11 +118,12 @@
 }
 
 .dark-theme {
+    --phone-bg: #1C464F;
     --background:#1C464F;
     --menu-background: #185461;
     --menu-accent: #66D9D3;
     --menu-accent-darker: #44afaa;
-    --card-color: #34565D;
+    --card-color: #185461;
     --pages-color: #66D9D3; 
     --tags-color: #34D9D3;
     --tags-text: #45666D; 

@@ -59,6 +59,7 @@ export default {
     recomArticle: 'Recommendation',
     articleCreated: 'Article created',
     createArticleFailure: 'Error creating article',
+    findByName: 'Find article by name',
 
     notes: 'Abstracts',
     note: 'Abstract of',

@@ -2,10 +2,10 @@
     <div class="search-form">
         <div class="search-field">
             <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M796 935 533 672q-30 26-69.959 40.5T378 727q-108.162 0-183.081-75Q120 577 120 471t75-181q75-75 181.5-75t181 75Q632 365 632 471.15 632 514 618 554q-14 40-42 75l264 262-44 44ZM377 667q81.25 0 138.125-57.5T572 471q0-81-56.875-138.5T377 275q-82.083 0-139.542 57.5Q180 390 180 471t57.458 138.5Q294.917 667 377 667Z"/></svg>
-            <input type="text" v-model="name" @input="filterArticles" placeholder="Найти статью по названию">
+            <input type="text" v-model="name" @input="filterArticles" :placeholder="$t('findByName')">
         </div>
         
-        <div class="extra-search">
+        <div v-if="!isMobile" class="extra-search">
             <label class="search-option-label">Tags
                 <svg v-if="!isTagListShown" @click="isTagListShown = true" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M480 711 240 471l43-43 197 198 197-197 43 43-240 239Z"/></svg>
                 <svg v-if="isTagListShown" @click="isTagListShown = false" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m283 711-43-43 240-240 240 239-43 43-197-197-197 198Z"/></svg>
@@ -55,6 +55,9 @@
                 
             </label>
         </div>
+        <div v-else class="filter-mobile">
+            <svg xmlns="http://www.w3.org/2000/svg" height="15" viewBox="0 96 960 960" width="15"><path d="M400 816v-60h160v60H400ZM240 606v-60h480v60H240ZM120 396v-60h720v60H120Z"/></svg>
+        </div>
     </div>
     
     
@@ -64,7 +67,8 @@
     export default {
         name: 'SearchForm',
         props: {
-            items: Array
+            items: Array,
+            isMobile: Boolean
         },
         data() {
             return {
@@ -227,7 +231,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    width: 80%;
+    width: 100%;
     margin: auto;
 }
 
@@ -319,6 +323,10 @@
     margin: 5px 0;
 }
 
+.filter-mobile svg{
+    fill: var(--text-color);
+}
+
 .v-enter-active,
 .v-leave-active {
   transition: opacity 0.5s ease;
@@ -327,5 +335,21 @@
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+
+@media (max-width: 420px) {
+    .search-form {
+        margin: 16px auto;
+    }
+    .search-field {
+        width: calc(100% - 20px);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .search-field input {
+        width: calc(100% - 20px);
+        font-size: 12px;
+    }
 }
 </style>

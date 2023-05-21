@@ -59,6 +59,7 @@ export default {
     recomArticle: 'Рекомендация',
     articleCreated: 'Статья создана',
     createArticleFailure: 'Ошибка при создании статьи',
+    findByName: 'Найти статью по названию',
 
     notes: 'Конспекты',
     note: 'Конспект',
