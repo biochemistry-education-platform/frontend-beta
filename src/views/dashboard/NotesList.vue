@@ -1,5 +1,5 @@
 <template>
-    <div v-if="this.$store.state.user.role != 'Teacher'" class="biochemistry-page">
+    <div class="biochemistry-page">
         <div v-if="isMenuShown" class="darker-bg" @click="emit('closeMenu')"></div>
         <div v-if="isMobile" class="mobile-header">
             <img src="@/assets/icons/logo_text.png">
@@ -43,6 +43,7 @@ export default {
 
 <script setup>
 import SearchForm from '@/components/SearchForm.vue'
+import store from '@/store'
 import { ref, defineEmits, defineProps, onMounted } from 'vue'
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'

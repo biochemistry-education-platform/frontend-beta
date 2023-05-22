@@ -215,6 +215,12 @@ function getMyInfo() {
     //         console.log(JSON.stringify(error))
     //     })
 }
+
+function switchMenuDisplay() {
+    if (props.isMenuShown == false) {
+        emit('openMenu', true)
+    }
+}
 </script>
 
 <style>
