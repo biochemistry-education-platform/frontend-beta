@@ -2,8 +2,8 @@
     <div :class="theme === 'light' ? 'light-theme' : 'dark-theme'">
         <div id="initial-wrapper">
             <div class="content-block">
-                <InitialMenu @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-                <router-view/>
+                <InitialMenu v-if="!isMobile" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+                <router-view :isMobile="isMobile" @switchTheme="switchTheme" @switchLanguage="switchLanguage" />
             </div>      
         </div>
     </div>
@@ -16,7 +16,8 @@
 
     const i18n = useI18n()
     
-    onMounted(() => {
+    onMounted(async () => {
+        await getDevice()
         if (localStorage.theme) {
             theme.value = localStorage.theme;
         }
@@ -27,6 +28,14 @@
     
     const theme = ref('light')
     const language = ref('ru')
+    let isMobile = ref(false)
+
+    async function getDevice() {
+        if (screen.width > 420) {
+            isMobile.value = false
+        }
+        else { isMobile.value = true }
+    }
 
     watchEffect(() => {
         localStorage.theme = theme.value
@@ -74,6 +83,7 @@
 }
 
 .light-theme {
+    --phone-bg: #EBFFFD;
     --background:#F5F5F5;
     --menu-background: #EBFFFD;
     --menu-accent: #66D9D3;
@@ -88,11 +98,12 @@
 }
 
 .dark-theme {
+    --phone-bg: #1C464F;
     --background:#1C464F;
     --menu-background: #185461;
     --menu-accent: #66D9D3;
     --menu-accent-darker: #44afaa;
-    --card-color: #34565D;
+    --card-color: #185461;
     --pages-color: #66D9D3; 
     --tags-color: #34D9D3;
     --tags-text: #45666D; 
@@ -110,9 +121,18 @@
     height: 100%;
     background: var(--card-color);
     display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
     font-family: Montserrat;
+}
+
+.logo-name {
+    font-family: "RalewayLight";
+    color: var(--menu-accent);
+    font-size: 24px;
+    font-weight: 200;
+    letter-spacing: 0.1em;
 }
 
 .initial-form {
@@ -189,6 +209,79 @@
     font-size: 16px;
     color: var(--text-extra);
     text-align: center;
+}
+
+@media (max-width: 420px) {
+    .logo-name {
+        font-family: "RalewayLight";
+        color: var(--menu-accent);
+        font-size: 24px;
+        font-weight: 200;
+        letter-spacing: 0.1em;
+    }
+
+    .initial-page {
+        flex-direction: column;
+        width: calc(100% - 40px);
+        height: calc(100% - 24px);
+        background: var(--phone-bg);
+        justify-content: flex-start;
+        min-width: auto;
+        margin: 12px 20px;
+    }
+
+    .content-block {
+        width: 100%;
+        height: 100%;
+        background: var(--phone-bg);
+    }
+
+    .initial-mobile-menu {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .initial-form {
+        background: var(--card-color);
+        padding: 30px 20px;
+        border-radius: 20px;
+        width: 100%;
+        margin: auto;
+    }
+
+    .initial-title {
+        font-size: 24px;
+    }
+
+    .initial-field {
+        width: 100%;
+    }
+
+    .initial-field-label {
+        font-size: 16px;
+    }
+
+    .initial-input {
+        width: 100%;
+        height: 20px;
+        font-size: 16px;
+    }
+
+    .initial-btn {
+        width: 100%;
+        height: 45px;
+        font-size: 16px;
+        border-radius: 20px;
+        margin-bottom: 24px;
+        line-height: 45px;
+        margin-top: 16px;
+    }
+
+    .initial-link {
+        font-size: 14px;
+    }
 }
 </style>
   
