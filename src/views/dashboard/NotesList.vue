@@ -1,6 +1,6 @@
 <template>
     <div v-if="this.$store.state.user.role != 'Teacher'" class="biochemistry-page">
-        <div v-if="isMenuShown" class="darker-bg"></div>
+        <div v-if="isMenuShown" class="darker-bg" @click="emit('closeMenu')"></div>
         <div v-if="isMobile" class="mobile-header">
             <img src="@/assets/icons/logo_text.png">
             <svg @click="switchMenuDisplay" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="M120 816v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/></svg>

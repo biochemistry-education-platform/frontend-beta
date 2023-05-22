@@ -339,7 +339,7 @@
 
 @media (max-width: 420px) {
     .search-form {
-        margin: 16px auto;
+        margin: 0 auto 16px;
     }
     .search-field {
         width: calc(100% - 20px);

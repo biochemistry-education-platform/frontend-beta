@@ -1,14 +1,22 @@
 <template>
     <div class="biochemistry-page">
+        <div v-if="isMenuShown" class="darker-bg" @click="emit('closeMenu')"></div>
+        <div v-if="isMobile" class="mobile-header">
+            <div class="logo-block">
+                <img src="@/assets/icons/logo.png">
+                <p class="logo-name">plateaumed</p>
+            </div>
+            <svg @click="switchMenuDisplay" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="M120 816v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/></svg>
+        </div>
         <h1 class="biochemistry-page-title">{{ $t('favorites') }}</h1>
         <!-- <SearchForm v-bind:items="articles" v-on:filterit="filterit"/> -->
-        <hr class="biochemistry-page-hr">
+        <hr v-if="!isMobile" class="biochemistry-page-hr">
         <div class="articles-list">
             <div class="articles__article" v-for="article in filteredArticles" v-bind:key="article.id">
                 <div class="article-type">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg>
                 </div>
-                <hr class="article-separator">
+                <hr v-if="!isMobile" class="article-separator">
                 <div class="article__content">
                     <router-link :to="{ name: 'Article', params: { id: article.id }}" class="article__title">{{ article.title }}</router-link>
                     <div class="article__info">
@@ -18,14 +26,14 @@
                         </div>
                         <div class="article-info-item article-info__date">
                             <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m627 769 45-45-159-160V363h-60v225l174 181ZM480 976q-82 0-155-31.5t-127.5-86Q143 804 111.5 731T80 576q0-82 31.5-155t86-127.5Q252 239 325 207.5T480 176q82 0 155 31.5t127.5 86Q817 348 848.5 421T880 576q0 82-31.5 155t-86 127.5Q708 913 635 944.5T480 976Zm0-400Zm0 340q140 0 240-100t100-240q0-140-100-240T480 236q-140 0-240 100T140 576q0 140 100 240t240 100Z"/></svg>
-                            <p>{{ (new Date(Date.parse(article.publish_date.slice(0,19)))).toLocaleString('en-GB') }}</p>
+                            <p>{{ article.publish_date }}</p>
                         </div>
                     </div>
                     <div class="article__tags-list" v-if="article.tags.length > 0">
                         <div class="article__tag" v-for="tag in article.tags">{{ tag }}</div>
                     </div>
                 </div>
-                <hr class="article-separator">
+                <hr v-if="!isMobile" class="article-separator">
                 <div class="article-favorite" @click="deleteArticle(article.id)">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m233 976 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Z"/></svg>
                 </div>
@@ -36,34 +44,84 @@
 </template>
 
 <script>
-import axios from 'axios'
-import SearchForm from '@/components/SearchForm.vue'
-
-
 export default {
     name: 'Favourites',
-    components: {
-        SearchForm,
-    },
-    data() {
-        return {
-            articles: [],
-            filteredArticles: []
+}
+</script>
+
+<script setup>
+import SearchForm from '@/components/SearchForm.vue'
+import { ref, defineEmits, defineProps, onMounted } from 'vue'
+import gql from 'graphql-tag'
+import { apolloClient } from '@/vue-apollo'
+import { toast } from 'bulma-toast'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+
+const i18n = useI18n()
+const router = useRouter()
+
+const emit = defineEmits(['openMenu', 'closeMenu'])
+
+const props = defineProps({
+    isMenuShown: Boolean,
+    isMobile: Boolean
+})
+
+let articles = []
+let filteredArticles = ref([])
+
+const ALL_ARTICLES_QUERY = gql`query {
+  allArticles {
+    id
+    name
+    author {
+      authorId {
+        id
+        name
+        surname
+        secondname
+        role {
+          roleName
         }
-    },
-    mounted() {
-        this.getArticles()
-    },
-    methods: {
-        getArticles() {
-            this.articles = [
+      }
+    }
+    reviewer {
+      id
+      name
+      surname
+      secondname
+      role {
+        roleName
+      }
+    }
+    publishDate
+    publishStatus
+    articletagSet {
+      tagId {
+        name
+      }
+    }
+  }
+}`
+
+onMounted(async () => {
+    await getArticles()
+})
+
+async function getArticles() {
+    articles = [
                 {
                     id: 1,
                     title: 'article title',
                     type: 'text_article',
                     author: 'author name',
-                    tags: [],
-                    publish_date: (new Date('05 October 2011 14:48 UTC')).toISOString()
+                    tags: ['тег'],
+                    publish_date: new Date(Date.parse(new Date('05 May 2023 11:37 UTC'))).toLocaleDateString('ru-RU', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                    })
                 },
                 {
                     id: 2,
@@ -71,7 +129,11 @@ export default {
                     type: 'text_article',
                     author: 'author name2',
                     tags: ['белки', 'липиды'],
-                    publish_date: (new Date('06 October 2011 16:48 UTC')).toISOString()
+                    publish_date: new Date(Date.parse(new Date('06 May 2023 08:16 UTC'))).toLocaleDateString('ru-RU', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                    })
                 },
                 {
                     id: 3,
@@ -79,37 +141,33 @@ export default {
                     type: 'text_article',
                     author: 'author name3',
                     tags: ['гормоны'],
-                    publish_date: (new Date('07 October 2011 12:40 UTC')).toISOString()
+                    publish_date: new Date(Date.parse(new Date('08 May 2023 14:20 UTC'))).toLocaleDateString('ru-RU', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                    })
                 }
             ]
-            this.filteredArticles = this.articles.reverse()
-        },
-        // getArticles() {
-        //     axios
-        //         .get('/api/v1/articles/')
-        //         .then(response => {
-        //             for (let i = 0; i < response.data.length; i++) {
-        //                 this.articles.push(response.data[i])
-        //                 this.filteredArticles.push(response.data[i])
-        //             }
-        //             this.filteredArticles = this.filteredArticles.reverse()
-        //         })
-        //         .catch(error => {
-        //             console.log(JSON.stringify(error))
-        //         })
-        // },
-        deleteArticle(id) {
-            let index = -1
-            this.filteredArticles.forEach(article => {
-                if (article.id === id) {
-                    index = this.filteredArticles.indexOf(article)
-                }
-            })
-            // отправить запрос на удаление статьи из избранного
-        },
-        filterit(newArticles) {
-            this.filteredArticles = newArticles
-        }
+            filteredArticles.value = articles.reverse()
+}
+
+function filterit(newArticles) {
+    filteredArticles.value = newArticles
+}
+
+function switchMenuDisplay() {
+    if (props.isMenuShown == false) {
+        emit('openMenu', true)
     }
+}
+
+function deleteArticle(id) {
+    let index = -1
+    filteredArticles.value.forEach(article => {
+        if (article.id === id) {
+            index = filteredArticles.value.indexOf(article)
+        }
+    })
+    // отправить запрос на удаление статьи из избранного
 }
 </script>

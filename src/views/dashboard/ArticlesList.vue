@@ -1,6 +1,6 @@
 <template>
     <div class="biochemistry-page">
-        <div v-if="isMenuShown" class="darker-bg"></div>
+        <div v-if="isMenuShown" class="darker-bg" @click="emit('closeMenu')"></div>
         <div v-if="isMobile" class="mobile-header">
             <div class="logo-block">
                 <img src="@/assets/icons/logo.png">
