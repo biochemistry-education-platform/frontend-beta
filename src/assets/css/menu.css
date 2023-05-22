@@ -23,7 +23,7 @@
 }
 
 .logo-name {
-    font-family: "RalewayLight";
+    font-family: "Raleway";
     color: var(--menu-accent);
     font-size: 24px;
     font-weight: 200;
@@ -142,6 +142,8 @@
         margin-left: auto;
         padding: 20px 28px;
         border-radius: 20px 0px 0px 20px;
+        z-index: 100;
+        display: none;
     }
 
     .unauth-menu-items, .menu-items, .sss-menu-items {

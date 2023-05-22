@@ -61,7 +61,7 @@
 <style lang="scss">
 @import '@/../node_modules/bulma';
 @font-face {
-    font-family: "RalewayLight";
+    font-family: "Raleway";
     font-weight: 200;
     src: url(@/assets/fonts/Raleway-ExtraLight.ttf) fomat("truetype");
 }
@@ -128,7 +128,7 @@
 }
 
 .logo-name {
-    font-family: "RalewayLight";
+    font-family: "Raleway";
     color: var(--menu-accent);
     font-size: 24px;
     font-weight: 200;
@@ -212,14 +212,6 @@
 }
 
 @media (max-width: 420px) {
-    .logo-name {
-        font-family: "RalewayLight";
-        color: var(--menu-accent);
-        font-size: 24px;
-        font-weight: 200;
-        letter-spacing: 0.1em;
-    }
-
     .initial-page {
         flex-direction: column;
         width: calc(100% - 40px);
@@ -237,10 +229,15 @@
     }
 
     .initial-mobile-menu {
+        width: 100%;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: flex-start;
+    }
+
+    .initial-mobile-menu .logo-block img{
+        margin-top: 0;
     }
 
     .initial-form {

@@ -7,10 +7,29 @@
     z-index: 5;
 }
 
+.logo-name {
+    font-family: "Raleway";
+    color: var(--menu-accent);
+    font-size: 24px;
+    font-weight: 200;
+    letter-spacing: 0.1em;
+}
+
 .mobile-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.mobile-header .logo-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.mobile-header .logo-block img{
+    margin: 0;
+    margin-right: 16px;
 }
 
 .mobile-header svg {
@@ -146,12 +165,14 @@
     width: fit-content;
     border-radius: 16px;
     padding: 4px 0 4px 12px;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
 }
 
 .article-tag {
     color: var(--tags-text);
     font-size: 18px;
-    display: inline-block;
     padding-right: 12px;
     font-weight: 500;
 }
@@ -168,6 +189,7 @@
     height: 120px;
     display: flex;
     justify-content: space-between;
+    margin-bottom: 0;
 }
 
 .article-author {
@@ -190,11 +212,13 @@
 .article-author-name {
     font-size: 24px;
     color: var(--text-color);
+    letter-spacing: normal;
 }
 
 .article-author-extra {
     font-size: 16px;
     color: var(--text-extra);
+    letter-spacing: normal;
 }
 
 .article-actions, .note-actions {
@@ -318,9 +342,9 @@ hr {
 
 .darker-bg {
     position: absolute;
-    margin-left: -10%;
-    margin-top: -20px;
-    width: 110%;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100vh;
     z-index: 15;
     background: rgba(0, 0, 0, 0.2);
@@ -343,6 +367,10 @@ hr {
 
 .article-status-checking {
     fill: var(--text-extra);
+}
+
+.ql-container {
+    font-size: 16px !important;
 }
 
 @media (max-width: 420px) {
@@ -390,6 +418,11 @@ hr {
         letter-spacing: -0.05em;
     }
 
+    .article-info {
+        height: 60px;
+        margin-bottom: 30px;
+    }
+
     .article-info-item {
         font-size: 12px;
         letter-spacing: -0.05em;
@@ -424,5 +457,118 @@ hr {
         margin-bottom: auto;
         width: 16px;
         height: auto;
+    }
+
+    .article-page, .note-page {
+        padding: 12px 20px;
+    }
+
+    .article-tags {
+        padding: 4px 0 4px 8px;
+        margin: 16px 0 12px 0;
+    }
+
+    .article-tag {
+        font-size: 10px;
+        line-height: 10px;
+        padding-right: 8px;
+    }
+
+    .mobile-article-title, .mobile-note-title {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .article-title, .note-title {
+        font-size: 24px;
+        padding: 0;
+        padding-bottom: 12px;
+        flex: 1;
+    }
+
+    .mobile-article-title svg, .mobile-note-title svg {
+        margin-top: 9px;
+        fill: var(--text-color);
+    }
+
+    .article-author-img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .article-author-info {
+        height: 60px;
+        padding-left: 12px;
+    }
+
+    .article-author-name {
+        font-size: 16px;
+        letter-spacing: -0.05em;
+    }
+
+    .article-author-extra {
+        font-size: 12px;
+        letter-spacing: -0.05em;
+    }
+
+    .ql-editor {
+        padding: 0 !important;
+    }
+
+    .ql-container {
+        font-size: 12px !important;
+    }
+
+    .mobile-article-actions, .mobile-note-actions {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: flex-start;
+        background: var(--menu-background);
+        border-radius: 20px 20px 0px 0px;
+        z-index: 100;
+    }
+
+    .mobile-article-action, .mobile-note-action {
+        color: var(--text-color);
+        font-size: 16px;
+        display: flex;
+        margin-top: 28px;
+    }
+
+    .mobile-article-action:first-child, .mobile-note-action:first-child {
+        margin-top: 20px;
+    }
+
+    .mobile-article-action:last-child, .mobile-note-action:last-child {
+        margin-bottom: 20px;
+    }
+    
+    .mobile-article-action svg, .mobile-note-action svg {
+        fill: var(--text-color);
+        margin-left: 20px;
+        margin-right: 30px;
+    }
+
+    .action-green {
+        color: var(--menu-accent);
+    }
+
+    .action-green svg {
+        fill: var(--menu-accent);
+    }
+
+    .action-red {
+        color: var(--danger);
+    }
+    
+    .action-red svg {
+        fill: var(--danger);
     }
 }

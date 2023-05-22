@@ -2,7 +2,10 @@
     <div class="biochemistry-page">
         <div v-if="isMenuShown" class="darker-bg"></div>
         <div v-if="isMobile" class="mobile-header">
-            <img src="@/assets/icons/logo_text.png">
+            <div class="logo-block">
+                <img src="@/assets/icons/logo.png">
+                <p class="logo-name">plateaumed</p>
+            </div>
             <svg @click="switchMenuDisplay" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="M120 816v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/></svg>
         </div>
         <h1 class="biochemistry-page-title">{{ $t('feed') }}</h1>

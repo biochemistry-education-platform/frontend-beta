@@ -6,7 +6,7 @@
         <UnauthMenu v-else :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
         <div id="wrapper" :isMenuShown="isMenuShown" >  
             <section>
-                <router-view @openMenu="openMenu" :isMobile="isMobile" :isMenuShown="isMenuShown" />
+                <router-view @openMenu="openMenu" @closeMenu="closeMenu" :isMobile="isMobile" :isMenuShown="isMenuShown" />
             </section> 
         </div>
     </div>    
@@ -67,12 +67,12 @@
 
     function closeMenu() {
         isMenuShown.value = false
-        document.getElementsByClassName('side-menu')[0].style.zIndex = '0'
+        document.getElementsByClassName('side-menu')[0].style.display = 'none'
     }
 
     function openMenu() {
         isMenuShown.value = true
-        document.getElementsByClassName('side-menu')[0].style.zIndex = '20'
+        document.getElementsByClassName('side-menu')[0].style.display = 'flex'
     }
 
 
@@ -84,7 +84,7 @@
 @import '@/assets/css/menu.css';
 
 @font-face {
-    font-family: "RalewayLight";
+    font-family: "Raleway";
     font-weight: 200;
     src: url(@/assets/fonts/Raleway-ExtraLight.ttf) fomat("truetype");
 }
