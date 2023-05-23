@@ -57,6 +57,7 @@ import { apolloClient } from '@/vue-apollo'
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import store from '@/store'
 
 const i18n = useI18n()
 const router = useRouter()
@@ -176,18 +177,34 @@ async function getArticles() {
             })
         })
         .catch(error => console.log(error))
-
-        await apolloClient
-            .query({
-                query: FAV_QUERY,
-                variables: {
-                    userId: 38
-                }
-            })
-            .then(result => { console.log(result) })
-            .catch(error => { console.log(error) })
+        
         articles.forEach(article => filteredArticles.value.push(article))
         filteredArticles.value.sort((a,b) => new Date(b.publish_date) - new Date(a.publish_date))
+
+        if (store.state.user.id != '') {
+            let id = Number(store.state.user.id)
+            await apolloClient
+                .query({
+                    query: FAV_QUERY,
+                    variables: {
+                        userId: id
+                    }
+                })
+                .then(result => { 
+                    if (result.data.getUserFavour.length > 0) {
+                        let allFavours = []
+                        result.data.getUserFavour.forEach(article => {
+                            allFavours.push(article.articleId.id)
+                        })
+                        filteredArticles.value.forEach(article => {
+                            if (allFavours.includes(article.id)) {
+                                article.isSaved = true
+                            }
+                        })
+                    }
+                })
+                .catch(error => { console.log(error) })
+        }
 }
 
 function filterit(newArticles) {

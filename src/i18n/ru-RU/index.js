@@ -33,6 +33,7 @@ export default {
     roleTeacher: 'Преподаватель',
     roleStudent: 'Студент',
     roleSSS: 'Председатель СНО',
+    tagDoesntExist: 'Невозможно подписаться на тег, его ещё не использовали',
 
     toFavorites: 'В избранное',
     toNote: 'К конспекту',

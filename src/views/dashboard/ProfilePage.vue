@@ -55,19 +55,19 @@
                 <div class="authors-subscriptions">
                     <h2 class="subscription-title">{{ $t('authorsSubscriptions') }}</h2>
                     <div class="authors-subscriptions-content">
-                        <div v-for="author, index in authors" :key="index">
+                        <div v-for="author, index in subscriptedAuthors" :key="index">
                             <div class="subscription-author">
                                 <p v-if="!isMobile" class="subscription-author-number">{{ index + 1 }}</p>
                                 <hr v-if="!isMobile" class="vertical-hr">
                                 <div class="subscription-author-content">
                                     <img class="subscription-author-img" src="@/assets/icons/profile_img.png">
                                     <div class="subscription-author-info">
-                                        <p class="subscription-author-name">{{ author.surname }} {{ author.name }} {{ author.patronymic }}</p>
+                                        <p class="subscription-author-name">{{ author.fullname }}</p>
                                         <p class="subscription-author-role">{{ author.role == 'Teacher' ? $t('roleTeacher') : (author.role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
                                     </div>                  
                                 </div>
                                 <hr v-if="!isMobile" class="vertical-hr">
-                                <div class="delete-subscription-author"><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
+                                <div @click="deleteAuthorSubscription(author.id)" class="delete-subscription-author"><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
                             </div>
                             <hr v-if="!isMobile" class="authors-subscription-hr">
                         </div>
@@ -118,8 +118,11 @@ import { useRouter } from 'vue-router'
 import { ref, reactive, onMounted, defineProps, defineEmits } from 'vue'
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
+import { toast } from 'bulma-toast'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
+const i18n = useI18n()
 
 const emit = defineEmits(['openMenu', 'closeMenu'])
 
@@ -139,7 +142,10 @@ let user = reactive({
 
 let tagAdding = ref(false)
 let allTags = ref([])
+let userID = 0
 let subscriptedTags = ref([])
+let allAuthors = ref([])
+let subscriptedAuthors = ref([])
 let numberOfTags = ref(0)
 let authors = ref([{
                 surname: 'Иванов',
@@ -176,7 +182,7 @@ let sss = ref([{
             }])
 
 const MY_INFO_QUERY = gql`query($userId: Int!) {
-    getProfile(userId: $userId) {
+    getProfile(id: $userId) {
         id
         user
         name
@@ -194,17 +200,17 @@ const MY_INFO_QUERY = gql`query($userId: Int!) {
             id
             authorId {
                 authorId {
+                    id
                     name
                     surname
                     secondname
                     photo
+                    role {
+                        roleName
+                    }
                 }
             }
         }
-    }
-    getUser(id: $userId) {
-        id
-        email
     }
 }`
 
@@ -212,6 +218,17 @@ const ALL_TAGS = gql`query {
     allTags {
         id
         name
+    }
+}`
+
+const ALL_AUTHORS = gql`query{
+    allAuthors{
+        authorId {
+            id
+            name
+            surname
+            secondname
+        }
     }
 }`
 
@@ -247,9 +264,29 @@ const REMOVE_TAG_SUBSCRIPTION = gql`mutation DeleteTagFromUser($userId: Int!, $t
     }
 }`
 
+const REMOVE_AUTHOR_SUBSCRIPTION = gql`mutation DeleteAuthorFromUser($userId: Int!, $authorId: Int!) {
+    deleteAuthorFromUser(userId: $userId, authorId: $authorId) {
+        authorSubscription {
+            id
+            userId {
+                id
+                user
+                name
+            }
+            authorId {
+                authorId {
+                    id
+                    user
+                    name
+                }
+            }
+        }
+    }
+}`
 onMounted(async () => {
     await getMyInfo()
     await getAllTags()
+    await getAllAuthors()
 })
 
 function logout() {
@@ -283,7 +320,7 @@ async function getMyInfo() {
     user.surname = store.state.user.surname
     user.patronymic = store.state.user.patronymic
     user.role = store.state.user.role
-    let id = Number(store.state.user.id) + 27
+    let id = Number(store.state.user.id)
 
     await apolloClient
         .query({
@@ -293,21 +330,29 @@ async function getMyInfo() {
             }
         })
         .then(result => {
-            console.log(result)
+            userID = result.data.getProfile.user
             result.data.getProfile.tagsubscriptionSet.forEach(tag => {
                 subscriptedTags.value.push(tag.tagId.name)
             })
+            result.data.getProfile.authorsubscriptionSet.forEach(author => {
+                subscriptedAuthors.value.push({
+                    id: author.authorId.authorId.id,
+                    fullname: author.authorId.authorId.surname + ' ' + author.authorId.authorId.name + (author.authorId.authorId.secondname != '' ? (' ' + author.authorId.authorId.secondname) : ''),
+                    role: author.authorId.authorId.role.roleName,
+                    photo: author.authorId.authorId.photo
+                })
+            })
+            console.log(subscriptedAuthors.value)
         })
         .catch(error => console.log(error))
 }
 
 async function getAllTags() {
-    let id = Number(store.state.user.id) + 27
     await apolloClient
         .query({
             query: ALL_TAGS,
             variables: {
-                userId: id
+                userId: userID
             }
         })
         .then(result => {
@@ -318,6 +363,31 @@ async function getAllTags() {
                 }
                 allTags.value.push(newTag)
             })
+            console.log('all tags')
+            console.log(allTags.value)
+        })
+        .catch(error => console.log(error))
+}
+
+async function getAllAuthors() {
+    await apolloClient
+        .query({
+            query: ALL_AUTHORS,
+            variables: {
+                userId: userID
+            }
+        })
+        .then(result => {
+            console.log(result)
+            result.data.allAuthors.forEach(author => {
+                let newAuthor = {
+                    id: author.authorId.id,
+                    fullname: author.authorId.surname + ' ' + author.authorId.name + (author.authorId.secondname != '' ? (' ' + author.authorId.secondname) : ''),
+                }
+                allAuthors.value.push(newAuthor)
+            })
+            console.log('all authors')
+            console.log(allAuthors.value)
         })
         .catch(error => console.log(error))
 }
@@ -330,17 +400,31 @@ function switchMenuDisplay() {
 
 function addTagSubscription(chosenTag) {
     console.log(`подписаться на тег ${chosenTag}`)
-    let tagID = allTags.value.find(tag => tag.name == chosenTag).id
-    apolloClient
-        .mutate({
-            mutation: ADD_TAG_SUBSCRIPTION,
-            variables: {
-                userId: 38,
-                tagId: tagID
-            },
+    let userID = Number(store.state.user.id)
+    let tagID = allTags.value.find(tag => tag.name == chosenTag)
+    if (tagID){
+        apolloClient
+            .mutate({
+                mutation: ADD_TAG_SUBSCRIPTION,
+                variables: {
+                    userId: userID,
+                    tagId: tagID.id
+                },
+            })
+            .then(result => { console.log(result) })
+            .catch(error => { console.log(error) })
+    } else {
+        toast({
+            message: i18n.t('tagDoesntExist'),
+            type: 'notification-danger',
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 4000,
+            position: 'top-right',
         })
-        .then(result => { console.log(result) })
-        .catch(error => { console.log(error) })
+        let incorrectTagNumber = document.getElementsByClassName('tags-subscriptions-content')[0].children.length - 2
+        document.getElementsByClassName('tags-subscriptions-content')[0].children.item(incorrectTagNumber).remove()
+    }  
 }
 
 async function addNewTag(event) {
@@ -357,11 +441,12 @@ function deleteTagSubscription(tagToDelete) {
             } else { input.parentElement.parentElement.remove() }
             console.log(`удалить тег ${tagToDelete}`)
             let tagID = allTags.value.find(tag => tag.name == tagToDelete).id
+            let userID = Number(store.state.user.id)
             apolloClient
                 .mutate({
                     mutation: REMOVE_TAG_SUBSCRIPTION,
                     variables: {
-                        userId: 38,
+                        userId: userID,
                         tagId: tagID
                     },
                 })
@@ -369,6 +454,19 @@ function deleteTagSubscription(tagToDelete) {
                 .catch(error => { console.log(error) })
         }
     }
+}
+
+function deleteAuthorSubscription(authorID) {
+    apolloClient
+        .mutate({
+            mutation: REMOVE_AUTHOR_SUBSCRIPTION,
+            variables: {
+                userId: userID,
+                authorId: authorID
+            },
+        })
+        .then(result => { console.log(result) })
+        .catch(error => { console.log(error) })
 }
 </script>
 

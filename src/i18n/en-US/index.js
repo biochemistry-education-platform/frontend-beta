@@ -33,6 +33,7 @@ export default {
     roleTeacher: 'Teacher',
     roleStudent: 'Student',
     roleSSS: 'Responsible for SSS',
+    tagDoesntExist: "Unable to subscribe to tag, it hasn't been used yet",
 
     toFavorites: 'Add to favorites',
     toNote: 'To the abstract',

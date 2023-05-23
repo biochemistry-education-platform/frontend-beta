@@ -12,7 +12,7 @@
         <!-- <SearchForm v-bind:items="articles" v-on:filterit="filterit"/> -->
         <hr v-if="!isMobile" class="biochemistry-page-hr">
         <div class="articles-list">
-            <div class="articles__article" v-for="article in filteredArticles" v-bind:key="article.id">
+            <div class="articles__article" v-for="article in filteredArticles" :key="article.id">
                 <div class="article-type">
                     <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg>
                 </div>
@@ -57,6 +57,7 @@ import { apolloClient } from '@/vue-apollo'
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import store from '@/store'
 
 const i18n = useI18n()
 const router = useRouter()
@@ -105,50 +106,83 @@ const ALL_ARTICLES_QUERY = gql`query {
   }
 }`
 
+const FAV_QUERY = gql`query GetUserFavour($userId: Int!) {
+    getUserFavour(userId: $userId) {
+        articleId {
+            id
+            name
+        }
+    }
+}`
+
 onMounted(async () => {
     await getArticles()
 })
 
 async function getArticles() {
-    articles = [
-                {
-                    id: 1,
-                    title: 'article title',
-                    type: 'text_article',
-                    author: 'author name',
-                    tags: ['тег'],
-                    publish_date: new Date(Date.parse(new Date('05 May 2023 11:37 UTC'))).toLocaleDateString('ru-RU', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                    })
-                },
-                {
-                    id: 2,
-                    title: 'article title2',
-                    type: 'text_article',
-                    author: 'author name2',
-                    tags: ['белки', 'липиды'],
-                    publish_date: new Date(Date.parse(new Date('06 May 2023 08:16 UTC'))).toLocaleDateString('ru-RU', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                    })
-                },
-                {
-                    id: 3,
-                    title: 'article title3',
-                    type: 'text_article',
-                    author: 'author name3',
-                    tags: ['гормоны'],
-                    publish_date: new Date(Date.parse(new Date('08 May 2023 14:20 UTC'))).toLocaleDateString('ru-RU', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                    })
+    await apolloClient
+        .query({
+            query: ALL_ARTICLES_QUERY
+        })
+        .then(result => {
+            result.data.allArticles.forEach(article => { 
+                let authorFullName = article.author.authorId.surname + ' ' + article.author.authorId.name.charAt(0) + '.'
+                if (article.author.authorId.secondname != "") { authorFullName += (' ' + article.author.authorId.secondname.charAt(0) + '.')}
+                let reviewerFullName = ''
+                if (article.author.authorId.id != article.reviewer.id) {
+                    //есть и автор, и проверяющий
+                    reviewerFullName = article.reviewer.surname + ' ' + article.reviewer.name.charAt(0) + '.'
+                    if (article.reviewer.secondname != "") { reviewerFullName += (' ' + article.reviewer.secondname.charAt(0) + '.')}
                 }
-            ]
-            filteredArticles.value = articles.reverse()
+                let tagList = []
+                article.articletagSet.forEach(tag => {
+                    tagList.push(tag.tagId.name)
+                })
+                let date = new Date(Date.parse(article.publishDate)).toLocaleDateString('ru-RU', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                })
+                articles.push({
+                    id: article.id,
+                    title: article.name,
+                    type: 'text_article',
+                    author: authorFullName,
+                    reviewer: reviewerFullName,
+                    tags: tagList,
+                    publish_date: date,
+                    isSaved: false
+                })
+            })
+        })
+        .catch(error => console.log(error))
+        
+        if (store.state.user.id != '') {
+            let id = Number(store.state.user.id)
+            await apolloClient
+                .query({
+                    query: FAV_QUERY,
+                    variables: {
+                        userId: id
+                    }
+                })
+                .then(result => { 
+                    if (result.data.getUserFavour.length > 0) {
+                        let allFavours = []
+                        result.data.getUserFavour.forEach(article => {
+                            allFavours.push(article.articleId.id)
+                        })
+                        articles.forEach(article => {
+                            if (allFavours.includes(article.id)) {
+                                filteredArticles.value.push(article)
+                            }
+                        })
+                        filteredArticles.value.forEach(article => article.isSaved = true)
+                        filteredArticles.value.sort((a,b) => new Date(b.publish_date) - new Date(a.publish_date))
+                    }
+                })
+                .catch(error => { console.log(error) })
+        }
 }
 
 function filterit(newArticles) {
