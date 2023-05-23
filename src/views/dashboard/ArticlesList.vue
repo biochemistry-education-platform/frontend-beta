@@ -34,7 +34,7 @@
                     </div>
                 </div>
                 <hr v-if="!isMobile" class="article-separator">
-                <div class="article-favorite" @click="article.isSaved = !article.isSaved">
+                <div class="article-favorite" @click="switchSaved(article.id)">
                     <svg v-if="article.isSaved" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m233 976 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Z"/></svg>
                     <svg v-else xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg>
                 </div>
@@ -105,6 +105,36 @@ const ALL_ARTICLES_QUERY = gql`query {
   }
 }`
 
+const FAV_QUERY = gql`query GetUserFavour($userId: Int!) {
+    getUserFavour(userId: $userId) {
+        articleId {
+            id
+            name
+        }
+    }
+}`
+
+const ADD_TO_FAV = gql`mutation ($userId: Int!, $articleId: Int!) {
+    addFavourite(userId: $userId, articleId: $articleId) {
+        favour{
+            articleId{
+                id, 
+                name
+            }
+        }
+    }
+}`
+
+const REMOVE_FROM_FAV = gql`mutation ($userId: Int!, $articleId: Int!) {
+    deleteFavourite(userId: $userId, articleId: $articleId) {
+        favour{
+            articleId{
+            id, name
+            }
+        }
+    }
+}`
+
 onMounted(async () => {
     await getArticles()
 })
@@ -147,6 +177,15 @@ async function getArticles() {
         })
         .catch(error => console.log(error))
 
+        await apolloClient
+            .query({
+                query: FAV_QUERY,
+                variables: {
+                    userId: 38
+                }
+            })
+            .then(result => { console.log(result) })
+            .catch(error => { console.log(error) })
         articles.forEach(article => filteredArticles.value.push(article))
         filteredArticles.value.sort((a,b) => new Date(b.publish_date) - new Date(a.publish_date))
 }
@@ -158,6 +197,42 @@ function filterit(newArticles) {
 function switchMenuDisplay() {
     if (props.isMenuShown == false) {
         emit('openMenu', true)
+    }
+}
+
+async function switchSaved(articleId) {
+    let result = filteredArticles.value.findIndex(article => article.id == articleId)
+    console.log(result)
+    if (filteredArticles.value[result].isSaved) {
+        filteredArticles.value[result].isSaved = false
+        console.log(`удалить статью ${filteredArticles.value[result].title}`)
+        await apolloClient
+            .mutate({
+                mutation: REMOVE_FROM_FAV,
+                // тут айди профиля!! из стора
+                variables: {
+                    userId: 11, 
+                    articleId: articleId
+                },
+            })
+            .then(result => { console.log(result) })
+            .catch(error => { console.log(error) })
+        return
+    } else {
+        filteredArticles.value[result].isSaved = true
+        console.log(`добавить статью ${filteredArticles.value[result].title}`)
+        await apolloClient
+            .mutate({
+                mutation: ADD_TO_FAV,
+                // тут айди профиля!! из стора
+                variables: {
+                    userId: 11, 
+                    articleId: articleId
+                },
+            })
+            .then(result => { console.log(result) })
+            .catch(error => { console.log(error) })
+        return
     }
 }
 </script>

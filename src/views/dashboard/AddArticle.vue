@@ -108,7 +108,21 @@ const CREATE_NOTIF_ARTICLE_MUTATION = gql`
             }
         }
     }`
+
+const REVIEWERS_QUERY = gql`query {
+    getReviewers {
+        id,
+        name
+    }
+}`
+
 onMounted(() => {
+    apolloClient
+        .query({
+            query: REVIEWERS_QUERY
+        })
+        .then(result => { console.log(result) })
+        .catch(error => { console.log(error) })
     user_role.value = store.state.user.role
     type.value = route.params.type
     let colorVars = getComputedStyle(document.getElementsByClassName('theme')[0])
@@ -332,7 +346,6 @@ function toJSON(element) {
     background: var(--card-color);
 }
 .add-article-title {
-    margin-left: 10%;
     margin-top: 30px;
     font-size: 32px;
     color: var(--text-color);
@@ -347,8 +360,7 @@ function toJSON(element) {
 }
 
 .tagline {
-    width: 80%;
-    margin: auto;
+    width: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -397,8 +409,7 @@ function toJSON(element) {
 }
 
 .add-article-text {
-    width: 80%;
-    margin: auto;
+    width: 100%;
     font-size: 16px;
     color: var(--text-color);
     flex-grow: 1;
@@ -418,8 +429,7 @@ function toJSON(element) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 80%;
-    margin: auto;
+    width: 100%;
     margin-bottom: 20px;
 }
 
@@ -460,8 +470,7 @@ function toJSON(element) {
 .add-article-extra-options {
     display: flex;
     flex-direction: row;
-    width: 80%;
-    margin: auto;
+    width: 100%;
     margin-bottom: 20px;
 }
 

@@ -3,7 +3,7 @@
         <div v-if="!finished">
             <input list="tags-options" id="tag-choice" name="tag-choice" class="tag-input" v-on:change="saveTag" v-model="currentTag" :placeholder="$t('tag')">
             <datalist id="tags-options" >>
-                <option v-for="tag in tags" v-bind:key="tag.id">{{ tag }}</option>
+                <option v-for="tag in tags" v-bind:key="tag.id">{{ tag.name }}</option>
             </datalist>
         </div>
         <div v-else class="finished-tag">{{ currentTag }}<svg @click="deleteTag" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
