@@ -1,5 +1,5 @@
 <template>
-    <div class="article-page">
+    <div class="article-page" id="article-page">
         <div v-if="isMenuShown || showActions" class="darker-bg" @click="closeMenus"></div>
         <div v-if="isMobile" class="mobile-header">
             <div class="logo-block">
@@ -24,7 +24,7 @@
                 </div>
             </div>
 
-            <div v-if="!isMobile" class="article-actions">
+            <div v-if="!isMobile && !hideForPdf" class="article-actions">
                 <div v-if="user_role != ''" class="article-action"><p>{{ $t('toFavorites') }}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg></div>
                 <div v-if="user_role != 'Teacher' && user_role != ''" class="article-action"><p>{{ $t('toNote') }}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg></div>
                 <div class="article-action" v-on:click="getPdf"><p>{{ $t('download')}}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M220 896q-24 0-42-18t-18-42V693h60v143h520V693h60v143q0 24-18 42t-42 18H220Zm260-153L287 550l43-43 120 120V256h60v371l120-120 43 43-193 193Z"/></svg></div>
@@ -35,7 +35,7 @@
 
         <div class="article-text" id="articleText"></div>
         <button v-show="isSelected" id="add-selected-text-btn" v-on:click="getSelectedText">{{ $t('writeToNote') }}</button>
-        <div v-if="isMobile && showActions" class="mobile-article-actions">
+        <div v-if="isMobile && showActions && !hideForPdf" class="mobile-article-actions">
             <div v-if="user_role != ''" class="mobile-article-action"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m323 851 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"/></svg><p>{{ $t('toFavorites') }}</p></div>
             <div v-if="user_role != 'Teacher' && user_role != ''" class="mobile-article-action"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg><p>{{ $t('toNote') }}</p></div>
             <div class="mobile-article-action" v-on:click="getPdf"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M220 896q-24 0-42-18t-18-42V693h60v143h520V693h60v143q0 24-18 42t-42 18H220Zm260-153L287 550l43-43 120 120V256h60v371l120-120 43 43-193 193Z"/></svg><p>{{ $t('download')}}</p></div>
@@ -60,6 +60,9 @@ import { QuillEditor, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
+import { jsPDF } from 'jspdf'
+import { pdfExporter } from 'quill-to-pdf'
+import html2pdf from "html2pdf.js"
 
 const i18n = useI18n()
 
@@ -71,6 +74,7 @@ const props = defineProps({
 })
 
 let showActions = ref(false)
+let hideForPdf = ref(false)
 
 const GET_ARTICLE_QUERY = gql`
     query getArticle($id: Int!) {
@@ -118,6 +122,15 @@ let date = ref('')
 let role = ref('')
 let user_role = ref('')
 const route = useRoute()
+let quill
+
+onMounted(async () => {
+    quill = new Quill('#articleText', {
+        readOnly: true,
+        theme: 'bubble'
+    })
+    await getArticle()
+})
 
 function switchMenuDisplay() {
     if (props.isMenuShown == false) {
@@ -204,19 +217,13 @@ function toDOM(input) {
     return node
 }
 
-function getPdf(event) {
-    const articleID = route.params.id
-    
-    axios
-        .get(`/api/v1/articles/${articleID}/generate_pdf/`, {
-            responseType: 'blob',
-        })
-        .then(response => {
-            fileDownload(response.data, `${article.title}.pdf`)
-        })
-        .catch(error => {
-            console.log(error)
-        })
+async function getPdf() {
+    await (hideForPdf.value = true)
+    html2pdf(document.getElementById("article-page"), {
+        margin: 1,
+        filename: `${article.title}.pdf`,
+    })
+    hideForPdf.value = false
 }
 
 document.onselectionchange = () => { showButton() }
@@ -306,14 +313,6 @@ async function getSelectedText(event) {
         })
     }
 }
-
-onMounted(async () => {
-    var quill = new Quill('#articleText', {
-        readOnly: true,
-        theme: 'bubble'
-    })
-    await getArticle()
-})
 </script>
 
 <style>

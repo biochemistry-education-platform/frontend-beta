@@ -68,6 +68,8 @@ const emit = defineEmits(['switchTheme', 'switchLanguage'])
 
 const theme = ref('light')
 const language = ref('ru')
+let email = ref('')
+let password = ref('')
 
 function switchTheme () {
     theme.value = theme.value === 'light' ? 'dark' : 'light'
@@ -98,9 +100,6 @@ const AUTH_USER_MUTATION = gql`
             }
         }
     }`
-
-let email = ref('')
-let password = ref('')
 
 function submitForm() {
     apolloClient

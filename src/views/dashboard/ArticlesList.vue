@@ -72,6 +72,36 @@ const props = defineProps({
 let articles = []
 let filteredArticles = ref([])
 
+const FAV_QUERY = gql`query GetUserFavour($userId: Int!) {
+    getUserFavour(userId: $userId) {
+        articleId {
+            id
+            name
+        }
+    }
+}`
+
+const ADD_TO_FAV = gql`mutation ($userId: Int!, $articleId: Int!) {
+    addFavourite(userId: $userId, articleId: $articleId) {
+        favour{
+            articleId{
+                id, 
+                name
+            }
+        }
+    }
+}`
+
+const REMOVE_FROM_FAV = gql`mutation ($userId: Int!, $articleId: Int!) {
+    deleteFavourite(userId: $userId, articleId: $articleId) {
+        favour{
+            articleId{
+            id, name
+            }
+        }
+    }
+}`
+
 const ALL_ARTICLES_QUERY = gql`query {
   allArticles {
     id
@@ -104,36 +134,6 @@ const ALL_ARTICLES_QUERY = gql`query {
       }
     }
   }
-}`
-
-const FAV_QUERY = gql`query GetUserFavour($userId: Int!) {
-    getUserFavour(userId: $userId) {
-        articleId {
-            id
-            name
-        }
-    }
-}`
-
-const ADD_TO_FAV = gql`mutation ($userId: Int!, $articleId: Int!) {
-    addFavourite(userId: $userId, articleId: $articleId) {
-        favour{
-            articleId{
-                id, 
-                name
-            }
-        }
-    }
-}`
-
-const REMOVE_FROM_FAV = gql`mutation ($userId: Int!, $articleId: Int!) {
-    deleteFavourite(userId: $userId, articleId: $articleId) {
-        favour{
-            articleId{
-            id, name
-            }
-        }
-    }
 }`
 
 onMounted(async () => {
