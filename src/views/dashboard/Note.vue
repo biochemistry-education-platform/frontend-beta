@@ -332,7 +332,7 @@ async function editNote(event) {
 
 async function getPdf() {
     await (hideForPdf.value = true)
-    html2pdf(document.getElementById("article-page"), {
+    html2pdf(document.getElementById("note-page"), {
         margin: 1,
         filename: `${article.title}.pdf`,
     })
