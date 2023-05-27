@@ -112,7 +112,9 @@ const CREATE_NOTIF_ARTICLE_MUTATION = gql`
 const REVIEWERS_QUERY = gql`query {
     getReviewers {
         id,
-        name
+        name,
+        surname,
+        secondname
     }
 }`
 

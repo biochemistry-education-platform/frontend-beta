@@ -6,7 +6,7 @@
                 <img src="@/assets/icons/logo.png">
                 <p class="logo-name">plateaumed</p>
             </div>
-            <svg v-i="!hideForPdf" @click="switchMenuDisplay" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="M120 816v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/></svg>
+            <svg v-if="!hideForPdf" @click="switchMenuDisplay" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="M120 816v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/></svg>
         </div>
         <div v-if="article.tags.length > 0" class="article-tags">
             <div v-for="tag in article.tags" class="article-tag">#{{ tag }}</div>
@@ -60,8 +60,6 @@ import { QuillEditor, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
-import { jsPDF } from 'jspdf'
-import { pdfExporter } from 'quill-to-pdf'
 import html2pdf from "html2pdf.js"
 
 const i18n = useI18n()
@@ -110,7 +108,6 @@ const GET_ARTICLE_QUERY = gql`
         }
     }`
 
-const fileDownload = require('js-file-download')
 let isSelected = ref(false)
 let article = reactive({
     author: '',

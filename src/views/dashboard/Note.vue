@@ -1,12 +1,12 @@
 <template>
     <div v-if="store.state.user.role != 'Teacher'" class="note-page">
-        <div v-if="isMenuShown || showActions" class="darker-bg" @click="closeMenus"></div>
-        <div v-if="isMobile" class="mobile-header">
+        <div v-if="(isMenuShown || showActions) && !hideForPdf" class="darker-bg" @click="closeMenus"></div>
+        <div v-if="isMobile && !hideForPdf" class="mobile-header">
             <div class="logo-block">
                 <img src="@/assets/icons/logo.png">
                 <p class="logo-name">plateaumed</p>
             </div>
-            <svg @click="switchMenuDisplay" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="M120 816v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/></svg>
+            <svg v-if="!hideForPdf" @click="switchMenuDisplay" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="M120 816v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/></svg>
         </div>
         <div v-if="article.tags.length > 0" class="article-tags">
             <div v-for="tag in article.tags" class="article-tag">#{{ tag }}</div>
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            <div v-if="!isMobile" class="note-actions">
+            <div v-if="!isMobile && !hideForPdf" class="note-actions">
                 <div class="note-action"><p>{{ $t('toArticle') }}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg></div>
                 <div class="note-action" v-on:click="getPdf"><p>{{ $t('download')}}</p><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M220 896q-24 0-42-18t-18-42V693h60v143h520V693h60v143q0 24-18 42t-42 18H220Zm260-153L287 550l43-43 120 120V256h60v371l120-120 43 43-193 193Z"/></svg></div>
             </div>
@@ -40,7 +40,7 @@
         <hr v-if="!isMobile">
 
         <div class="note-text" id="noteText"></div>
-        <div v-if="isMobile && showActions" class="mobile-note-actions">
+        <div v-if="isMobile && showActions && !hideForPdf" class="mobile-note-actions">
             <div v-if="user_role != '' && !isEditMode" class="mobile-note-action action-green" @click="editNote"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M180 876h44l443-443-44-44-443 443v44Zm614-486L666 262l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L248 936H120V808l504-504 128 128Zm-107-21-22-22 44 44-22-22Z"/></svg><p>{{ $t('edit') }}</p></div>
             <div v-if="user_role != '' && isEditMode" class="mobile-note-action action-green" @click="saveNote"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m421 758 283-283-46-45-237 237-120-120-45 45 165 166Zm59 218q-82 0-155-31.5t-127.5-86Q143 804 111.5 731T80 576q0-83 31.5-156t86-127Q252 239 325 207.5T480 176q83 0 156 31.5T763 293q54 54 85.5 127T880 576q0 82-31.5 155T763 858.5q-54 54.5-127 86T480 976Zm0-60q142 0 241-99.5T820 576q0-142-99-241t-241-99q-141 0-240.5 99T140 576q0 141 99.5 240.5T480 916Zm0-340Z"/></svg><p>{{ $t('save') }}</p></div>
             <div class="mobile-note-action"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg><p>{{ $t('toArticle') }}</p></div>
@@ -65,6 +65,7 @@ import { QuillEditor, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
+import html2pdf from "html2pdf.js"
 
 const i18n = useI18n()
 
@@ -76,6 +77,7 @@ const props = defineProps({
 })
 
 let showActions = ref(false)
+let hideForPdf = ref(false)
 
 function switchMenuDisplay() {
     if (props.isMenuShown == false) {
@@ -88,7 +90,6 @@ function closeMenus() {
     showActions.value = false
 }
 
-const fileDownload = require('js-file-download')
 let isSelected = ref(false)
 let article = reactive({
     author: '',
@@ -329,19 +330,13 @@ async function editNote(event) {
     // })
 }
 
-function getPdf(event) {
-    const articleID = route.params.id
-    
-    axios
-        .get(`/api/v1/articles/${articleID}/generate_pdf/`, {
-            responseType: 'blob',
-        })
-        .then(response => {
-            fileDownload(response.data, `${article.title}.pdf`)
-        })
-        .catch(error => {
-            console.log(error)
-        })
+async function getPdf() {
+    await (hideForPdf.value = true)
+    html2pdf(document.getElementById("article-page"), {
+        margin: 1,
+        filename: `${article.title}.pdf`,
+    })
+    hideForPdf.value = false
 }
 
 function deleteNote(event) {

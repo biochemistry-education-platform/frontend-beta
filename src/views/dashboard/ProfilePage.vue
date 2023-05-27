@@ -147,24 +147,9 @@ let subscriptedTags = ref([])
 let allAuthors = ref([])
 let subscriptedAuthors = ref([])
 let numberOfTags = ref(0)
-let authors = ref([{
-                surname: 'Иванов',
-                name: 'Иван',
-                patronymic: 'Иванович',
-                role: 'Teacher'
-            },
-            {
-                surname: 'Константинопольская',
-                name: 'Анастасия',
-                patronymic: 'Александровна',
-                role: 'Teacher'
-            },
-            {
-                surname: 'Фамилия',
-                name: 'Имя',
-                patronymic: 'Отчество',
-                role: 'Student'
-            }])
+let email_channel = ref('')
+let vk_channel = ref('')
+let tg_channel = ref('')
 let sss = ref([{
                 surname: 'Иванов',
                 name: 'Иван',
@@ -330,6 +315,7 @@ async function getMyInfo() {
             }
         })
         .then(result => {
+            console.log(result.data)
             userID = result.data.getProfile.user
             result.data.getProfile.tagsubscriptionSet.forEach(tag => {
                 subscriptedTags.value.push(tag.tagId.name)
@@ -342,7 +328,6 @@ async function getMyInfo() {
                     photo: author.authorId.authorId.photo
                 })
             })
-            console.log(subscriptedAuthors.value)
         })
         .catch(error => console.log(error))
 }
