@@ -1,5 +1,5 @@
 <template>
-    <div v-if="store.state.user.role != 'Teacher'" class="note-page">
+    <div v-if="store.state.user.role != 'Teacher'" class="note-page" id="note-page">
         <div v-if="(isMenuShown || showActions) && !hideForPdf" class="darker-bg" @click="closeMenus"></div>
         <div v-if="isMobile && !hideForPdf" class="mobile-header">
             <div class="logo-block">
@@ -19,7 +19,7 @@
                 <button class="note-red-btn" @click="deleteNote">{{ $t('delete') }}</button>
             </div>
         </div>
-        <div class="mobile-note-title" v-if="isMobile"><h1 class="note-title">{{ $t('note') }} «{{ note.based_on_article }}»</h1><svg @click="showActions = true" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M479.858 896Q460 896 446 881.858q-14-14.141-14-34Q432 828 446.142 814q14.141-14 34-14Q500 800 514 814.142q14 14.141 14 34Q528 868 513.858 882q-14.141 14-34 14Zm0-272Q460 624 446 609.858q-14-14.141-14-34Q432 556 446.142 542q14.141-14 34-14Q500 528 514 542.142q14 14.141 14 34Q528 596 513.858 610q-14.141 14-34 14Zm0-272Q460 352 446 337.858q-14-14.141-14-34Q432 284 446.142 270q14.141-14 34-14Q500 256 514 270.142q14 14.141 14 34Q528 324 513.858 338q-14.141 14-34 14Z"/></svg></div>
+        <div class="mobile-note-title" v-if="isMobile && !hideForPdf"><h1 class="note-title">{{ $t('note') }} «{{ note.based_on_article }}»</h1><svg @click="showActions = true" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M479.858 896Q460 896 446 881.858q-14-14.141-14-34Q432 828 446.142 814q14.141-14 34-14Q500 800 514 814.142q14 14.141 14 34Q528 868 513.858 882q-14.141 14-34 14Zm0-272Q460 624 446 609.858q-14-14.141-14-34Q432 556 446.142 542q14.141-14 34-14Q500 528 514 542.142q14 14.141 14 34Q528 596 513.858 610q-14.141 14-34 14Zm0-272Q460 352 446 337.858q-14-14.141-14-34Q432 284 446.142 270q14.141-14 34-14Q500 256 514 270.142q14 14.141 14 34Q528 324 513.858 338q-14.141 14-34 14Z"/></svg></div>
         
         <div class="article-info">
             <div class="article-author">
@@ -334,7 +334,7 @@ async function getPdf() {
     await (hideForPdf.value = true)
     html2pdf(document.getElementById("note-page"), {
         margin: 1,
-        filename: `${article.title}.pdf`,
+        filename: `${note.based_on_article}.pdf`,
     })
     hideForPdf.value = false
 }
