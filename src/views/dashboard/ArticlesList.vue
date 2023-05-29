@@ -190,15 +190,17 @@ async function getArticles() {
                     reviewer: 'Селина А.',
                     tags: ['оповещение', 'СНО', 'маркеры', 'почки', 'патология'],
                     filter_date: new Date(Date.parse('25 May 2023 16:48 UTC')),
-                    publish_date: new Date(Date.parse('25 May 2023 16:48 UTC')).toLocaleDateString('ru-RU', {
+                    publish_date: new Date(Date.parse('25 May 2023 16:48 UTC')).toLocaleString('ru-RU', {
                         year: 'numeric',
                         month: '2-digit',
-                        day: '2-digit',
+                        day: '2-digit'
                     }),
-                    event_date: new Date(Date.parse(new Date('25 May 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
+                    event_date: new Date(Date.parse(new Date('25 May 2023 12:00 UTC'))).toLocaleDateString('ru-RU', {
                         year: 'numeric',
                         month: '2-digit',
                         day: '2-digit',
+                        hour: '2-digit',
+                        minute:'2-digit'
                     }),
                     event_place: 'Webinar',
                     isSaved: false

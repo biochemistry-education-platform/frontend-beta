@@ -166,8 +166,8 @@ function showArticleTypes () {
     height: 36px;
     background: var(--menu-background);
     position: absolute;
-    bottom: -13.5px;
-    left: -32.4px;
+    bottom: -7.5px;
+    left: -35.4px;
     border-radius: 50%;
     box-shadow: 13px -25px 0 var(--menu-accent);
 }
