@@ -73,25 +73,25 @@ async function getArticles() {
     notes = [
         {
             id: 1,
-            based_on_article: 'Name of the article',
-            article_author: 'Author Name',
-            article_publish_date: new Date(Date.parse(new Date('16 April 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
+            based_on_article: 'Медицина в литературе',
+            article_author: 'Онегин Е.',
+            article_publish_date: new Date(Date.parse(new Date('23 May 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
             }),
-            article_tags: ['белки']
+            article_tags: ['литература, дуэли']
         },
         {
             id: 2,
-            based_on_article: 'Article name',
-            article_author: 'Author Name',
-            article_publish_date: new Date(Date.parse(new Date('06 May 2023 10:28 UTC'))).toLocaleDateString('ru-RU', {
+            based_on_article: 'Статья с полным форматированием',
+            article_author: 'Быстрых Е.',
+            article_publish_date: new Date(Date.parse(new Date('25 May 2023 10:28 UTC'))).toLocaleDateString('ru-RU', {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
             }),
-            article_tags: ['липиды']
+            article_tags: ['форматирование, платформа']
         }
     ]
     filteredNotes.value = notes.reverse()

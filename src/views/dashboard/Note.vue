@@ -128,14 +128,20 @@ async function getArticle() {
     //     .catch(error => {
     //         console.log(JSON.stringify(error))
     //     })
-    article.author = 'Фамилия Имя Отчество'
-    article.tags = ['сердце', 'человек']
-    note.based_on_article = 'Сердце человека'
-    note.text = '[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"Роль сердца в организме человека\\nЧто значит сердце для человека? Очень много! Например:\\nКачает кровь\\nСнабжает что-то чем-то\\nБьется"}]}]'
-    var tzoffset = (new Date()).getTimezoneOffset() * 72000;
-    var pdate = new Date('05 May 2023 14:48 UTC')
-    article.publish_date = (new Date(pdate - tzoffset)).toISOString()
-    date = (new Date(Date.parse(article.publish_date.slice(0,19)))).toLocaleString('ru-RU')
+    article.author = 'Быстрых Елена'
+    article.tags = ['форматирование', 'платформа']
+    note.based_on_article = 'Статья с полным форматированием'
+    note.text = '[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"Заголовок 1 уровня\\nОбычный текст по левому краю\\nЖирный текст"}]}]'
+    article.publish_date = new Date(Date.parse(new Date('25 May 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+            })
+    date = new Date(Date.parse(new Date('25 May 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+            })
     let text = JSON.parse(note.text)
     let place = document.getElementsByClassName('ql-editor')[0]
     place.removeChild(place.firstChild)
