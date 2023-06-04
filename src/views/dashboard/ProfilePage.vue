@@ -43,11 +43,12 @@
                 <div class="tags-subscriptions">
                     <h2 class="subscription-title">{{ $t('tagsSubscriptions') }}</h2>
                     <div class="tags-subscriptions-content">
-                        <div v-for="tag, index in subscriptedTags" :key="index" class="subscription-tag finished-tag"><p>{{ tag }}</p><svg @click="deleteTagSubscription(tag)" class="delete-tag-sub-btn" xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 96 960 960" width="18"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
+                        <div v-for="tag, index in subscriptedTags" :key="index" class="subscription-tag finished-tag"><p>{{ tag }}</p><svg @click="deleteTagModal(tag)" class="delete-tag-sub-btn" xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 96 960 960" width="18"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
                         <!-- <svg @click="addNewTag" class="add-tag-subscription" xmlns="http://www.w3.org/2000/svg" height="27" viewBox="0 96 960 960" width="27"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg> -->
                         <div class="tag-field" v-for="index in numberOfTags" :key="index">
-                            <Tags :initialTags="allTags" @addTag="addTagSubscription" @deleteTag="deleteTagSubscription" />
+                            <Tags :initialTags="allTags" @addTag="addTagSubscription" @deleteTag="deleteTagModal" />
                         </div>
+                        <DeletionConfirmationModal v-if="showDeleteTagModal" @cancel="showDeleteTagModal = false" @delete="deleteTagSubscription(tagnameToDelete)" :text="tagnameToDelete" :type="'tag'" />
                         <svg @click="addNewTag" class="add-tag-subscription" xmlns="http://www.w3.org/2000/svg" height="27" viewBox="0 96 960 960" width="27"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
                     </div>    
                 </div>
@@ -67,7 +68,8 @@
                                     </div>                  
                                 </div>
                                 <hr v-if="!isMobile" class="vertical-hr">
-                                <div @click="deleteAuthorSubscription(author.id)" class="delete-subscription-author"><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
+                                <div @click="showDeleteAuthorModal = true" class="delete-subscription-author"><svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
+                                <DeletionConfirmationModal v-if="showDeleteAuthorModal" @cancel="showDeleteAuthorModal = false" @delete="deleteAuthorSubscription(author.id)" :text="author.fullname" :type="'author'" />
                             </div>
                             <hr v-if="!isMobile" class="authors-subscription-hr">
                         </div>
@@ -114,6 +116,7 @@ export default {
 import axios from 'axios'
 import store from '@/store'
 import Tags from '@/components/Tags.vue'
+import DeletionConfirmationModal from '@/components/DeletionConfirmationModal.vue'
 import { useRouter } from 'vue-router'
 import { ref, reactive, onMounted, defineProps, defineEmits } from 'vue'
 import gql from 'graphql-tag'
@@ -140,6 +143,8 @@ let user = reactive({
     patronymic: ''
 })
 
+let showDeleteTagModal = ref(false)
+let showDeleteAuthorModal = ref(false)
 let tagAdding = ref(false)
 let allTags = ref([])
 let userID = 0
@@ -147,6 +152,7 @@ let subscriptedTags = ref([])
 let allAuthors = ref([])
 let subscriptedAuthors = ref([])
 let numberOfTags = ref(0)
+let tagnameToDelete = ref('')
 let email_channel = ref('')
 let vk_channel = ref('')
 let tg_channel = ref('')
@@ -417,7 +423,12 @@ async function addNewTag(event) {
     tagAdding.value = true
 }
 
-function deleteTagSubscription(tagToDelete) {
+function deleteTagModal(tag) {
+    tagnameToDelete.value = tag
+    showDeleteTagModal.value = true
+}
+
+async function deleteTagSubscription(tagToDelete) {
     let inputs = document.getElementsByClassName('finished-tag')
     for (let input of inputs) {
         if (input.innerText == tagToDelete) {
@@ -427,7 +438,7 @@ function deleteTagSubscription(tagToDelete) {
             console.log(`удалить тег ${tagToDelete}`)
             let tagID = allTags.value.find(tag => tag.name == tagToDelete).id
             let userID = Number(store.state.user.id)
-            apolloClient
+            await apolloClient
                 .mutate({
                     mutation: REMOVE_TAG_SUBSCRIPTION,
                     variables: {
@@ -439,6 +450,7 @@ function deleteTagSubscription(tagToDelete) {
                 .catch(error => { console.log(error) })
         }
     }
+    showDeleteTagModal.value = false
 }
 
 function deleteAuthorSubscription(authorID) {

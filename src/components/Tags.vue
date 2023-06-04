@@ -32,7 +32,7 @@ export default {
             this.finished = true
             this.$emit('addTag', this.currentTag)
 
-            //TODO сохранять не при изминении, а собирать значения из инпутов при сохранении всей формы (родителя)
+            //TODO сохранять не при изменении, а собирать значения из инпутов при сохранении всей формы (родителя)
         },
         deleteTag(event) {
             this.$emit('deleteTag', this.currentTag)

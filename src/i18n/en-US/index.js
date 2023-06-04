@@ -34,13 +34,20 @@ export default {
     roleStudent: 'Student',
     roleSSS: 'Responsible for SSS',
     tagDoesntExist: "Unable to subscribe to tag, it hasn't been used yet",
-
+    confirmUnsub: 'Confirm unsubscription',
+    unsubTag: 'Are you sure you want to unsubscribe from the tag ',
+    unsubAuthor: 'Are you sure you want to unsubscribe from the author ',
+    cancelUnsub: 'No, cancel',
+    acceptUnsub: 'Yes, unsubscribe',
+    
     toFavorites: 'Add to favorites',
     toNote: 'To the abstract',
     download: 'Download',
     writeToNote: 'Write to the abstract',
     noteCreated: 'The abstract has been created',
     noteEdited: 'The abstract has been edited',
+    createNoteFailure: 'Error creating abstract',
+    editNoteFailure: 'Error editing abstract',
 
     articleTitle: 'Article title',
     tags: 'Tags',

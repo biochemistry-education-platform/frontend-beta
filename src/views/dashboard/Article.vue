@@ -108,6 +108,34 @@ const GET_ARTICLE_QUERY = gql`
         }
     }`
 
+const GET_NOTE_QUERY = gql`
+    query ($userId: Int!, $articleId: Int!) {
+        getNoteByArticle (userId: $userId, articleId: $articleId) {
+            id
+            articleId {
+                id
+                name
+            }
+            noteText
+            creationDate
+        }
+    }`
+
+const CREATE_NOTE_MUTATION = gql`
+    mutation ($userId: Int!, $articleId: Int!, $noteText: String!) {
+        createNote(userId: $userId, articleId: $articleId, noteText: $noteText) {
+            note {
+                id
+                articleId {
+                    id
+                    name
+                }
+                noteText
+                creationDate
+            }
+        }
+    }`
+
 let isSelected = ref(false)
 let article = reactive({
     author: '',
@@ -242,72 +270,64 @@ async function showButton() {
 
 async function getSelectedText(event) {
     if (window.getSelection()) {
-        let isExist = false
         var select = window.getSelection()
         let menu = document.getElementById('add-selected-text-btn')
         menu.style.cssText += `display: none;`
-        // await axios
-        //     .get('/api/v1/notes/')
-        //     .then(response => {
-        //         for (let i = 0; i < response.data.length; i++) {
-        //             // TODO !!! check not by title but by id (check if the note based on this article already exists)
-        //             if (article.title === response.data[i].based_on_article) {
-        //                 // add text to the existing note
-        //                 isExist = true
-        //                 let current_text = response.data[i].text
-        //                 current_text = current_text.substring(0, current_text.length-1)
-        //                 let new_text = `${current_text},{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"${select.toString()}"}]}]`
-        //                 axios
-        //                     .patch(`/api/v1/notes/${response.data[i].id}/`, {text: new_text})
-        //                     .then(response => {
-        //                         toast({
-        //                             message: $t('noteEdited'),
-        //                             type: 'is-success',
-        //                             dismissible: true,
-        //                             pauseOnHover: true,
-        //                             duration: 2000,
-        //                             position: 'top-right',
-        //                         })
-        //                     })
-        //                     .catch(error => {
-        //                         console.log(JSON.stringify(error))
-        //                     })
-        //             }                      
-        //         }
-        //         if (isExist == false) {
-        //             const articleID = route.params.id
-        //             let title = article.title
-        //             let note = {
-        //                 text: `[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"${select.toString()}"}]}]`,
-        //                 based_on_article: articleID
-        //             }
-        //             axios
-        //                 .post('/api/v1/notes/', note)
-        //                 .then(response => {
-        //                     toast({
-        //                         message: $t('noteCreated'),
-        //                         type: 'is-success',
-        //                         dismissible: true,
-        //                         pauseOnHover: true,
-        //                         duration: 2000,
-        //                         position: 'top-right',
-        //                     })
-        //                 })
-        //                 .catch(error => {
-        //                     console.log(JSON.stringify(error))
-        //                 })
-        //         }
-        //     })
+        const articleID = route.params.id
+        let userID = store.state.user.id
+        // проверка, существует ли конспект
+        await apolloClient
+            .query({
+                query: GET_NOTE_QUERY,
+                variables: {
+                    userId: userID, 
+                    articleId: articleID
+                }
+            })
+            .then(result => {
+                // конспект существует. добавить в него текст
+                let current_text = JSON.parse(result.data.getNoteByArticle.noteText)
+                current_text = current_text.substring(0, current_text.length-1)
+                let new_text = `${current_text},{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"${select.toString()}"}]}]`
+                console.log(new_text)
+                // запрос на обновление конспекта, в качестве текста значение из new_text
+            })
+            .catch(error => {
+                // конспект не существует. создать конспект с выделенным текстом
+                let noteText = `[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"${select.toString()}"}]}]`
+                apolloClient
+                    .mutate({
+                        mutation: CREATE_NOTE_MUTATION,
+                        variables: {
+                            userId: userID,
+                            articleId: articleID,
+                            noteText: noteText,
+                        },
+                    })
+                    .then(result => {
+                        toast({
+                            message: i18n.t('noteCreated'),
+                            type: 'notification-success',
+                            dismissible: true,
+                            pauseOnHover: true,
+                            duration: 2000,
+                            position: 'top-right',
+                        })
+                    })
+                    .catch(error => {
+                        toast({
+                            message: i18n.t('createNoteFailure') + '\n' + error,
+                            type: 'notification-danger',
+                            dismissible: true,
+                            pauseOnHover: true,
+                            duration: 2000,
+                            position: 'top-right',
+                        })
+                    })
+            })
+
         isSelected = false
         window.getSelection().empty()
-        toast({
-            message: i18n.t('noteCreated'),
-            type: 'notification-success',
-            dismissible: true,
-            pauseOnHover: true,
-            duration: 2000,
-            position: 'top-right',
-        })
     }
 }
 </script>

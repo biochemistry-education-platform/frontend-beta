@@ -34,6 +34,11 @@ export default {
     roleStudent: 'Студент',
     roleSSS: 'Председатель СНО',
     tagDoesntExist: 'Невозможно подписаться на тег, его ещё не использовали',
+    confirmUnsub: 'Подтвердите отмену подписки',
+    unsubTag: 'Вы уверены, что хотите отменить подписку на тег ',
+    unsubAuthor: 'Вы уверены, что хотите отменить подписку на автора ',
+    cancelUnsub: 'Нет, оставить',
+    acceptUnsub: 'Да, отписаться',
 
     toFavorites: 'В избранное',
     toNote: 'К конспекту',
@@ -41,6 +46,8 @@ export default {
     writeToNote: 'Записать в конспект',
     noteCreated: 'Конспект был успешно создан',
     noteEdited: 'Конспект был успешно изменен',
+    createNoteFailure: 'Ошибка при создании конспекта',
+    editNoteFailure: 'Ошибка при изменении конспекта',
 
     articleTitle: 'Название статьи',
     tags: 'Теги',
