@@ -24,6 +24,10 @@ export default {
     registrationFailed: 'Registration error!',
     authFailed: 'Authentication error!',
 
+    tags: 'Tags',
+    authors: 'Authors',
+    sort: 'Sort',
+
     profileTitle: 'My account',
     logOut: 'Log out',
     changePassword: 'Change password',
@@ -51,7 +55,6 @@ export default {
     editNoteFailure: 'Error editing abstract',
 
     articleTitle: 'Article title',
-    tags: 'Tags',
     tag: 'Tag',
     choosePlace: 'Place of the event',
     chooseDateTime: 'Date and time of the event',

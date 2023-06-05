@@ -80,7 +80,7 @@ async function getArticles() {
                 month: '2-digit',
                 day: '2-digit',
             }),
-            article_tags: ['литература, дуэли']
+            article_tags: ['литература', 'дуэли']
         },
         {
             id: 2,
@@ -91,7 +91,7 @@ async function getArticles() {
                 month: '2-digit',
                 day: '2-digit',
             }),
-            article_tags: ['форматирование, платформа']
+            article_tags: ['форматирование', 'платформа']
         }
     ]
     filteredNotes.value = notes.reverse()

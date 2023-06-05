@@ -24,6 +24,10 @@ export default {
     registrationFailed: 'Произошла ошибка регистрации!',
     authFailed: 'Произошла ошибка авторизации!',
 
+    tags: 'Теги',
+    authors: 'Авторы',
+    sort: 'Сортировка',
+
     profileTitle: 'Кабинет',
     logOut: 'Выйти',
     changePassword: 'Изменить пароль',
@@ -51,7 +55,6 @@ export default {
     editNoteFailure: 'Ошибка при изменении конспекта',
 
     articleTitle: 'Название статьи',
-    tags: 'Теги',
     tag: 'Тег',
     choosePlace: 'Место проведения мероприятия',
     chooseDateTime: 'Дата и время проведения мероприятия',
