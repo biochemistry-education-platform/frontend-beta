@@ -772,6 +772,10 @@ function deleteAuthorSubscription(authorID) {
     height: 40px;
 }
 
+.logout-btn:hover {
+    cursor: pointer;
+}
+
 .tag-field {
     margin-right: 20px;
 }

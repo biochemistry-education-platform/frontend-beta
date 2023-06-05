@@ -144,7 +144,7 @@ function showArticleTypes () {
     background: var(--menu-accent);
     color: var(--card-color);
     border-radius: 20px;
-    z-index: 100;
+    z-index: 20;
     text-align: left;
     padding: 20px 16px;
 }

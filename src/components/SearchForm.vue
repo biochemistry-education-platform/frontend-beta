@@ -16,7 +16,7 @@
                                 <svg v-if="chosenTags.includes(tag)" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M378 810 154 586l43-43 181 181 384-384 43 43-427 427Z"/></svg>
                                 <div v-else class="search-option-padding"></div>{{ tag }}
                             </p>
-                            <hr class="search-options-separator">
+                            <hr class="search-options-separator tagsearch-separator">
                         </div> 
                     </div>
                 </TransitionGroup>
@@ -32,7 +32,7 @@
                                 <svg v-if="chosenAuthors.includes(author)" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M378 810 154 586l43-43 181 181 384-384 43 43-427 427Z"/></svg>
                                 <div v-else class="search-option-padding"></div>{{ author }}
                             </p>
-                            <hr class="search-options-separator">
+                            <hr class="search-options-separator authorsearch-separator">
                         </div> 
                     </div>
                 </TransitionGroup>
@@ -48,7 +48,7 @@
                                 <svg v-if="chosenSorting.includes(option)" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M378 810 154 586l43-43 181 181 384-384 43 43-427 427Z"/></svg>
                                 <div v-else class="search-option-padding"></div>{{ option }}
                             </p>
-                            <hr class="search-options-separator">
+                            <hr class="search-options-separator sort-separator">
                         </div> 
                     </div>
                 </TransitionGroup>

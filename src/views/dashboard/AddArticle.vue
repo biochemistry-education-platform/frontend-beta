@@ -56,7 +56,8 @@ const i18n = useI18n()
 
 const route = useRoute()
 const router = useRouter()
-let tags = ref(['липиды', 'белки'])
+let tags = ref(['липиды', 'белки', 'здоровье', 'СНО', 'медицина', 'тег', 'иммунитет', 'холестирин'])
+// загрузить список тегов с сервера ^^^ !!!
 let chosenTags = ref([])
 let numberOfTags = ref(1)
 let article = reactive({
@@ -370,9 +371,6 @@ function toJSON(element) {
     font-size: 18px;
     color: var(--text-color);
     margin-top: 10px;
-    min-height: 60px;
-    max-height: 120px;
-    overflow-y: scroll;
 }
 
 .tagline::-webkit-scrollbar {
@@ -408,6 +406,7 @@ function toJSON(element) {
 
 .aftertags-hr {
     margin-top: 0;
+    z-index: 15;
 }
 
 .add-article-text {
@@ -415,6 +414,7 @@ function toJSON(element) {
     font-size: 16px;
     color: var(--text-color);
     flex-grow: 1;
+    z-index: 15;
 }
 
 .add-tag-btn svg {

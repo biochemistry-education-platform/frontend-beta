@@ -534,7 +534,7 @@ hr {
         align-items: flex-start;
         background: var(--menu-background);
         border-radius: 20px 20px 0px 0px;
-        z-index: 100;
+        z-index: 20;
     }
 
     .mobile-article-action, .mobile-note-action {
