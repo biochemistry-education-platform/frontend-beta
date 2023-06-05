@@ -4,7 +4,8 @@
             <input list="tags-options" id="tag-choice" name="tag-choice" class="tag-input" autocomplete="off" @input="filterTags" @keyup.native.enter="saveTag" v-model="currentTag" :placeholder="$t('tag')">
             <div v-if="isTagListShown && filteredTags.length > 0" class="tags-options-block">
                 <div class="tags-options-option" v-for="tag in filteredTags" :key="tag.id">
-                    <p @click="chooseTag(tag)">{{ tag }}</p>
+                    <p v-if="props.page == 'AddArticle'" @click="chooseTag(tag)">{{ tag }}</p>
+                    <p v-if="props.page == 'Profile'" @click="chooseTag(tag.name)">{{ tag.name }}</p>
                     <hr class="tags-options-separator">
                 </div> 
             </div>   
@@ -26,7 +27,8 @@ import { ref, defineEmits, defineProps } from 'vue'
 const emit = defineEmits(['addTag', 'deleteTag'])
 
 const props = defineProps({
-    initialTags: Object
+    initialTags: Object,
+    page: String
 })
 
 let allTags = props.initialTags
@@ -37,13 +39,15 @@ let isTagListShown = ref(false)
 
 function filterTags() {
     isTagListShown.value = true
-    filteredTags.value = allTags.filter(word =>  word.toLowerCase().includes(currentTag.value.toLowerCase()))
+    if (props.page == 'AddArticle') { filteredTags.value = allTags.filter(word =>  word.toLowerCase().includes(currentTag.value.toLowerCase())) }
+    else if (props.page == 'Profile') { filteredTags.value = allTags.filter(word =>  word.name.toLowerCase().includes(currentTag.value.toLowerCase())) }
+    
 }
 
 function saveTag() {
     isFinished.value = true
     isTagListShown.value = false
-    emit('addTag', currentTag.value)
+    emit('addTag', currentTag.value)   
 }
 
 async function chooseTag(tag) {
