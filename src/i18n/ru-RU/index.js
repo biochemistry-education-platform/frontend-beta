@@ -13,6 +13,8 @@ export default {
     surnamePlaceholder: 'Иванов',
     name: 'Имя',
     namePlaceholder: 'Иван',
+    patronymic: 'Отчество',
+    patronymicPlaceholder: 'Иванович',
     password: 'Пароль',
     student: 'Я студент',
     toSignUp: 'Зарегистрироваться',
@@ -45,6 +47,7 @@ export default {
     unsubAuthor: 'Вы уверены, что хотите отменить подписку на автора ',
     cancelUnsub: 'Нет, оставить',
     acceptUnsub: 'Да, отписаться',
+    changeInfo: 'Изменить личные данные',
 
     toFavorites: 'В избранное',
     toNote: 'К конспекту',

@@ -13,6 +13,8 @@ export default {
     surnamePlaceholder: 'Doe',
     name: 'Name',
     namePlaceholder: 'John',
+    patronymic: 'Middle name',
+    patronymicPlaceholder: 'William',
     password: 'Password',
     student: 'I am student',
     toSignUp: 'Sign up',
@@ -45,6 +47,7 @@ export default {
     unsubAuthor: 'Are you sure you want to unsubscribe from the author ',
     cancelUnsub: 'No, cancel',
     acceptUnsub: 'Yes, unsubscribe',
+    changeInfo: 'Change personal info',
     
     toFavorites: 'Add to favorites',
     toNote: 'To the abstract',

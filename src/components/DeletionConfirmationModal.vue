@@ -1,16 +1,15 @@
 <template>
-    <div class="modal-bg" @click="emit('cancel')">
-        <div class="confirm-modal">
-            <h2 v-if="props.type == 'file'" class="confirm-modal-title">{{ $t('fileDeletionTitle') }}</h2>
-            <h2 v-else class="confirm-modal-title">{{ $t('confirmUnsub') }}</h2>
-            <p class="confirm-modal-text" v-if="props.type == 'tag'">{{ $t('unsubTag') }} «{{ props.text }}»?</p>
-            <p class="confirm-modal-text" v-if="props.type == 'author'">{{ $t('unsubAuthor') }} «{{ props.text }}»?</p>
-            <p class="confirm-modal-text" v-if="props.type == 'file'">{{ $t('fileDeletionText') }} «{{ props.text }}»?</p>
-            <div class="confirm-modal-actions">
-                <p class="modal-cancel" @click="emit('cancel')">{{ $t('cancelUnsub') }}</p>
-                <button v-if="props.type == 'file'" class="modal-confirm-btn" @click="emit('delete')">{{ $t('acceptDeletion') }}</button>
-                <button v-else class="modal-confirm-btn" @click="emit('delete')">{{ $t('acceptUnsub') }}</button>
-            </div>
+    <div class="modal-bg" @click="emit('cancel')"></div>
+    <div class="confirm-modal">
+        <h2 v-if="props.type == 'file'" class="confirm-modal-title">{{ $t('fileDeletionTitle') }}</h2>
+        <h2 v-else class="confirm-modal-title">{{ $t('confirmUnsub') }}</h2>
+        <p class="confirm-modal-text" v-if="props.type == 'tag'">{{ $t('unsubTag') }} «{{ props.text }}»?</p>
+        <p class="confirm-modal-text" v-if="props.type == 'author'">{{ $t('unsubAuthor') }} «{{ props.text }}»?</p>
+        <p class="confirm-modal-text" v-if="props.type == 'file'">{{ $t('fileDeletionText') }} «{{ props.text }}»?</p>
+        <div class="confirm-modal-actions">
+            <p class="modal-cancel" @click="emit('cancel')">{{ $t('cancelUnsub') }}</p>
+            <button v-if="props.type == 'file'" class="modal-confirm-btn" @click="emit('delete')">{{ $t('acceptDeletion') }}</button>
+            <button v-else class="modal-confirm-btn" @click="emit('delete')">{{ $t('acceptUnsub') }}</button>
         </div>
     </div>
 </template>
@@ -29,9 +28,6 @@ const emit = defineEmits(['cancel', 'delete'])
     position: absolute;
     left: 0;
     top: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.2);
@@ -39,6 +35,10 @@ const emit = defineEmits(['cancel', 'delete'])
 }
 
 .confirm-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 20;
     width: 500px;
     padding: 20px;

@@ -20,7 +20,11 @@
             <div class="my-account__info">
                 <img @click="changeProfilePhoto" id="profile-img" class="my-account__img" src="@/assets/icons/profile_img.png">
                 <!-- TODO если есть фото в профиле (из запроса на сервер) то в src подставить его, иначе - то, что указано выше -->
-                <h2 class="my-account-name">{{ user.surname }} {{ user.name }} {{ user.patronymic }}</h2>
+                <div class="my-account-name-block">
+                    <h2 class="my-account-name">{{ user.surname }} {{ user.name }} {{ user.patronymic }}</h2>
+                    <svg class="my-account-name-edit-btn" @click="isModalShown = true" xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 96 960 960" width="28"><path d="M180 876h44l443-443-44-44-443 443v44Zm614-486L666 262l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L248 936H120V808l504-504 128 128Zm-107-21-22-22 44 44-22-22Z"/></svg>
+                </div>
+                
                 <p class="my-account-role">{{ user.role == 'Teacher' ? $t('roleTeacher') : (user.role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
                 <p class="my-account-mail">{{ user.email }}</p>
                 <button class="my-account-password-btn">{{ $t('changePassword') }}</button>
@@ -104,6 +108,23 @@
             </div>
             
         </div>
+        <div v-if="isModalShown" class="edit-name-modal-bg" @click="isModalShown = false"></div>
+        <div v-if="isModalShown" class="edit-name-modal">
+            <h2 class="edit-name-modal-title">{{ $t('changeInfo') }}</h2>
+            <div class="initial-field edit-name-modal-field">
+                <label class="initial-field-label">{{ $t('name') }}</label>
+                <input type="text" name="name" class="initial-input" v-model="tempUser.name" :placeholder="$t('namePlaceholder')">
+            </div>
+            <div class="initial-field edit-name-modal-field">
+                <label class="initial-field-label">{{ $t('patronymic') }}</label>
+                <input type="text" name="patronymic" class="initial-input" v-model="tempUser.patronymic" :placeholder="$t('patronymicPlaceholder')">
+            </div>
+            <div class="initial-field edit-name-modal-field">
+                <label class="initial-field-label">{{ $t('surname') }}</label>
+                <input type="text" name="surname" class="initial-input" v-model="tempUser.surname" :placeholder="$t('surnamePlaceholder')">
+            </div>
+            <button class="modal-edit-name-btn" @click="changeMyInfo">{{ $t('save') }}</button>
+        </div>
     </div>
 </template>
 
@@ -144,6 +165,12 @@ let user = reactive({
     patronymic: ''
 })
 
+let tempUser = reactive({
+    name: store.state.user.name,
+    patronymic: store.state.user.patronymic,
+    surname: store.state.user.surname
+})
+
 let showDeleteTagModal = ref(false)
 let showDeleteAuthorModal = ref(false)
 let tagAdding = ref(false)
@@ -157,6 +184,7 @@ let tagnameToDelete = ref('')
 let email_channel = ref('')
 let vk_channel = ref('')
 let tg_channel = ref('')
+let isModalShown = ref(false)
 let sss = ref([{
                 surname: 'Иванов',
                 name: 'Иван',
@@ -507,6 +535,17 @@ function changeProfilePhoto() {
     }
     input.click()
 }
+
+function changeMyInfo() {
+    user.name = tempUser.name
+    user.patronymic = tempUser.patronymic
+    user.surname = tempUser.surname
+    store.state.user.name = tempUser.name
+    store.state.user.patronymic = tempUser.patronymic
+    store.state.user.surname = tempUser.surname
+    // TODO запрос на сервер для изменения имени
+    isModalShown.value = false
+}
 </script>
 
 <style>
@@ -565,12 +604,24 @@ function changeProfilePhoto() {
     margin: 40px 0 20px 0;
 }
 
+.my-account-name-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
 .my-account-name {
     color: var(--text-color);
     font-size: 28px;
     font-weight: 500;
     margin: 0;
     letter-spacing: normal;
+}
+
+.my-account-name-edit-btn {
+    fill: var(--text-color);
+    padding-left: 8px;
+    cursor: pointer;
 }
 
 .my-account-role, .my-account-mail {
@@ -822,6 +873,57 @@ function changeProfilePhoto() {
 
 .tag-field {
     margin-right: 20px;
+}
+
+.edit-name-modal-bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 15;
+}
+
+.edit-name-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    width: 500px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--card-color);
+    box-shadow: 0px 3.2375px 3.2375px rgba(0, 0, 0, 0.25);
+    border-radius: 0;
+}
+
+.edit-name-modal-field {
+    z-index: 25;
+}
+
+.edit-name-modal-title {
+    color: var(--text-color);
+    font-size: 24px;
+    margin-bottom: 12px;
+}
+
+.modal-edit-name-btn {
+    background: var(--pages-color);
+    width: 400px;
+    height: 40px;
+    color: var(--card-color);
+    font-size: 16px;
+    line-height: 16px;
+    padding: 12px 0;
+    text-align: center;
+    border: none;
+    border-radius: 10px;
+    margin: 12px 30px 8px 30px;
+    cursor: pointer;
 }
 
 @media (max-width: 420px) {
