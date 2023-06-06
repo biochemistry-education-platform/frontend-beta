@@ -22,15 +22,16 @@
         </div>
         <div class="add-article-footer">        
             <hr class="biochemistry-page-hr">
+            <div class="attached-files" id="attached-files"></div>
             <div class="add-article-footer-actions">
-                <div class="attach-file"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>{{ $t('attachFile') }}</div>
+                <div class="attach-file" @click="attachFile"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>{{ $t('attachFile') }}</div>
                 <div class="add-article-sending">
                     <input v-if="user_role == 'Student'" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
                     <button class="publish-article-btn" @click="createArticle">{{ user_role == 'Student' ? $t('send') : $t('publish') }}</button>
                 </div>
-                
             </div>
         </div>
+        <DeletionConfirmationModal v-if="showDeleteFileModal" @cancel="showDeleteFileModal = false" @delete="deleteFile" :text="chosenFileName" :type="'file'" />
     </div>
 </template>
 
@@ -44,6 +45,7 @@ export default {
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import Tags from '@/components/Tags.vue'
+import DeletionConfirmationModal from '@/components/DeletionConfirmationModal.vue'
 import { ref, reactive, onMounted } from 'vue'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
@@ -57,7 +59,7 @@ const i18n = useI18n()
 const route = useRoute()
 const router = useRouter()
 let tags = ref(['липиды', 'белки', 'здоровье', 'СНО', 'медицина', 'тег', 'иммунитет', 'холестирин'])
-// загрузить список тегов с сервера ^^^ !!!
+// TODO загрузить список тегов с сервера ^^^ !!!
 let chosenTags = ref([])
 let numberOfTags = ref(1)
 let article = reactive({
@@ -71,6 +73,9 @@ let articleTitle = ref('')
 let chosenTags2 = []
 let place = ref('')
 let eventDate = ref('')
+let chosenFileName = ref('')
+let chosenFile
+let showDeleteFileModal = ref(false)
 
 const CREATE_ARTICLE_MUTATION = gql`
     mutation createArticle($name: String!, $articleText: JSONString!, $reviewer: Int!, $profileId: Int!, $tags: [String!]!) {
@@ -332,6 +337,66 @@ function toJSON(element) {
     }
     return obj
 }
+
+function attachFile() {
+    let input = document.createElement('input')
+    input.type = 'file'
+
+    input.onchange = e => { 
+        let file = e.target.files[0]
+        let reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = readerEvent => {
+            let content = readerEvent.target.result
+
+            let fileDiv = document.createElement('div')
+            fileDiv.classList.add('attached-file')
+
+            let fileLink = document.createElement('a')
+            fileLink.setAttribute('download', file.name)
+            fileLink.setAttribute('href', content)
+            fileLink.innerHTML = file.name
+            fileLink.classList.add('attached-file-link')
+
+            let deleteSvg = document.createElementNS("http://www.w3.org/2000/svg", 'svg')
+            let deletePath = document.createElementNS("http://www.w3.org/2000/svg", 'path')
+            deletePath.setAttribute("d", "m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z")
+            deleteSvg.setAttribute('xmlns', "http://www.w3.org/2000/svg")
+            deleteSvg.setAttribute('height', "16")
+            deleteSvg.setAttribute('viewBox', "0 96 960 960")
+            deleteSvg.setAttribute('width', "16")
+            deleteSvg.style.fill = '#F65151'
+            deleteSvg.style.cursor = 'pointer'
+            deleteSvg.appendChild(deletePath)
+            deleteSvg.classList.add('delete-file')
+            deleteSvg.onclick = showModal
+
+            fileDiv.appendChild(fileLink)
+            fileDiv.appendChild(deleteSvg)
+
+            document.getElementById('attached-files').appendChild(fileDiv)
+        }
+    }
+
+    input.click()
+}
+
+function showModal() {
+    showDeleteFileModal.value = true
+    if (event.target.tagName == 'svg') {
+        chosenFile = event.target.parentElement
+        chosenFileName = event.target.parentElement.firstChild.innerHTML
+    } else if (event.target.tagName == 'path') {
+        chosenFile = event.target.parentElement.parentElement
+        chosenFileName = event.target.parentElement.parentElement.firstChild.innerHTML
+    }
+   
+}
+
+function deleteFile() {
+    chosenFile.remove()
+    console.log('deleteeee')
+}
 </script>
 
 <style>
@@ -427,6 +492,27 @@ function toJSON(element) {
     width: 100%;
 }
 
+.attached-files {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.attached-file {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-right: 20px;
+}
+
+.attached-file-link {
+    color: var(--text-color);
+    font-size: 16px;
+    text-decoration: underline;
+    padding-right: 8px;
+}
+
 .add-article-footer-actions {
     display: flex;
     justify-content: space-between;
@@ -440,6 +526,7 @@ function toJSON(element) {
     white-space: nowrap;
     color: var(--text-extra);
     font-size: 16px;
+    cursor: pointer;
 }
 
 .attach-file svg {

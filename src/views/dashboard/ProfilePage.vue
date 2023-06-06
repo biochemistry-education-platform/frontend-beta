@@ -485,7 +485,7 @@ function changeProfilePhoto() {
     input.accept = 'image/*'
 
     input.onchange = e => { 
-        let file = e.target.files[0]; 
+        let file = e.target.files[0]
         if (file.type.match('image.*')) {
             let reader = new FileReader()
             reader.readAsDataURL(file)

@@ -1,12 +1,15 @@
 <template>
     <div class="modal-bg" @click="emit('cancel')">
         <div class="confirm-modal">
-            <h2 class="confirm-modal-title">{{ $t('confirmUnsub') }}</h2>
-            <p class="confirm-modal-text" v-if="props.type=='tag'">{{ $t('unsubTag') }} «{{ props.text }}»?</p>
-            <p class="confirm-modal-text" v-if="props.type=='author'">{{ $t('unsubAuthor') }} «{{ props.text }}»?</p>
+            <h2 v-if="props.type == 'file'" class="confirm-modal-title">{{ $t('fileDeletionTitle') }}</h2>
+            <h2 v-else class="confirm-modal-title">{{ $t('confirmUnsub') }}</h2>
+            <p class="confirm-modal-text" v-if="props.type == 'tag'">{{ $t('unsubTag') }} «{{ props.text }}»?</p>
+            <p class="confirm-modal-text" v-if="props.type == 'author'">{{ $t('unsubAuthor') }} «{{ props.text }}»?</p>
+            <p class="confirm-modal-text" v-if="props.type == 'file'">{{ $t('fileDeletionText') }} «{{ props.text }}»?</p>
             <div class="confirm-modal-actions">
                 <p class="modal-cancel" @click="emit('cancel')">{{ $t('cancelUnsub') }}</p>
-                <button class="modal-confirm-btn" @click="emit('delete')">{{ $t('acceptUnsub') }}</button>
+                <button v-if="props.type == 'file'" class="modal-confirm-btn" @click="emit('delete')">{{ $t('acceptDeletion') }}</button>
+                <button v-else class="modal-confirm-btn" @click="emit('delete')">{{ $t('acceptUnsub') }}</button>
             </div>
         </div>
     </div>
@@ -75,6 +78,7 @@ const emit = defineEmits(['cancel', 'delete'])
     border: none;
     border-radius: 10px;
     margin: 0;
+    cursor: pointer;
 }
 
 .modal-cancel {
@@ -87,5 +91,6 @@ const emit = defineEmits(['cancel', 'delete'])
     padding: 14px 0;
     margin: 0;
     text-align: center;
+    cursor: pointer;
 }
 </style>
