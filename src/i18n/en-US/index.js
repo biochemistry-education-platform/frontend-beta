@@ -37,6 +37,7 @@ export default {
     roleTeacher: 'Teacher',
     roleStudent: 'Student',
     roleSSS: 'Responsible for SSS',
+    onlyImg: 'Only images can be used as a profile picture',
     tagDoesntExist: "Unable to subscribe to tag that hasn't been used yet",
     alreadySubscriptedTag: 'Unable to subscribe to a tag you are already subscribed to',
     confirmUnsub: 'Confirm unsubscription',

@@ -18,7 +18,8 @@
         <hr v-if="!isMobile" class="my-account__hr">
         <div class="my-account__content">
             <div class="my-account__info">
-                <img class="my-account__img" src="@/assets/icons/profile_img.png">
+                <img @click="changeProfilePhoto" id="profile-img" class="my-account__img" src="@/assets/icons/profile_img.png">
+                <!-- TODO если есть фото в профиле (из запроса на сервер) то в src подставить его, иначе - то, что указано выше -->
                 <h2 class="my-account-name">{{ user.surname }} {{ user.name }} {{ user.patronymic }}</h2>
                 <p class="my-account-role">{{ user.role == 'Teacher' ? $t('roleTeacher') : (user.role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
                 <p class="my-account-mail">{{ user.email }}</p>
@@ -477,6 +478,35 @@ function deleteAuthorSubscription(authorID) {
         .then(result => { console.log(result) })
         .catch(error => { console.log(error) })
 }
+
+function changeProfilePhoto() {
+    let input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+
+    input.onchange = e => { 
+        let file = e.target.files[0]; 
+        if (file.type.match('image.*')) {
+            let reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onload = readerEvent => {
+                let content = readerEvent.target.result
+                document.getElementById('profile-img').src = content
+                // TODO отправить запрос о смене фото профиля на сервер
+            }  
+        } else {
+            toast({
+                message: i18n.t('onlyImg'),
+                type: 'notification-danger',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 4000,
+                position: 'top-right',
+            })
+        }
+    }
+    input.click()
+}
 </script>
 
 <style>
@@ -530,6 +560,8 @@ function deleteAuthorSubscription(authorID) {
 }
 
 .my-account__img{
+    width: 160px;
+    height: 160px;
     margin: 40px 0 20px 0;
 }
 
