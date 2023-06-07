@@ -1,5 +1,13 @@
 <template>
     <div class="biochemistry-page page-flex">
+        <div v-if="isMenuShown" class="darker-bg" @click="emit('closeMenu')"></div>
+        <div v-if="isMobile" class="mobile-header">
+            <div class="logo-block">
+                <img src="@/assets/icons/logo.png">
+                <p class="logo-name">plateaumed</p>
+            </div>
+            <svg @click="switchMenuDisplay" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="M120 816v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/></svg>
+        </div>
         <input type="text" class="add-article-title" v-on:change="saveTitle" v-model="articleTitle" :placeholder="$t('articleTitle')">
         <div class="tagline">        
             <p>{{ $t('tags') }}</p>
@@ -23,11 +31,18 @@
         <div class="add-article-footer">        
             <hr class="biochemistry-page-hr">
             <div class="attached-files" id="attached-files"></div>
-            <div class="add-article-footer-actions">
+            <div v-if="!isMobile" class="add-article-footer-actions">
                 <div class="attach-file" @click="attachFile"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>{{ $t('attachFile') }}</div>
                 <div class="add-article-sending">
                     <input v-if="user_role == 'Student'" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
                     <button class="publish-article-btn" @click="createArticle">{{ user_role == 'Student' ? $t('send') : $t('publish') }}</button>
+                </div>
+            </div>
+            <div v-else class="add-article-footer-actions">
+                <input v-if="user_role == 'Student'" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
+                <div class="mobile-add-article-btns">
+                    <svg @click="attachFile" xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 96 960 960" width="30"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>
+                    <button class="publish-article-btn" @click="createArticle">{{ user_role == 'Student' ? $t('send') : $t('publish') }}</button>           
                 </div>
             </div>
         </div>
@@ -46,9 +61,10 @@ import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import Tags from '@/components/Tags.vue'
 import DeletionConfirmationModal from '@/components/DeletionConfirmationModal.vue'
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, defineProps, onMounted } from 'vue'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'bulma-toast'
@@ -57,6 +73,14 @@ import store from '@/store'
 const i18n = useI18n()
 
 const route = useRoute()
+
+const emit = defineEmits(['openMenu', 'closeMenu'])
+
+const props = defineProps({
+    isMenuShown: Boolean,
+    isMobile: Boolean
+})
+
 const router = useRouter()
 let tags = ref(['липиды', 'белки', 'здоровье', 'СНО', 'медицина', 'тег', 'иммунитет', 'холестирин'])
 // TODO загрузить список тегов с сервера ^^^ !!!
@@ -146,7 +170,6 @@ onMounted(() => {
     var toolbarOptions = [            
         [{ 'header': [1, 2, 3,  false] }],            
         
-        [{ 'font': [] }],
 
         ['bold', 'italic', 'underline'],                  
         
@@ -168,13 +191,23 @@ onMounted(() => {
                             '#FFF436', '#FFBF2E', '#FA7325', '#E63034', '#FF4F63', '#E62EA2', '#E82DFA',   
                             '#F3EC67', '#F3C761', '#F0915B', '#E26365', '#F37886', '#E261B2', '#E360F0'] }],
     ]
-    var quill = new Quill('#maineditor', {
-        modules: {
-            toolbar: toolbarOptions
-        },
-        placeholder: i18n.t('addArticlePlaceholder'),
-        theme: 'bubble'
-    })
+    if (props.isMobile == false) {
+        var quill = new Quill('#maineditor', {
+            modules: {
+                toolbar: toolbarOptions
+            },
+            placeholder: i18n.t('addArticlePlaceholder'),
+            theme: 'bubble'
+        })
+    } else {
+        var quill = new Quill('#maineditor', {
+            modules: {
+                toolbar: toolbarOptions
+            },
+            placeholder: i18n.t('mobileAddArticle'),
+            theme: 'snow'
+        })
+    }
     if (type.value == 'recommend') {
         chosenTags.value.push(i18n.t('recommend'))
     } else if (type.value == 'notification') {
@@ -397,6 +430,12 @@ function deleteFile() {
     chosenFile.remove()
     console.log('deleteeee')
 }
+
+function switchMenuDisplay() {
+    if (props.isMenuShown == false) {
+        emit('openMenu', true)
+    }
+}
 </script>
 
 <style>
@@ -469,6 +508,11 @@ function deleteFile() {
     margin-bottom: 12px;
 }
 
+.biochemistry-page-hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
 .aftertags-hr {
     margin-top: 0;
     z-index: 15;
@@ -515,6 +559,7 @@ function deleteFile() {
 
 .add-article-footer-actions {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
     width: 100%;
@@ -531,6 +576,7 @@ function deleteFile() {
 
 .attach-file svg {
     fill: var(--text-extra);
+    transform: rotate(0deg);
 }
 
 .add-article-sending {
@@ -601,9 +647,77 @@ function deleteFile() {
 
 #maineditor {
     color: var(--text-color);
+    border-radius: none;
 }
 /* .ql-bubble .ql-tooltip {
     background: var(--card-color);
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 } */
+
+/* .ql-toolbar.ql-snow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+} */
+
+@media (max-width: 420px) {
+    #maineditor {
+        padding: 12px;
+        border-radius: 0 0 20px 20px;
+    }
+
+    .add-article-title {
+        margin-top: 24px;
+        font-size: 24px;
+    }
+
+    .tagline {
+        font-size: 16px;
+    }
+
+    .biochemistry-page-hr {
+        margin-top: 12px;
+        margin-bottom: 12px;
+    }
+
+    .add-article-footer-actions {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .add-article-reviewer {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .mobile-add-article-btns {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        align-items: center;
+        margin-top: 12px;
+    }
+
+    .mobile-add-article-btns svg {
+        transform: rotate(45deg);
+        fill: var(--text-extra);
+        margin-right: 12px;
+    }
+
+    .publish-article-btn {
+        font-size: 16px;
+        border-radius: 20px;
+        text-align: center;
+        padding: 12px 12px;
+        width: 100%;
+    }
+    .ql-toolbar.ql-snow {
+        border-radius: 20px 20px 0 0;
+    }
+}
 </style>
