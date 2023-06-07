@@ -62,7 +62,8 @@ import { ref, reactive, onMounted, defineProps, defineEmits } from 'vue'
 import { useRoute } from 'vue-router'
 import store from '@/store'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.bubble.css';
+import '@vueup/vue-quill/dist/vue-quill.bubble.css'
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
 import html2pdf from "html2pdf.js"
@@ -104,7 +105,6 @@ let role = ref('')
 const route = useRoute()
 let isEditMode = ref(false)
 let quill
-let colors
 
 async function getArticle() {
     // const articleID = route.params.id
@@ -240,7 +240,7 @@ function toDOM(input) {
 async function saveNote(event) {
     const noteID = route.params.id
     const textarea = document.getElementsByClassName('ql-editor')[0]
-    const children = textarea.children;
+    const children = textarea.children
 
     let arr = []
     Array.from(children).forEach(element => {
@@ -248,38 +248,15 @@ async function saveNote(event) {
     })
     let jsonresult = JSON.stringify(arr)
     note.text = jsonresult
-    
-    // axios
-    // .patch(`/api/v1/notes/${noteID}/`, {text: note.text})
-    //     .then(response => {
-    //         toast({
-    //             message: 'The note has been updated',
-    //             type: 'is-success',
-    //             dismissible: true,
-    //             pauseOnHover: true,
-    //             duration: 2000,
-    //             position: 'top-right',
-    //         })
-    //     })
-    //     .catch(error => {
-    //         console.log(JSON.stringify(error))
-    //     })
 
     await (isEditMode.value = false)
 
-    quill = new Quill('#noteText', {
-        readOnly: true,
-        theme: 'bubble'
-    })
+    let noteText = document.getElementById('noteText')
+    noteText.classList.add('ql-disabled')
+    let quillEditor = document.getElementsByClassName('ql-editor')[0]
+    quillEditor.setAttribute('contenteditable','false')
 
-    let text = JSON.parse(note.text)
-    Object.entries(text).forEach(entry => {
-        const [key, value] = entry
-        let place = document.getElementById('noteText')
-        let node = toDOM(JSON.stringify(value))
-        place.appendChild(node)
-    })
-
+    // TODO отправить запрос на изменение существующего конспекта на сервер. Если успешно, то показать уведу ниже, иначе - уведу об ошибке
     toast({
         message: i18n.t('noteEdited'),
         type: 'notification-success',
@@ -293,8 +270,35 @@ async function saveNote(event) {
 async function editNote(event) {
     await (isEditMode.value = true)
     let noteText = document.getElementById('noteText')
-    noteText.className = 'note-text'
-    let text = JSON.parse(note.text)
+    noteText.classList.remove('ql-disabled')
+    let quillEditor = document.getElementsByClassName('ql-editor')[0]
+    quillEditor.setAttribute('contenteditable','true')
+}
+
+async function getPdf() {
+    await (hideForPdf.value = true)
+    html2pdf(document.getElementById("note-page"), {
+        margin: 1,
+        filename: `${note.based_on_article}.pdf`,
+    })
+    hideForPdf.value = false
+}
+
+function deleteNote(event) {
+    const noteID = route.params.id
+    // axios.delete(`/api/v1/notes/${noteID}`)
+}
+
+onMounted(async () => {
+    let colorVars = getComputedStyle(document.getElementsByClassName('theme')[0])
+    let colors = [
+        colorVars.getPropertyValue('--card-color'),
+        colorVars.getPropertyValue('--background'),
+        colorVars.getPropertyValue('--lines-color'), 
+        colorVars.getPropertyValue('--text-extra'),                        
+        colorVars.getPropertyValue('--text-color'),
+        colorVars.getPropertyValue('--tags-color')
+    ]
 
     const toolbarOptions = [            
         [{ 'header': [1, 2, 3,  false] }],            
@@ -321,49 +325,24 @@ async function editNote(event) {
                             '#FFF436', '#FFBF2E', '#FA7325', '#E63034', '#FF4F63', '#E62EA2', '#E82DFA',   
                             '#F3EC67', '#F3C761', '#F0915B', '#E26365', '#F37886', '#E261B2', '#E360F0'] }],
     ]
-
-    quill = new Quill('#noteText', {
-        modules: {
-            toolbar: toolbarOptions
-        },
-        theme: 'bubble'
-    })
-    // let place = document.getElementsByClassName('ql-editor')[0] 
-    // Object.entries(text).forEach(entry => {
-    //     const [key, value] = entry
-    //     let node = toDOM(JSON.stringify(value))
-    //     place.appendChild(node)
-    // })
-}
-
-async function getPdf() {
-    await (hideForPdf.value = true)
-    html2pdf(document.getElementById("note-page"), {
-        margin: 1,
-        filename: `${note.based_on_article}.pdf`,
-    })
-    hideForPdf.value = false
-}
-
-function deleteNote(event) {
-    const noteID = route.params.id
-    // axios.delete(`/api/v1/notes/${noteID}`)
-}
-
-onMounted(async () => {
-    const colorVars = getComputedStyle(document.getElementsByClassName('theme')[0])
-    colors = [
-        colorVars.getPropertyValue('--card-color'),
-        colorVars.getPropertyValue('--background'),
-        colorVars.getPropertyValue('--lines-color'), 
-        colorVars.getPropertyValue('--text-extra'),                        
-        colorVars.getPropertyValue('--text-color'),
-        colorVars.getPropertyValue('--tags-color')
-    ]
-    quill = new Quill('#noteText', {
-        readOnly: true,
-        theme: 'bubble'
-    })
+    
+    if (props.isMobile == false) {
+        quill = new Quill('#noteText', {
+            modules: {
+                toolbar: toolbarOptions
+            },
+            readOnly: true,
+            theme: 'bubble'
+        })
+    } else {
+        quill = new Quill('#noteText', {
+            modules: {
+                toolbar: toolbarOptions
+            },
+            readOnly: true,
+            theme: 'snow'
+        })
+    }
     await getArticle()
 })
 </script>
@@ -379,5 +358,20 @@ onMounted(async () => {
     background-color: #F65151;
     border-radius: 16px;
     color: white;
+}
+
+#noteText {
+    border-radius: none;
+}
+
+@media (max-width: 420px) {
+    #noteText {
+        padding: 12px;
+        border-radius: 0 0 20px 20px;
+    }
+    
+    .ql-toolbar.ql-snow {
+        border-radius: 20px 20px 0 0;
+    }
 }
 </style>

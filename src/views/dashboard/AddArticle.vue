@@ -170,7 +170,6 @@ onMounted(() => {
     var toolbarOptions = [            
         [{ 'header': [1, 2, 3,  false] }],            
         
-
         ['bold', 'italic', 'underline'],                  
         
         [{ 'list': 'ordered' }, { 'list': 'bullet' }],    
@@ -649,17 +648,6 @@ function switchMenuDisplay() {
     color: var(--text-color);
     border-radius: none;
 }
-/* .ql-bubble .ql-tooltip {
-    background: var(--card-color);
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-} */
-
-/* .ql-toolbar.ql-snow {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-} */
 
 @media (max-width: 420px) {
     #maineditor {
