@@ -8,8 +8,8 @@
             </div>
             <svg v-if="!hideForPdf" @click="switchMenuDisplay" xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 96 960 960" width="16"><path d="M120 816v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"/></svg>
         </div>
-        <div v-if="article.tags.length > 0" class="article-tags">
-            <div v-for="tag in article.tags" class="article-tag">#{{ tag }}</div>
+        <div v-if="note.tags.length > 0" class="article-tags">
+            <div v-for="tag in note.tags" class="article-tag">#{{ tag }}</div>
         </div>
         <div v-if="!isMobile" class="note-main">
             <h1 class="note-title">{{ $t('note') }} «{{ note.based_on_article }}»</h1>
@@ -25,9 +25,9 @@
             <div class="article-author">
                 <div><img class="article-author-img" src="@/assets/icons/profile_img.png"></div>
                 <div class="article-author-info">
-                    <p class="article-author-name">{{ article.author }}</p>
-                    <p class="article-author-extra">{{ role == 'Teacher' ? $t('roleTeacher') : (role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
-                    <p class="article-author-extra">{{ date }}</p>
+                    <p class="article-author-name">{{ article_author.name }}</p>
+                    <p class="article-author-extra">{{ article_author.role == 'Teacher' ? $t('roleTeacher') : (article_author.role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
+                    <!-- <p class="article-author-extra">{{ date }}</p> -->
                 </div>
             </div>
 
@@ -64,6 +64,8 @@ import store from '@/store'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import gql from 'graphql-tag'
+import { apolloClient } from '@/vue-apollo'
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
 import html2pdf from "html2pdf.js"
@@ -86,28 +88,115 @@ function switchMenuDisplay() {
     }
 }
 
+let article = reactive({})
+
 function closeMenus() {
     emit('closeMenu')
     showActions.value = false
 }
 
-let isSelected = ref(false)
-let article = reactive({
-    author: '',
-    tags: [],
+let article_author = reactive({
+    photo: '',
+    name: '',
+    role: ''
 })
+
+let article_reviewer = reactive({
+    photo: '',
+    name: '',
+    role: ''
+})
+
 let note = reactive({
     based_on_article: '',
-    text: ''
-})
-let date = ref('')
-let role = ref('')
+    text: '',
+    tags: []
+}) 
+
 const route = useRoute()
 let isEditMode = ref(false)
 let quill
 
-async function getArticle() {
-    // const articleID = route.params.id
+
+const GET_NOTE = gql`query GetNoteByIdQuery($noteId: Int!) {
+    getNoteById(id: $noteId) {
+        id
+        articleId {
+            id
+            name
+            articletagSet {
+                tagId {
+                    id
+                    name
+                }
+            }
+            author {
+                authorId {
+                    id
+                    name
+                    surname
+                    secondname
+                    photo
+                    role {
+                        roleName
+                    } 
+                }
+            }
+            reviewer {
+                id
+                name
+                surname
+                secondname
+                photo
+                role {
+                    roleName
+                } 
+            }
+            publishDate
+        }
+        noteText
+  }
+}`
+async function getNote() {
+    const noteID = route.params.id
+    await apolloClient
+        .query({
+            query: GET_NOTE,
+            variables: {
+                noteId: noteID
+            }
+        })
+        .then(result => { 
+            let full_a_name = `${result.data.getNoteById.articleId.author.authorId.surname} ${result.data.getNoteById.articleId.author.authorId.name} ${result.data.getNoteById.articleId.author.authorId.secondname}`
+            let full_r_name = `${result.data.getNoteById.articleId.reviewer.surname} ${result.data.getNoteById.articleId.reviewer.name} ${result.data.getNoteById.articleId.reviewer.secondname}`
+            let taglist = []
+            result.data.getNoteById.articleId.articletagSet.forEach(tag => taglist.push(tag.tagId.name))
+            note.based_on_article = result.data.getNoteById.articleId.name
+            note.tags = taglist
+            article_author.name = full_a_name
+            article_author.role = result.data.getNoteById.articleId.author.authorId.role.roleName
+            article_author.photo = result.data.getNoteById.articleId.author.authorId.photo
+            article_reviewer.name = full_r_name
+            article_reviewer.role = result.data.getNoteById.articleId.reviewer.role.roleName
+            article_reviewer.photo = result.data.getNoteById.articleId.reviewer.photo
+            note.text = result.data.getNoteById.noteText
+                // article_reviewer: note.articleId.reviewer,
+                // article_publish_date: new Date(Date.parse(new Date(note.articleId.publishDate))).toLocaleDateString('ru-RU', {
+                //     year: 'numeric',
+                //     month: '2-digit',
+                //     day: '2-digit',
+                // }),
+                // filter_date: new Date(Date.parse(note.articleId.publishDate)),
+                // article_tags: taglist
+        })
+    let text = JSON.parse(JSON.parse(note.text))
+    let place = document.getElementsByClassName('ql-editor')[0]
+    place.removeChild(place.firstChild)
+    Object.entries(text).forEach(entry => {
+        const [key, value] = entry
+        let node = toDOM(JSON.stringify(value))
+        place.appendChild(node)
+    })
     // await axios
     //     .get(`/api/v1/articles/${articleID}`)
     //     .then(response => {
@@ -128,28 +217,33 @@ async function getArticle() {
     //     .catch(error => {
     //         console.log(JSON.stringify(error))
     //     })
-    article.author = 'Быстрых Елена'
-    article.tags = ['форматирование', 'платформа']
-    note.based_on_article = 'Статья с полным форматированием'
-    note.text = '[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"Заголовок 1 уровня\\nОбычный текст по левому краю\\nЖирный текст"}]}]'
-    article.publish_date = new Date(Date.parse(new Date('25 May 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-            })
-    date = new Date(Date.parse(new Date('25 May 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-            })
-    let text = JSON.parse(note.text)
-    let place = document.getElementsByClassName('ql-editor')[0]
-    place.removeChild(place.firstChild)
-    Object.entries(text).forEach(entry => {
-        const [key, value] = entry
-        let node = toDOM(JSON.stringify(value))
-        place.appendChild(node)
-    })
+
+
+
+
+
+    // article.author = 'Быстрых Елена'
+    // article.tags = ['форматирование', 'платформа']
+    // note.based_on_article = 'Статья с полным форматированием'
+    // note.text = '[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"Заголовок 1 уровня\\nОбычный текст по левому краю\\nЖирный текст"}]}]'
+    // article.publish_date = new Date(Date.parse(new Date('25 May 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
+    //             year: 'numeric',
+    //             month: '2-digit',
+    //             day: '2-digit',
+    //         })
+    // date = new Date(Date.parse(new Date('25 May 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
+    //             year: 'numeric',
+    //             month: '2-digit',
+    //             day: '2-digit',
+    //         })
+    // let text = JSON.parse(note.text)
+    // let place = document.getElementsByClassName('ql-editor')[0]
+    // place.removeChild(place.firstChild)
+    // Object.entries(text).forEach(entry => {
+    //     const [key, value] = entry
+    //     let node = toDOM(JSON.stringify(value))
+    //     place.appendChild(node)
+    // })
 }
 
 function toJSON(element) {
@@ -343,7 +437,7 @@ onMounted(async () => {
             theme: 'snow'
         })
     }
-    await getArticle()
+    await getNote()
 })
 </script>
 

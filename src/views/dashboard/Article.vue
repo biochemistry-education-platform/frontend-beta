@@ -136,6 +136,15 @@ const CREATE_NOTE_MUTATION = gql`
         }
     }`
 
+const EDIT_NOTE_MUTATION = gql`mutation UpdateNoteMutation($noteId: Int!, $noteText: String!) {
+    updateNote(noteId: $noteId, noteText: $noteText) {
+        note {
+            id
+            noteText
+        }
+    }
+}`
+
 let isSelected = ref(false)
 let article = reactive({
     author: '',
@@ -202,6 +211,53 @@ async function getArticle() {
         let node = toDOM(JSON.stringify(value))
         place.appendChild(node)
     })
+}
+
+function toJSON(element) {
+    let propFix = { for: 'htmlFor', class: 'className' };
+    let specialGetters = {
+        style: (node) => node.style.cssText,
+    }
+    let attrDefaultValues = { style: '' }
+    let obj = {
+        nodeType: element.nodeType
+    }
+    if (element.tagName) {
+        obj.tagName = element.tagName.toLowerCase();
+    } else if (element.nodeName) {
+        obj.nodeName = element.nodeName;
+    }
+    if (element.nodeValue) {
+        obj.nodeValue = element.nodeValue;
+    }
+    let attrs = element.attributes;
+    if (attrs) {
+        let defaultValues = new Map()
+        for (let i = 0; i < attrs.length; i++) {
+            let name = attrs[i].nodeName
+            defaultValues.set(name, attrDefaultValues[name])
+        }
+        let arr = []
+        for (let [name, defaultValue] of defaultValues) {
+            let propName = propFix[name] || name
+            let specialGetter = specialGetters[propName]
+            let value = specialGetter ? specialGetter(element) : element[propName]
+            if (value !== defaultValue) {
+                arr.push([name, value])
+            }
+        }
+        if (arr.length) {
+            obj.attributes = arr
+        }
+    }
+    let childNodes = element.childNodes
+    if (obj.tagName !== 'textarea' && childNodes && childNodes.length) {
+        let arr = (obj.childNodes = []);
+        for (let i = 0; i < childNodes.length; i++) {
+            arr[i] = toJSON(childNodes[i])
+        }
+    }
+    return obj
 }
 
 function toDOM(input) {
@@ -286,15 +342,51 @@ async function getSelectedText(event) {
             })
             .then(result => {
                 // конспект существует. добавить в него текст
-                let current_text = JSON.parse(result.data.getNoteByArticle.noteText)
-                current_text = current_text.substring(0, current_text.length-1)
-                let new_text = `${current_text},{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"${select.toString()}"}]}]`
-                console.log(new_text)
-                // запрос на обновление конспекта, в качестве текста значение из new_text
+                console.log(result.data)
+                let noteID = result.data.getNoteByArticle.id
+                let text = JSON.parse(JSON.parse(result.data.getNoteByArticle.noteText))
+                let p = document.createElement('p')
+                p.innerText = select.toString()
+                text.push(toJSON(p))
+                let noteText = JSON.stringify(text)
+                console.log(text)
+                console.log(noteText)
+                apolloClient
+                    .mutate({
+                        mutation: EDIT_NOTE_MUTATION,
+                        variables: {
+                            noteId: noteID,
+                            noteText: noteText,
+                        },
+                    })
+                    .then(result => {
+                        toast({
+                            message: i18n.t('noteEdited'),
+                            type: 'notification-success',
+                            dismissible: true,
+                            pauseOnHover: true,
+                            duration: 2000,
+                            position: 'top-right',
+                        })
+                    })
+                    .catch(error => {
+                        toast({
+                            message: i18n.t('editNoteFailure'),
+                            type: 'notification-danger',
+                            dismissible: true,
+                            pauseOnHover: true,
+                            duration: 2000,
+                            position: 'top-right',
+                        })
+                    })
             })
             .catch(error => {
                 // конспект не существует. создать конспект с выделенным текстом
-                let noteText = `[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"${select.toString()}"}]}]`
+                let arr = []
+                let p = document.createElement('p')
+                p.innerText = select.toString()
+                arr.push(toJSON(p))
+                let noteText = JSON.stringify(arr)
                 apolloClient
                     .mutate({
                         mutation: CREATE_NOTE_MUTATION,
