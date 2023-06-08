@@ -7,8 +7,8 @@
                     <p v-if="props.page == 'AddArticle'" @click="chooseTag(tag)">{{ tag }}</p>
                     <p v-if="props.page == 'Profile'" @click="chooseTag(tag.name)">{{ tag.name }}</p>
                     <hr class="tags-options-separator">
-                </div> 
-            </div>   
+                </div>
+            </div>
         </div>
         <div v-else class="finished-tag">{{ currentTag }}<svg @click="deleteTag" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg></div>
     </div>        
@@ -40,8 +40,7 @@ let isTagListShown = ref(false)
 function filterTags() {
     isTagListShown.value = true
     if (props.page == 'AddArticle') { filteredTags.value = allTags.filter(word =>  word.toLowerCase().includes(currentTag.value.toLowerCase())) }
-    else if (props.page == 'Profile') { filteredTags.value = allTags.filter(word =>  word.name.toLowerCase().includes(currentTag.value.toLowerCase())) }
-    
+    else if (props.page == 'Profile') { filteredTags.value = allTags.filter(word =>  word.name.toLowerCase().includes(currentTag.value.toLowerCase())) } 
 }
 
 function saveTag() {

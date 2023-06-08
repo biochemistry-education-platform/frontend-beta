@@ -63,6 +63,7 @@ export default {
     choosePlace: 'Place of the event',
     chooseDateTime: 'Date and time of the event',
     chooseReviewer: 'Choose a reviewer',
+    noReviewer: 'Students must choose a reviewer!',
     addArticlePlaceholder: 'Article text. For formatting select the text and choose an option in a popup menu',
     mobileAddArticle: 'Enter article text',
     attachFile: 'Attach file',

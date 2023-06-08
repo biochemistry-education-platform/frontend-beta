@@ -34,12 +34,18 @@
             <div v-if="!isMobile" class="add-article-footer-actions">
                 <div class="attach-file" @click="attachFile"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>{{ $t('attachFile') }}</div>
                 <div class="add-article-sending">
-                    <input v-if="user_role == 'Student'" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
+                    <input v-if="user_role == 'Student'" autocomplete="off" @input="filterReviewers" @keyup.native.enter="saveReviewer" v-model="chosenReviewer" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
+                    <div v-if="areReviewersShown && filteredReviewers.length > 0" class="reviewers-block">
+                        <div class="reviewer-option" v-for="reviewer in filteredReviewers" :key="reviewer.id">
+                            <!-- TODO разместить здесь фото пользователя -->
+                            <p @click="chooseReviewer(reviewer.id)">{{ reviewer.surname }} {{ reviewer.name }} {{ reviewer.secondname }}</p>
+                        </div>
+                    </div>
                     <button class="publish-article-btn" @click="createArticle">{{ user_role == 'Student' ? $t('send') : $t('publish') }}</button>
                 </div>
             </div>
             <div v-else class="add-article-footer-actions">
-                <input v-if="user_role == 'Student'" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
+                <input v-if="user_role == 'Student'" autocomplete="off" @input="filterReviewers" @keyup.native.enter="saveReviewer" v-model="chosenReviewer" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
                 <div class="mobile-add-article-btns">
                     <svg @click="attachFile" xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 96 960 960" width="30"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>
                     <button class="publish-article-btn" @click="createArticle">{{ user_role == 'Student' ? $t('send') : $t('publish') }}</button>           
@@ -91,6 +97,11 @@ let article = reactive({
     text: '',
     tags: []
 })
+let reviewers = ref([])
+let chosenReviewer = ref('')
+let reviewerID = 0
+let areReviewersShown = ref(false)
+let filteredReviewers = ref([])
 let type = ref('')
 let user_role = ref('')
 let articleTitle = ref('')
@@ -149,13 +160,18 @@ const REVIEWERS_QUERY = gql`query {
 }`
 
 onMounted(() => {
-    apolloClient
-        .query({
-            query: REVIEWERS_QUERY
-        })
-        .then(result => { console.log(result) })
-        .catch(error => { console.log(error) })
     user_role.value = store.state.user.role
+    if (user_role.value == 'Student') {
+        apolloClient
+            .query({
+                query: REVIEWERS_QUERY
+            })
+            .then(result => { 
+                reviewers.value = result.data.getReviewers
+                filteredReviewers.value = result.data.getReviewers
+            })
+            .catch(error => { console.log(error) })
+    }
     type.value = route.params.type
     let colorVars = getComputedStyle(document.getElementsByClassName('theme')[0])
     let colors = [
@@ -249,13 +265,24 @@ function createArticle() {
     JSON.parse(JSON.stringify(chosenTags.value)).forEach(value => chosenTags2.push(value))
 
     if (type.value == 'text') {
+        if (user_role == 'Student' && chooseReviewer.value == '') {
+            toast({
+                message: i18n.t('noReviewer'),
+                type: 'notification-danger',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 2000,
+                position: 'top-right',
+            })
+            return
+        }
         apolloClient
             .mutate({
                 mutation: CREATE_ARTICLE_MUTATION,
                 variables: {
                     name: articleTitle.value,
                     articleText: jsonresult,
-                    reviewer: store.state.user.id,
+                    reviewer: reviewerID,
                     profileId: store.state.user.id,
                     tags: chosenTags2
                 },
@@ -435,6 +462,21 @@ function switchMenuDisplay() {
         emit('openMenu', true)
     }
 }
+
+function filterReviewers() {
+    areReviewersShown.value = true
+    filteredReviewers.value = reviewers.value.filter(reviewer => {
+        let fullname = `${reviewer.surname} ${reviewer.name} ${reviewer.secondname}`
+        return fullname.toLowerCase().includes(chosenReviewer.value.toLowerCase())
+    })
+}
+
+function chooseReviewer(id) {
+    let rev = reviewers.value.find(r => r.id == id)
+    reviewerID = id
+    chosenReviewer.value = `${rev.surname} ${rev.name} ${rev.secondname}`
+    areReviewersShown.value = false
+}
 </script>
 
 <style>
@@ -560,6 +602,7 @@ function switchMenuDisplay() {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    position: relative;
     align-items: center;
     width: 100%;
     margin-bottom: 20px;
@@ -625,6 +668,29 @@ function switchMenuDisplay() {
     border: none;
     outline: none;
     font-size: 16px;
+    color: var(--text-color);
+}
+
+.reviewers-block {
+    position: absolute;
+    top: 0;
+    transform: translate(-145px, -100%);
+    right: 0;
+    max-height: 200px;
+    background: var(--card-color);
+    border-radius: 10px;
+    box-shadow: 0px 3.2375px 3.2375px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 12px;
+    z-index: 25;
+    overflow-y: scroll;
+}
+
+.reviewers-block p {
+    margin-top: 12px;
+    cursor: pointer;
     color: var(--text-color);
 }
 
