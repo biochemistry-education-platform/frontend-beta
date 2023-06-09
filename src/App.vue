@@ -3,23 +3,23 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import { useStore } from 'vuex'
+  // import axios from 'axios'
+  // import { useStore } from 'vuex'
 
   export default {
     name: 'App',
-    setup() {
-      const store = useStore()
-      store.commit('initializeStore')
+    // setup() {
+    //   const store = useStore()
+    //   store.commit('initializeStore')
 
-      const token = store.state.token
+    //   const token = store.state.token
 
-      if (token) {
-          axios.defaults.headers.common['Authorization'] = "Token " + token
-      } else {
-          axios.defaults.headers.common['Authorization'] = ""
-      }
-    }
+    //   if (token) {
+    //       axios.defaults.headers.common['Authorization'] = "Token " + token
+    //   } else {
+    //       axios.defaults.headers.common['Authorization'] = ""
+    //   }
+    // }
   }
 </script>
 

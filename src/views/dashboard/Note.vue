@@ -1,5 +1,6 @@
 <template>
-    <div v-if="store.state.user.role != 'Teacher'" class="note-page" id="note-page">
+    <!-- <div v-if="store.state.user.role != 'Teacher'" class="note-page" id="note-page"> -->
+    <div class="note-page" id="note-page">
         <div v-if="(isMenuShown || showActions) && !hideForPdf" class="darker-bg" @click="closeMenus"></div>
         <div v-if="isMobile && !hideForPdf" class="mobile-header">
             <div class="logo-block">
@@ -60,7 +61,7 @@ export default {
 import axios from 'axios'
 import { ref, reactive, onMounted, defineProps, defineEmits } from 'vue'
 import { useRoute } from 'vue-router'
-import store from '@/store'
+// import store from '@/stores/user'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'

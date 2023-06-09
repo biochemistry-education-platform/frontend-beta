@@ -74,7 +74,7 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'bulma-toast'
-import store from '@/store'
+// import store from '@/stores/user'
 
 const i18n = useI18n()
 
@@ -160,7 +160,8 @@ const REVIEWERS_QUERY = gql`query {
 }`
 
 onMounted(() => {
-    user_role.value = store.state.user.role
+    // user_role.value = store.state.user.role
+    user_role.value = 'Student'
     if (user_role.value == 'Student') {
         apolloClient
             .query({
@@ -283,7 +284,8 @@ function createArticle() {
                     name: articleTitle.value,
                     articleText: jsonresult,
                     reviewer: reviewerID,
-                    profileId: store.state.user.id,
+                    // profileId: store.state.user.id,
+                    profileId: 11,
                     tags: chosenTags2
                 },
             })
@@ -322,7 +324,8 @@ function createArticle() {
                 variables: {
                     name: articleTitle.value, 
                     notif_text: notifJson,
-                    author: store.state.user.id,
+                    // author: store.state.user.id,
+                    author: 11,
                     tags: chosenTags2
                 },
             })

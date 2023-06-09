@@ -54,7 +54,7 @@ export default {
 
 <script setup>
 import SearchForm from '@/components/SearchForm.vue'
-import store from '@/store'
+// import store from '@/stores/user'
 import { ref, defineEmits, defineProps, onMounted } from 'vue'
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
@@ -81,7 +81,8 @@ onMounted(async () => {
 })
 
 async function getArticles() {
-    current_role.value = store.state.user.role
+    // current_role.value = store.state.user.role
+    current_role.value = 'Student'
     articles = [
         {
             id: 1,

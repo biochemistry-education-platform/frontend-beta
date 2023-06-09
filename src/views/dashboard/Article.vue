@@ -53,7 +53,7 @@ export default {
 import axios from 'axios'
 import { ref, reactive, onMounted, defineProps, defineEmits } from 'vue'
 import { useRoute } from 'vue-router'
-import store from '@/store'
+// import store from '@/stores/user'
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
@@ -201,7 +201,8 @@ async function getArticle() {
             role.value = author.role.roleName
         })
         .catch(error => console.log(error))
-    user_role.value = store.state.user.role
+    // user_role.value = store.state.user.role
+    user_role.value = 'Student'
 
     let text = JSON.parse(article.text)
     let place = document.getElementsByClassName('ql-editor')[0]
@@ -311,7 +312,8 @@ document.onselectionchange = () => { showButton() }
 
 async function showButton() {
     let select = window.getSelection()
-    if (select != '' && store.state.user.role != 'Teacher') {
+    // if (select != '' && store.state.user.role != 'Teacher') {
+    if (select != '') {
         await (isSelected = true)
         let rect = select.getRangeAt(0).getBoundingClientRect()
         let menu = document.getElementById('add-selected-text-btn')
@@ -330,7 +332,8 @@ async function getSelectedText(event) {
         let menu = document.getElementById('add-selected-text-btn')
         menu.style.cssText += `display: none;`
         const articleID = route.params.id
-        let userID = store.state.user.id
+        // let userID = store.state.user.id
+        let userID = 11
         // проверка, существует ли конспект
         await apolloClient
             .query({

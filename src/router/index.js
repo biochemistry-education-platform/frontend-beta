@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '@/layouts/MainLayout.vue'
 import InitialLayout from '@/layouts/initial/InitialLayout.vue'
 
-import store from '../store'
+// import store from '../stores/user'
 
 const routes = [
   {
@@ -306,12 +306,12 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
-    next('/log-in')
-  } else {
-    next()
-  }
-})
+// router.beforeEach((to, from, next) => {
+//   if (to.matched.some(record => record.meta.requireLogin) && !store.state.isAuthenticated) {
+//     next('/log-in')
+//   } else {
+//     next()
+//   }
+// })
 
 export default router

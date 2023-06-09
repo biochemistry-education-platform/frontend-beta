@@ -55,10 +55,12 @@ import { ref, defineProps, defineEmits } from 'vue'
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import store from '@/store'
+// import store from '@/stores/user'
+import { useUserStore } from '@/stores/user'
 
 const i18n = useI18n()
 const router = useRouter()
+const userStore = useUserStore()
 
 const props = defineProps({
   isMobile: Boolean
@@ -70,6 +72,15 @@ const theme = ref('light')
 const language = ref('ru')
 let email = ref('')
 let password = ref('')
+let user = {
+    isAuthenticated: false,
+    token: userStore.getToken || '',
+    info: userStore.getUser || {}
+} 
+
+if (user.token) {
+    user.isAuthenticated = true
+}
 
 function switchTheme () {
     theme.value = theme.value === 'light' ? 'dark' : 'light'
@@ -101,22 +112,58 @@ const AUTH_USER_MUTATION = gql`
         }
     }`
 
+const AUTH_WITH_TOKEN = gql`mutation TokenAuth($username: String!, $password: String!) {
+    tokenAuth(username: $username, password: $password) {
+        token
+        user {
+            id
+            email
+        }
+        profile {
+            id
+            role {
+                roleName
+            }
+            channels
+            photo
+            name
+            surname
+            secondname
+        }
+    }
+}`
+
 function submitForm() {
     apolloClient
         .mutate({
-            mutation: AUTH_USER_MUTATION,
+            // mutation: AUTH_USER_MUTATION,
+            // variables: {
+            //     email: email.value,
+            //     password: password.value,
+            // },
+            mutation: AUTH_WITH_TOKEN,
             variables: {
-                email: email.value,
+                username: email.value,
                 password: password.value,
             },
         })
         .then(result => {
+            console.log(result)
             router.push({ name: 'Articles' })
-            store.state.user.id = result.data.authUser.profile.id
-            store.state.user.role = result.data.authUser.profile.role.roleName
-            store.state.user.name = result.data.authUser.profile.name
-            store.state.user.surname = result.data.authUser.profile.surname
-            store.state.user.email = email.value
+            let user = {
+                userID: result.data.tokenAuth.user.id,
+                profileID: result.data.tokenAuth.profile.id,
+                email: result.data.tokenAuth.user.email,
+                role: result.data.tokenAuth.profile.role.roleName,
+                name: result.data.tokenAuth.profile.name,
+                patronymic: result.data.tokenAuth.profile.secondname,
+                surname: result.data.tokenAuth.profile.surname,
+                photo: result.data.tokenAuth.profile.photo,
+                channels: result.data.tokenAuth.profile.channels
+            }
+            userStore.setToken(result.data.tokenAuth.token)
+            userStore.setUser(user)
+            router.push({ name: 'Articles' })
         })
         .catch(error => {
             toast({

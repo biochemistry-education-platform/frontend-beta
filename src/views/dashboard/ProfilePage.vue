@@ -151,7 +151,7 @@ export default {
 
 <script setup>
 import axios from 'axios'
-import store from '@/store'
+// import store from '@/stores/user'
 import Tags from '@/components/Tags.vue'
 import DeletionConfirmationModal from '@/components/DeletionConfirmationModal.vue'
 import { useRouter } from 'vue-router'
@@ -160,9 +160,11 @@ import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const i18n = useI18n()
+const userStore = useUserStore()
 
 const emit = defineEmits(['openMenu', 'closeMenu'])
 
@@ -185,10 +187,16 @@ let user = reactive({
     }
 })
 
+// let tempUser = reactive({
+//     name: store.state.user.name,
+//     patronymic: store.state.user.patronymic,
+//     surname: store.state.user.surname
+// })
+
 let tempUser = reactive({
-    name: store.state.user.name,
-    patronymic: store.state.user.patronymic,
-    surname: store.state.user.surname
+    name: 'name',
+    patronymic: 'patr',
+    surname: 'surname'
 })
 
 let showDeleteTagModal = ref(false)
@@ -350,18 +358,30 @@ function logout() {
     //                 console.log(JSON.stringify(error))
     //             }
     //         })
-    store.commit('changeUser')
+
+    userStore.removeToken()
+    userStore.removeUser()
+
+    // store.commit('changeUser')
     router.push({name: 'LogIn'})
 }
 
 async function getMyInfo() {
-    user.id = store.state.user.id
-    user.email = store.state.user.email
-    user.name = store.state.user.name
-    user.surname = store.state.user.surname
-    user.patronymic = store.state.user.patronymic
-    user.role = store.state.user.role
-    let id = Number(store.state.user.id)
+    // user.id = store.state.user.id
+    // user.email = store.state.user.email
+    // user.name = store.state.user.name
+    // user.surname = store.state.user.surname
+    // user.patronymic = store.state.user.patronymic
+    // user.role = store.state.user.role
+    // let id = Number(store.state.user.id)
+
+    user.id = 11
+    user.email = 'email@mail.ru'
+    user.name = 'name'
+    user.surname = 'surname'
+    user.patronymic = 'patr'
+    user.role = 'Student'
+    let id = 11
 
     await apolloClient
         .query({
@@ -456,7 +476,8 @@ function switchMenuDisplay() {
 }
 
 function addTagSubscription(chosenTag) {
-    let profileID = Number(store.state.user.id)
+    // let profileID = Number(store.state.user.id)
+    let profileID = 11
     let tagID = allTags.value.find(tag => tag.name == chosenTag)
     if (tagID){
         if (!subscriptedTags.value.includes(chosenTag)) {
@@ -515,7 +536,8 @@ async function deleteTagSubscription(tagToDelete) {
             } else { input.parentElement.parentElement.remove() }
             console.log(`удалить тег ${tagToDelete}`)
             let tagID = allTags.value.find(tag => tag.name == tagToDelete).id
-            let profileID = Number(store.state.user.id)
+            // let profileID = Number(store.state.user.id)
+            let profileID = 11
             await apolloClient
                 .mutate({
                     mutation: REMOVE_TAG_SUBSCRIPTION,
@@ -577,9 +599,9 @@ function changeMyInfo() {
     user.name = tempUser.name
     user.patronymic = tempUser.patronymic
     user.surname = tempUser.surname
-    store.state.user.name = tempUser.name
-    store.state.user.patronymic = tempUser.patronymic
-    store.state.user.surname = tempUser.surname
+    // store.state.user.name = tempUser.name
+    // store.state.user.patronymic = tempUser.patronymic
+    // store.state.user.surname = tempUser.surname
     // TODO запрос на сервер для изменения имени
     isModalShown.value = false
 }

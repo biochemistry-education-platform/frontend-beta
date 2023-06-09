@@ -1,8 +1,8 @@
 <template>
     <div :class="theme === 'light' ? 'light-theme' : 'dark-theme'" class="theme">
-        <StudentNavMenu v-if="$store.state.user.role == 'Student'" :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-        <SSSNavMenu v-else-if="$store.state.user.role == 'Sno_student'" :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
-        <TeacherNavMenu v-else-if="$store.state.user.role == 'Teacher'" :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <StudentNavMenu v-if="user && user.role == 'Student'" :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <SSSNavMenu v-else-if="user && user.role == 'Sno_student'" :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
+        <TeacherNavMenu v-else-if="user && user.role == 'Teacher'" :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
         <UnauthMenu v-else :isMobile="isMobile" @closeMenu="closeMenu" @switchTheme="switchTheme" @switchLanguage="switchLanguage"/>
         <div id="wrapper" :isMenuShown="isMenuShown" >  
             <section>
@@ -19,9 +19,13 @@
     import UnauthMenu from './UnauthMenu.vue'
     import { ref, onMounted, watchEffect } from 'vue'
     import { useI18n } from 'vue-i18n'
-    import store from '@/store'
+    import { useUserStore } from '@/stores/user'
+    // import store from '@/stores/user'
 
     const i18n = useI18n()
+    const userStore = useUserStore()
+
+    let user = JSON.parse(userStore.$state.user)
     
     onMounted(async () => {
         await getDevice()
@@ -38,10 +42,10 @@
     let isMobile = ref(false)
     let isMenuShown = ref(false)
 
-    watchEffect(() => {
-        localStorage.theme = theme.value
-        localStorage.language = language.value
-    })
+    // watchEffect(() => {
+    //     localStorage.theme = theme.value
+    //     localStorage.language = language.value
+    // })
 
     async function getDevice() {
         if (screen.width > 420) {
@@ -52,12 +56,12 @@
 
     function switchTheme (newTheme) {
         theme.value = newTheme
-        localStorage.theme = theme.value
+        localStorage.setItem('theme', theme.value)
     }
 
     function switchLanguage (newLanguage) {
         language.value = newLanguage
-        localStorage.language = language.value
+        localStorage.setItem('language', language.value)
         if (language.value === 'ru') {
             i18n.locale.value = 'ru-RU'
         } else {

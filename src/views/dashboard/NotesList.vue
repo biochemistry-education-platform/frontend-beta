@@ -47,7 +47,7 @@ export default {
 
 <script setup>
 import SearchForm from '@/components/SearchForm.vue'
-import store from '@/store'
+// import store from '@/stores/user'
 import { ref, defineEmits, defineProps, onMounted } from 'vue'
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
@@ -108,7 +108,8 @@ async function getNotes() {
         .query({
             query: GET_NOTES_QUERY,
             variables: {
-                userId: store.state.user.id
+                // userId: store.state.user.id
+                userId: 11
             }
         })
         .then(result => { result.data.getNoteByUser.forEach(note => {

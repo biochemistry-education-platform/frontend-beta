@@ -59,7 +59,7 @@ import { apolloClient } from '@/vue-apollo'
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import store from '@/store'
+// import store from '@/stores/user'
 
 const i18n = useI18n()
 const router = useRouter()
@@ -208,8 +208,9 @@ async function getArticles() {
         articles.forEach(article => filteredArticles.value.push(article))
         filteredArticles.value.sort((a,b) => new Date(b.filter_date) - new Date(a.filter_date))
 
-        if (store.state.user.id != '') {
-            let id = Number(store.state.user.id)
+        // if (store.state.user.id != '') {
+            // let id = Number(store.state.user.id)
+            let id = 11
             await apolloClient
                 .query({
                     query: FAV_QUERY,
@@ -231,7 +232,7 @@ async function getArticles() {
                     }
                 })
                 .catch(error => { console.log(error) })
-        }
+        // }
 }
 
 function filterit(newArticles) {

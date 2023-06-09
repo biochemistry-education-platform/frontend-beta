@@ -1,9 +1,10 @@
 import { createApp, provide, h } from 'vue'
 import { DefaultApolloClient } from '@vue/apollo-composable'
 import { createI18n } from 'vue-i18n'
+import { createPinia } from "pinia"
 import App from './App.vue'
 import router from './router'
-import store from './store'
+import store from './stores/user'
 import messages from '@/i18n'
 import { apolloClient } from './vue-apollo'
 
@@ -22,5 +23,4 @@ const app = createApp({
     render: () => h(App),
 })
 
-app.use(i18n)
-app.use(store).use(router).mount('#app')
+app.use(i18n).use(createPinia()).use(router).mount('#app')
