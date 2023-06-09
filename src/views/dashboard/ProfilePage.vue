@@ -18,7 +18,8 @@
         <hr v-if="!isMobile" class="my-account__hr">
         <div class="my-account__content">
             <div class="my-account__info">
-                <img @click="changeProfilePhoto" id="profile-img" class="my-account__img" src="@/assets/icons/profile_img.png">
+                <img v-if="user.photo" @click="changeProfilePhoto" id="profile-img" class="my-account__img" :src="user.photo">
+                <img v-else @click="changeProfilePhoto" id="profile-img" class="my-account__img" src="@/assets/icons/profile_img.png">
                 <!-- TODO если есть фото в профиле (из запроса на сервер) то в src подставить его, иначе - то, что указано выше -->
                 <div class="my-account-name-block">
                     <h2 class="my-account-name">{{ user.surname }} {{ user.name }} {{ user.patronymic }}</h2>
@@ -33,7 +34,7 @@
                     <div class="my-account-channel">
                         <img src="@/assets/icons/mail-icon.png">
                         <div v-if="isMailFilled" class="filled-channel-block">
-                            <p class="my-account-channel-filled">{{ user.channels.mail }}</p>
+                            <p class="my-account-channel-filled">{{ channels.mail }}</p>
                             <svg class="channel-edit-btn" @click="editChannel('mail')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M180 876h44l443-443-44-44-443 443v44Zm614-486L666 262l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L248 936H120V808l504-504 128 128Zm-107-21-22-22 44 44-22-22Z"/></svg>
                             <svg class="channel-delete-btn" @click="deleteChannel('mail')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg>
                         </div>
@@ -42,7 +43,7 @@
                     <div class="my-account-channel">
                         <img src="@/assets/icons/vk-icon.png">
                         <div v-if="isVkFilled" class="filled-channel-block">
-                            <p class="my-account-channel-filled">{{ user.channels.vk }}</p>
+                            <p class="my-account-channel-filled">{{ channels.vk }}</p>
                             <svg class="channel-edit-btn" @click="editChannel('vk')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M180 876h44l443-443-44-44-443 443v44Zm614-486L666 262l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L248 936H120V808l504-504 128 128Zm-107-21-22-22 44 44-22-22Z"/></svg>
                             <svg class="channel-delete-btn" @click="deleteChannel('vk')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg>
                         </div>
@@ -51,7 +52,7 @@
                     <div class="my-account-channel">
                         <img src="@/assets/icons/telegram-icon.png">
                         <div v-if="isTgFilled" class="filled-channel-block">
-                            <p class="my-account-channel-filled">{{ user.channels.tg }}</p>
+                            <p class="my-account-channel-filled">{{ channels.tg }}</p>
                             <svg class="channel-edit-btn" @click="editChannel('tg')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M180 876h44l443-443-44-44-443 443v44Zm614-486L666 262l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L248 936H120V808l504-504 128 128Zm-107-21-22-22 44 44-22-22Z"/></svg>
                             <svg class="channel-delete-btn" @click="deleteChannel('tg')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg>
                         </div>
@@ -150,8 +151,6 @@ export default {
 </script>
 
 <script setup>
-import axios from 'axios'
-// import store from '@/stores/user'
 import Tags from '@/components/Tags.vue'
 import DeletionConfirmationModal from '@/components/DeletionConfirmationModal.vue'
 import { useRouter } from 'vue-router'
@@ -173,37 +172,24 @@ const props = defineProps({
     isMobile: Boolean
 })
 
-let user = reactive({
-    id: '',
-    email: '',
-    role: '',
-    surname: '',
-    name: '',
-    patronymic: '',
-    channels: {
-        mail: '',
-        vk: '',
-        tg: ''
-    }
+let user = JSON.parse(userStore.$state.user)
+
+let channels = reactive({
+    mail: '',
+    vk: '',
+    tg: ''
 })
 
-// let tempUser = reactive({
-//     name: store.state.user.name,
-//     patronymic: store.state.user.patronymic,
-//     surname: store.state.user.surname
-// })
-
 let tempUser = reactive({
-    name: 'name',
-    patronymic: 'patr',
-    surname: 'surname'
+    name: user.name,
+    patronymic: user.patronymic,
+    surname: user.surname
 })
 
 let showDeleteTagModal = ref(false)
 let showDeleteAuthorModal = ref(false)
 let tagAdding = ref(false)
 let allTags = ref([])
-let userID = 0
 let subscriptedTags = ref([])
 let allAuthors = ref([])
 let subscriptedAuthors = ref([])
@@ -339,77 +325,40 @@ onMounted(async () => {
 })
 
 function logout() {
-    // axios
-    //     .post('/api/v1/token/logout/')
-    //     .then(response => {
-    //         axios.defaults.headers.common["Authorization"] = ""
-    //         localStorage.removeItem('email')
-    //         localStorage.removeItem('userid')
-    //         localStorage.removeItem('token')
-    //         this.$store.commit('removeToken')
-    //         this.$router.push('/log-in')
-    //     })
-    //     .catch(error => {
-    //             if (error.response) {
-    //                 console.log(JSON.stringify(error.response.data))
-    //             } else if (error.message) {
-    //                 console.log(JSON.stringify(error.message))
-    //             } else {
-    //                 console.log(JSON.stringify(error))
-    //             }
-    //         })
-
     userStore.removeToken()
     userStore.removeUser()
 
-    // store.commit('changeUser')
     router.push({name: 'LogIn'})
 }
 
 async function getMyInfo() {
-    // user.id = store.state.user.id
-    // user.email = store.state.user.email
-    // user.name = store.state.user.name
-    // user.surname = store.state.user.surname
-    // user.patronymic = store.state.user.patronymic
-    // user.role = store.state.user.role
-    // let id = Number(store.state.user.id)
-
-    user.id = 11
-    user.email = 'email@mail.ru'
-    user.name = 'name'
-    user.surname = 'surname'
-    user.patronymic = 'patr'
-    user.role = 'Student'
-    let id = 11
-
     await apolloClient
         .query({
             query: MY_INFO_QUERY,
             variables: {
-                userId: id
+                userId: Number(user.profileID)
             }
         })
         .then(result => {
-            console.log(result.data)
-            userID = result.data.getProfile.user
+            let photoUrl = result.data.getProfile.photo
+            user.photo = photoUrl.slice(1, photoUrl.length - 1).split('?')[0]
             result.data.getProfile.tagsubscriptionSet.forEach(tag => {
                 subscriptedTags.value.push(tag.tagId.name)
             })
-            let channels = result.data.getProfile.channels.split(';')
-            let mail = channels[0].split(': ')[1]
-            let vk = channels[1].split(': ')[1]
-            let tg = channels[2].split(': ')[1]
+            let userChannels = result.data.getProfile.channels.split(';')
+            let mail = userChannels[0].split(': ')[1]
+            let vk = userChannels[1].split(': ')[1]
+            let tg = userChannels[2].split(': ')[1]
             if (mail) {
-                user.channels.mail = mail
+                channels.mail = mail
                 isMailFilled.value = true
             }
             if (vk) {
-                user.channels.vk = vk
+                channels.vk = vk
                 isVkFilled.value = true
             }
             if (tg) {
-                user.channels.tg = tg
+                channels.tg = tg
                 isTgFilled.value = true
             }
             result.data.getProfile.authorsubscriptionSet.forEach(author => {
@@ -429,7 +378,7 @@ async function getAllTags() {
         .query({
             query: ALL_TAGS,
             variables: {
-                userId: userID
+                userId: user.userID
             }
         })
         .then(result => {
@@ -440,8 +389,6 @@ async function getAllTags() {
                 }
                 allTags.value.push(newTag)
             })
-            console.log('all tags')
-            console.log(allTags.value)
         })
         .catch(error => console.log(error))
 }
@@ -451,11 +398,10 @@ async function getAllAuthors() {
         .query({
             query: ALL_AUTHORS,
             variables: {
-                userId: userID
+                userId: user.userID
             }
         })
         .then(result => {
-            console.log(result)
             result.data.allAuthors.forEach(author => {
                 let newAuthor = {
                     id: author.authorId.id,
@@ -463,8 +409,6 @@ async function getAllAuthors() {
                 }
                 allAuthors.value.push(newAuthor)
             })
-            console.log('all authors')
-            console.log(allAuthors.value)
         })
         .catch(error => console.log(error))
 }
@@ -476,8 +420,6 @@ function switchMenuDisplay() {
 }
 
 function addTagSubscription(chosenTag) {
-    // let profileID = Number(store.state.user.id)
-    let profileID = 11
     let tagID = allTags.value.find(tag => tag.name == chosenTag)
     if (tagID){
         if (!subscriptedTags.value.includes(chosenTag)) {
@@ -485,7 +427,7 @@ function addTagSubscription(chosenTag) {
                 .mutate({
                     mutation: ADD_TAG_SUBSCRIPTION,
                     variables: {
-                        userId: profileID,
+                        userId: user.profileID,
                         tagId: tagID.id
                     },
                 })
@@ -534,15 +476,12 @@ async function deleteTagSubscription(tagToDelete) {
             if (input.classList.length > 1) {
                 input.remove()
             } else { input.parentElement.parentElement.remove() }
-            console.log(`удалить тег ${tagToDelete}`)
             let tagID = allTags.value.find(tag => tag.name == tagToDelete).id
-            // let profileID = Number(store.state.user.id)
-            let profileID = 11
             await apolloClient
                 .mutate({
                     mutation: REMOVE_TAG_SUBSCRIPTION,
                     variables: {
-                        userId: profileID,
+                        userId: user.profileID,
                         tagId: tagID
                     },
                 })
@@ -558,7 +497,7 @@ function deleteAuthorSubscription(authorID) {
         .mutate({
             mutation: REMOVE_AUTHOR_SUBSCRIPTION,
             variables: {
-                userId: userID,
+                userId: user.userID,
                 authorId: authorID
             },
         })
@@ -580,6 +519,24 @@ function changeProfilePhoto() {
                 let content = readerEvent.target.result
                 document.getElementById('profile-img').src = content
                 // TODO отправить запрос о смене фото профиля на сервер
+                let PHOTO_UPDATE = gql`mutation UpdateUserProfile($userId: Int!, $photo: String) {
+                    updateProfile(userId: $userId, photo: $photo) {
+                        profile {
+                            id
+                            photo
+                        }
+                    }
+                }`
+                // apolloClient
+                //     .mutate({
+                //         mutation: PHOTO_UPDATE,
+                //         variables: {
+                //             userId: user.userID,
+                //             photo: content
+                //         },
+                //     })
+                //     .then(result => { console.log(result) })
+                //     .catch(error => { console.log(error) })
             }  
         } else {
             toast({
@@ -599,9 +556,7 @@ function changeMyInfo() {
     user.name = tempUser.name
     user.patronymic = tempUser.patronymic
     user.surname = tempUser.surname
-    // store.state.user.name = tempUser.name
-    // store.state.user.patronymic = tempUser.patronymic
-    // store.state.user.surname = tempUser.surname
+    userStore.setUser(user)
     // TODO запрос на сервер для изменения имени
     isModalShown.value = false
 }
@@ -609,28 +564,28 @@ function changeMyInfo() {
 async function editChannel(messenger) {
     if (messenger == 'mail') {
         await (isMailFilled.value = false)
-        document.getElementById('mail-input').value = user.channels.mail
+        document.getElementById('mail-input').value = channels.mail
     } else if (messenger == 'vk') {
         await (isVkFilled.value = false)
-        document.getElementById('vk-input').value = user.channels.vk
+        document.getElementById('vk-input').value = channels.vk
     } else if (messenger == 'tg') {
         await (isTgFilled.value = false)
-        document.getElementById('tg-input').value = user.channels.tg
+        document.getElementById('tg-input').value = channels.tg
     }
 }
 
 async function saveChannel(messenger) {
     if (messenger == 'mail') {
-        await (user.channels.mail = document.getElementById('mail-input').value)
+        await (channels.mail = document.getElementById('mail-input').value)
         isMailFilled.value = true
     } else if (messenger == 'vk') {
-        await (user.channels.vk = document.getElementById('vk-input').value)
+        await (channels.vk = document.getElementById('vk-input').value)
         isVkFilled.value = true
     } else if (messenger == 'tg') {
-        await (user.channels.tg = document.getElementById('tg-input').value)
+        await (channels.tg = document.getElementById('tg-input').value)
         isTgFilled.value = true
     }
-    let channels = `mail: ${user.channels.mail}; vk: ${user.channels.vk}; tg: ${user.channels.tg}`
+    let userChannels = `mail: ${channels.mail}; vk: ${channels.vk}; tg: ${channels.tg}`
     apolloClient
         .mutate({
             mutation: gql`mutation UpdateUserProfile($userId: Int!, $channels: String) {
@@ -650,8 +605,8 @@ async function saveChannel(messenger) {
                 }
             }`,
             variables: {
-                userId: userID,
-                channels: channels
+                userId: user.userID,
+                channels: userChannels
             },
         })
         .then(result => { console.log(result) })
@@ -660,16 +615,16 @@ async function saveChannel(messenger) {
 
 async function deleteChannel(messenger) {
     if (messenger == 'mail') {
-        await (user.channels.mail = '')
+        await (channels.mail = '')
         isMailFilled.value = false
     } else if (messenger == 'vk') {
-        await (user.channels.vk = '')
+        await (channels.vk = '')
         isVkFilled.value = false
     } else if (messenger == 'tg') {
-        await (user.channels.tg = '')
+        await (channels.tg = '')
         isTgFilled.value = false
     }
-    let channels = `mail: ${user.channels.mail}; vk: ${user.channels.vk}; tg: ${user.channels.tg}`
+    let userChannels = `mail: ${channels.mail}; vk: ${channels.vk}; tg: ${channels.tg}`
     apolloClient
         .mutate({
             mutation: gql`mutation UpdateUserProfile($userId: Int!, $channels: String) {
@@ -689,8 +644,8 @@ async function deleteChannel(messenger) {
                 }
             }`,
             variables: {
-                userId: userID,
-                channels: channels
+                userId: user.userID,
+                channels: userChannels
             },
         })
         .then(result => { console.log(result) })
@@ -751,6 +706,7 @@ async function deleteChannel(messenger) {
 .my-account__img{
     width: 160px;
     height: 160px;
+    border-radius: 50%;
     margin: 40px 0 20px 0;
 }
 

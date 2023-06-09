@@ -50,19 +50,19 @@ export default {
 </script>
 
 <script setup>
-import axios from 'axios'
 import { ref, reactive, onMounted, defineProps, defineEmits } from 'vue'
 import { useRoute } from 'vue-router'
-// import store from '@/stores/user'
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
+import { useUserStore } from '@/stores/user'
 import html2pdf from "html2pdf.js"
 
 const i18n = useI18n()
+const userStore = useUserStore()
 
 const emit = defineEmits(['openMenu', 'closeMenu'])
 
@@ -73,6 +73,8 @@ const props = defineProps({
 
 let showActions = ref(false)
 let hideForPdf = ref(false)
+
+let user = JSON.parse(userStore.$state.user)
 
 const GET_ARTICLE_QUERY = gql`
     query getArticle($id: Int!) {
@@ -87,6 +89,7 @@ const GET_ARTICLE_QUERY = gql`
                     role {
                         roleName
                     }
+                    photo
                 }
             }
             reviewer {
@@ -201,8 +204,7 @@ async function getArticle() {
             role.value = author.role.roleName
         })
         .catch(error => console.log(error))
-    // user_role.value = store.state.user.role
-    user_role.value = 'Student'
+    if (user) { user_role.value = user.role } else { user_role.value = ''}
 
     let text = JSON.parse(article.text)
     let place = document.getElementsByClassName('ql-editor')[0]
@@ -312,17 +314,18 @@ document.onselectionchange = () => { showButton() }
 
 async function showButton() {
     let select = window.getSelection()
-    // if (select != '' && store.state.user.role != 'Teacher') {
-    if (select != '') {
-        await (isSelected = true)
-        let rect = select.getRangeAt(0).getBoundingClientRect()
-        let menu = document.getElementById('add-selected-text-btn')
-        menu.style.cssText += `left:${(rect.left + rect.right) / 2 - 14}px;top:${rect.bottom + 4}px; display: flex;`                
-    }
-    else {
-        isSelected = false
-        let menu = document.getElementById('add-selected-text-btn')
-        menu.style.cssText += `display: none;`
+    if (select != '' && user_role.value != 'Teacher' && user_role.value != '') {
+        if (select != '') {
+            await (isSelected = true)
+            let rect = select.getRangeAt(0).getBoundingClientRect()
+            let menu = document.getElementById('add-selected-text-btn')
+            menu.style.cssText += `left:${(rect.left + rect.right) / 2 - 14}px;top:${rect.bottom + 4}px; display: flex;`                
+        }
+        else {
+            isSelected = false
+            let menu = document.getElementById('add-selected-text-btn')
+            menu.style.cssText += `display: none;`
+        }
     }
 }
 
@@ -332,14 +335,12 @@ async function getSelectedText(event) {
         let menu = document.getElementById('add-selected-text-btn')
         menu.style.cssText += `display: none;`
         const articleID = route.params.id
-        // let userID = store.state.user.id
-        let userID = 11
         // проверка, существует ли конспект
         await apolloClient
             .query({
                 query: GET_NOTE_QUERY,
                 variables: {
-                    userId: userID, 
+                    userId: user.userID, 
                     articleId: articleID
                 }
             })
@@ -394,7 +395,7 @@ async function getSelectedText(event) {
                     .mutate({
                         mutation: CREATE_NOTE_MUTATION,
                         variables: {
-                            userId: userID,
+                            userId: user.userID,
                             articleId: articleID,
                             noteText: noteText,
                         },

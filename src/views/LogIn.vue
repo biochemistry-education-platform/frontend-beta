@@ -55,7 +55,6 @@ import { ref, defineProps, defineEmits } from 'vue'
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-// import store from '@/stores/user'
 import { useUserStore } from '@/stores/user'
 
 const i18n = useI18n()
@@ -92,26 +91,6 @@ function switchLanguage () {
     emit('switchLanguage', language.value)
 }
 
-const AUTH_USER_MUTATION = gql`
-    mutation AuthUser($email: String!, $password: String!) {
-        authUser(email: $email, password: $password) {
-            profile {
-                id
-                user
-                role {
-                    id
-                    roleName
-                }
-                channels
-                photo
-                getNotification
-                name
-                surname
-                secondname
-            }
-        }
-    }`
-
 const AUTH_WITH_TOKEN = gql`mutation TokenAuth($username: String!, $password: String!) {
     tokenAuth(username: $username, password: $password) {
         token
@@ -136,11 +115,6 @@ const AUTH_WITH_TOKEN = gql`mutation TokenAuth($username: String!, $password: St
 function submitForm() {
     apolloClient
         .mutate({
-            // mutation: AUTH_USER_MUTATION,
-            // variables: {
-            //     email: email.value,
-            //     password: password.value,
-            // },
             mutation: AUTH_WITH_TOKEN,
             variables: {
                 username: email.value,
@@ -148,8 +122,6 @@ function submitForm() {
             },
         })
         .then(result => {
-            console.log(result)
-            router.push({ name: 'Articles' })
             let user = {
                 userID: result.data.tokenAuth.user.id,
                 profileID: result.data.tokenAuth.profile.id,
@@ -191,135 +163,3 @@ function submitForm() {
     color: white;
 }
 </style>
-
-<!-- <script>
-import axios from 'axios'
-
-// я передаю username и password
-// хочу проверить: если такое существует, то мне бы хотелось получить ФИО, роль, емейл, айдишник (какой, из какой таблички? по какому айдишнику
-// я смогу потом забирать статьи пользователя, его конспекты и т.д.?)
-// import gql from 'graphql-tag'
-// import { apolloClient } from '@/vue-apollo'
-
-
-export default {
-    name: 'LogIn',
-    data() {
-        return {
-            email: '',
-            password: '',
-            errors: []
-        }
-    },
-    methods: {
-        // getUserInfo() {
-        //     apolloClient
-        //         .mutate({
-        //             mutation: gql`
-        //                 mutation GetUserInfo($email: String!, $password: String!) {
-        //                     getUserInfo(email: $email, password: $password) {
-        //                         user {
-        //                             id
-        //                             email
-        //                             name
-        //                             role
-        //                         }
-        //                     }
-        //                 }
-        //             `,
-        //             variables: {
-        //                 email: this.email,
-        //                 password: this.password,
-        //             },
-        //         })
-        //         .then(result => {
-        //             console.log(result)
-        //             let fullname = result.name.split(' ')
-        //             let surname = ''
-        //             let name = ''
-        //             let patronymic = ''
-        //             if (fullname.length > 1) {
-        //                 surname = fullname[0]
-        //                 name = fullname[1]
-        //                 if (fullname.length == 3) {
-        //                     patronymic = fullname[2]
-        //                 }
-        //             }
-
-        //             this.$store.state.user.surname = surname
-        //             this.$store.state.user.name = name
-        //             this.$store.state.user.patronymic = patronymic
-        //             this.$store.state.user.role = result.role
-        //             this.$store.state.user.email = result.email
-
-        //             this.$router.push('/articles')
-        //         })
-        //         .catch(error => {
-        //             console.log(error)
-        //         })
-        // },
-
-
-
-        async submitForm(e) {
-            axios.defaults.headers.common["Authorization"] = ""
-
-            localStorage.removeItem('token')
-
-            const formData = {
-                username: this.username,
-                password: this.password
-            }
-
-            await axios
-                .post('/api/v1/token/login/', formData)
-                .then(response => {
-                    const token = response.data.auth_token
-                    this.$store.commit('setToken', token)
-                    axios.defaults.headers.common["Authorization"] = "Token " + token
-                    localStorage.setItem('token', token)
-                })
-                .catch(error => {
-                    if (error.response) {
-                        for (const property in error.response.data) {
-                            this.errors.push(`${property}: ${error.response.data[property]}`)
-                        }
-                        console.log(JSON.stringify(error.response.data))
-                    } else if (error.message) {
-                        console.log(JSON.stringify(error.message))
-                    } else {
-                        console.log(JSON.stringify(error))
-                    }
-                })
-            
-            await axios
-                .get('/api/v1/users/me')
-                .then(response => {
-                    this.$store.commit('setUser', {'username': response.data.username, 'id': response.data.id})
-                    localStorage.setItem('username', response.data.username)
-                    localStorage.setItem('userid', response.data.id)
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
-
-            axios
-                .get('/api/v1/clients')
-                .then(response => {
-                    for (const property in response.data) {
-                        if (response.data[property].email == this.$store.state.user.username) {
-                            this.$store.state.user.surname = response.data[property].surname
-                            this.$store.state.user.name = response.data[property].name
-                            this.$store.state.user.patronymic = response.data[property].patronymic
-                            this.$store.state.user.role = response.data[property].role
-                        }
-                    }
-                    this.$router.push('/articles')
-                })
-                .catch(error => {
-                    console.log(JSON.stringify(error))
-                })
-        }  
-    }
-}
-</script> -->

@@ -111,26 +111,6 @@ const CREATE_PROFILE_MUTATION = gql`
         }
     }`
 
-const AUTH_USER_MUTATION = gql`
-    mutation AuthUser($email: String!, $password: String!) {
-        authUser(email: $email, password: $password) {
-            profile {
-                id
-                user
-                role {
-                    id
-                    roleName
-                }
-                channels
-                photo
-                getNotification
-                name
-                surname
-                secondname
-            }
-        }
-    }`
-
 const AUTH_WITH_TOKEN = gql`mutation TokenAuth($username: String!, $password: String!) {
     tokenAuth(username: $username, password: $password) {
         token
@@ -183,11 +163,6 @@ function addUser() {
             })
             apolloClient
                 .mutate({
-                    // mutation: AUTH_USER_MUTATION,
-                    // variables: {
-                    //     email: email.value,
-                    //     password: password.value,
-                    // },
                     mutation: AUTH_WITH_TOKEN,
                     variables: {
                         username: email.value,
@@ -195,7 +170,6 @@ function addUser() {
                     },
                 })
                 .then(result => {
-                    console.log(result)
                     router.push({ name: 'Articles' })
                     let user = {
                         userID: result.data.tokenAuth.user.id,
@@ -222,33 +196,6 @@ function addUser() {
                         position: 'top-right',
                     })
                 })
-            // apolloClient
-            //     .mutate({
-            //         mutation: AUTH_USER_MUTATION,
-            //         variables: {
-            //             email: email.value,
-            //             password: password.value,
-            //         },
-            //     })
-            //     .then(result => {
-            //         console.log('and this was auth')
-            //         router.push({ name: 'Articles' })
-            //         store.state.user.id = result.data.authUser.profile.id
-            //         store.state.user.role = result.data.authUser.profile.role.roleName
-            //         store.state.user.name = result.data.authUser.profile.name
-            //         store.state.user.surname = result.data.authUser.profile.surname
-            //         store.state.user.email = email.value
-            //     })
-            //     .catch(error => {
-            //         toast({
-            //             message: i18n.t('authFailed') + '\n' + error,
-            //             type: 'notification-danger',
-            //             dismissible: true,
-            //             pauseOnHover: true,
-            //             duration: 20000,
-            //             position: 'top-right',
-            //         })
-            //     })
         })
         .catch(error => {
             toast({

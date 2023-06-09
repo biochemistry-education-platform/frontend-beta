@@ -11,7 +11,7 @@
   
 <script setup>
     import InitialMenu from '@/layouts/initial/InitialMenu.vue'
-    import { ref, onMounted, watchEffect } from 'vue'
+    import { ref, onMounted } from 'vue'
     import { useI18n } from 'vue-i18n'
 
     const i18n = useI18n()
@@ -37,19 +37,14 @@
         else { isMobile.value = true }
     }
 
-    watchEffect(() => {
-        localStorage.theme = theme.value
-        localStorage.language = language.value
-    })
-
     function switchTheme (newTheme) {
         theme.value = newTheme
-        localStorage.theme = theme.value
+        localStorage.setItem('theme', theme.value)
     }
 
     function switchLanguage (newLanguage) {
         language.value = newLanguage
-        localStorage.language = language.value
+        localStorage.setItem('language', language.value)
         if (language.value === 'ru') {
             i18n.locale.value = 'ru-RU'
         } else {

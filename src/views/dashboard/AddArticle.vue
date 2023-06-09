@@ -41,6 +41,18 @@
                             <p @click="chooseReviewer(reviewer.id)">{{ reviewer.surname }} {{ reviewer.name }} {{ reviewer.secondname }}</p>
                         </div>
                     </div>
+                    <form action="https://storage.yandexcloud.net/plateaumed" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="key" value="users/uploads/${filename}" /><br />
+                        <input type="hidden"   name="X-Amz-Credential" value="YCAJEChUZ1sDsIoQljzBKmcfw/20230609/ru-central1/s3/aws4_request" />
+                        <input type="hidden"   name="acl" value="public-read" />
+                        <input type="hidden"   name="X-Amz-Algorithm" value="AWS4-HMAC-SHA256" />
+                        <input type="hidden"   name="X-Amz-Date" value="20230609T190106Z" />
+                        <input type="hidden"   name="policy" value="eyJleHBpcmF0aW9uIjogIjIwMjMtMDYtMDlUMjA6MDE6MDVaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQifSwgWyJzdGFydHMtd2l0aCIsICIka2V5IiwgInVzZXJzL3VwbG9hZHMiXSwgeyJidWNrZXQiOiAicGxhdGVhdW1lZCJ9LCBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidXNlcnMvdXBsb2Fkcy8iXSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiWUNBSkVDaFVaMXNEc0lvUWxqekJLbWNmdy8yMDIzMDYwOS9ydS1jZW50cmFsMS9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1kYXRlIjogIjIwMjMwNjA5VDE5MDEwNloifV19" />
+                        <input type="hidden" name="X-Amz-Signature" value="864bf64c27d8f22cd62905a641245a5bc6a3fc3d0f7b7d88f2fe4b076ad7e5e9" />
+                        <input type="file" @change="saveFileName" multiple id="filename-input" name="file" /> <br />
+                        <input type="submit" id="filesend-btn" name="submit" value="Загрузить" />
+                    </form>
+                    <button @click="sendFiles">send files</button>
                     <button class="publish-article-btn" @click="createArticle">{{ user_role == 'Student' ? $t('send') : $t('publish') }}</button>
                 </div>
             </div>
@@ -97,6 +109,7 @@ let article = reactive({
     text: '',
     tags: []
 })
+let fileList = new DataTransfer()
 let reviewers = ref([])
 let chosenReviewer = ref('')
 let reviewerID = 0
@@ -400,47 +413,71 @@ function toJSON(element) {
     return obj
 }
 
-function attachFile() {
-    let input = document.createElement('input')
-    input.type = 'file'
-
-    input.onchange = e => { 
-        let file = e.target.files[0]
-        let reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onload = readerEvent => {
-            let content = readerEvent.target.result
-
-            let fileDiv = document.createElement('div')
-            fileDiv.classList.add('attached-file')
-
-            let fileLink = document.createElement('a')
-            fileLink.setAttribute('download', file.name)
-            fileLink.setAttribute('href', content)
-            fileLink.innerHTML = file.name
-            fileLink.classList.add('attached-file-link')
-
-            let deleteSvg = document.createElementNS("http://www.w3.org/2000/svg", 'svg')
-            let deletePath = document.createElementNS("http://www.w3.org/2000/svg", 'path')
-            deletePath.setAttribute("d", "m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z")
-            deleteSvg.setAttribute('xmlns', "http://www.w3.org/2000/svg")
-            deleteSvg.setAttribute('height', "16")
-            deleteSvg.setAttribute('viewBox', "0 96 960 960")
-            deleteSvg.setAttribute('width', "16")
-            deleteSvg.style.fill = '#F65151'
-            deleteSvg.style.cursor = 'pointer'
-            deleteSvg.appendChild(deletePath)
-            deleteSvg.classList.add('delete-file')
-            deleteSvg.onclick = showModal
-
-            fileDiv.appendChild(fileLink)
-            fileDiv.appendChild(deleteSvg)
-
-            document.getElementById('attached-files').appendChild(fileDiv)
-        }
+function addFilesToList(files) {
+    let fileArray = Array.from(files)
+    let uploadedFileArray = Array.from(fileList.items)
+    if (fileList.items.length > 0) {
+        fileArray.forEach(file => {
+            uploadedFileArray.forEach(fileUploaded => {
+                if (file.name != fileUploaded.name) {
+                    fileList.items.add(file)
+                }
+            })
+        })
+    } else { 
+        fileArray.forEach(file => { fileList.items.add(file) })
     }
+    console.log(fileList)
+}
 
-    input.click()
+function saveFileName() {
+    addFilesToList(document.getElementById('filename-input').files)
+    let fileName = document.getElementById('filename-input').files[0].name
+    let fileUrl = `https://storage.yandexcloud.net/plateaumed/users/uploads/${fileName}`
+    
+    let fileDiv = document.createElement('div')
+    fileDiv.classList.add('attached-file')
+
+    let fileLink = document.createElement('a')
+    fileLink.setAttribute('download', fileName)
+    fileLink.setAttribute('href', fileUrl)
+    fileLink.innerHTML = fileName
+    fileLink.classList.add('attached-file-link')
+
+    let deleteSvg = document.createElementNS("http://www.w3.org/2000/svg", 'svg')
+    let deletePath = document.createElementNS("http://www.w3.org/2000/svg", 'path')
+    deletePath.setAttribute("d", "m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z")
+    deleteSvg.setAttribute('xmlns', "http://www.w3.org/2000/svg")
+    deleteSvg.setAttribute('height', "16")
+    deleteSvg.setAttribute('viewBox', "0 96 960 960")
+    deleteSvg.setAttribute('width', "16")
+    deleteSvg.style.fill = '#F65151'
+    deleteSvg.style.cursor = 'pointer'
+    deleteSvg.appendChild(deletePath)
+    deleteSvg.classList.add('delete-file')
+    deleteSvg.onclick = showModal
+
+    fileDiv.appendChild(fileLink)
+    fileDiv.appendChild(deleteSvg)
+
+    document.getElementById('attached-files').appendChild(fileDiv)
+    document.getElementById('filesend-btn').click()
+}
+
+function sendFiles() {
+    let uploadedFilesArray = Array.from(fileList.files)
+    uploadedFilesArray.forEach(file => {
+        var dt = new DataTransfer()
+        dt.items.add(file)
+        document.getElementById('filename-input').files = dt.files
+        console.log(document.getElementById('filename-input').files)
+        document.getElementById('filesend-btn').click()
+    })
+    
+}
+
+function attachFile() {
+    document.getElementById('filename-input').click()
 }
 
 function showModal() {
@@ -457,7 +494,6 @@ function showModal() {
 
 function deleteFile() {
     chosenFile.remove()
-    console.log('deleteeee')
 }
 
 function switchMenuDisplay() {
@@ -674,6 +710,10 @@ function chooseReviewer(id) {
     color: var(--text-color);
 }
 
+.add-article-reviewer::placeholder {
+    color: var(--text-extra);
+}
+
 .reviewers-block {
     position: absolute;
     top: 0;
@@ -716,6 +756,10 @@ function chooseReviewer(id) {
 #maineditor {
     color: var(--text-color);
     border-radius: none;
+}
+
+#filename-input, #filesend-btn {
+    display: none;
 }
 
 @media (max-width: 420px) {

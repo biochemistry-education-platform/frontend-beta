@@ -20,7 +20,6 @@
     import { ref, onMounted, watchEffect } from 'vue'
     import { useI18n } from 'vue-i18n'
     import { useUserStore } from '@/stores/user'
-    // import store from '@/stores/user'
 
     const i18n = useI18n()
     const userStore = useUserStore()
@@ -41,11 +40,6 @@
     const language = ref('ru')
     let isMobile = ref(false)
     let isMenuShown = ref(false)
-
-    // watchEffect(() => {
-    //     localStorage.theme = theme.value
-    //     localStorage.language = language.value
-    // })
 
     async function getDevice() {
         if (screen.width > 420) {
