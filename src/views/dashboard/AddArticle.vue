@@ -43,12 +43,12 @@
                     </div>
                     <form action="https://storage.yandexcloud.net/plateaumed" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="key" value="users/uploads/${filename}" /><br />
-                        <input type="hidden"   name="X-Amz-Credential" value="YCAJEChUZ1sDsIoQljzBKmcfw/20230609/ru-central1/s3/aws4_request" />
+                        <input type="hidden"   name="X-Amz-Credential" value="YCAJEChUZ1sDsIoQljzBKmcfw/20230610/ru-central1/s3/aws4_request" />
                         <input type="hidden"   name="acl" value="public-read" />
                         <input type="hidden"   name="X-Amz-Algorithm" value="AWS4-HMAC-SHA256" />
-                        <input type="hidden"   name="X-Amz-Date" value="20230609T190106Z" />
-                        <input type="hidden"   name="policy" value="eyJleHBpcmF0aW9uIjogIjIwMjMtMDYtMDlUMjA6MDE6MDVaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQifSwgWyJzdGFydHMtd2l0aCIsICIka2V5IiwgInVzZXJzL3VwbG9hZHMiXSwgeyJidWNrZXQiOiAicGxhdGVhdW1lZCJ9LCBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidXNlcnMvdXBsb2Fkcy8iXSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiWUNBSkVDaFVaMXNEc0lvUWxqekJLbWNmdy8yMDIzMDYwOS9ydS1jZW50cmFsMS9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1kYXRlIjogIjIwMjMwNjA5VDE5MDEwNloifV19" />
-                        <input type="hidden" name="X-Amz-Signature" value="864bf64c27d8f22cd62905a641245a5bc6a3fc3d0f7b7d88f2fe4b076ad7e5e9" />
+                        <input type="hidden"   name="X-Amz-Date" value="20230610T173419Z" />
+                        <input type="hidden"   name="policy" value="eyJleHBpcmF0aW9uIjogIjIwMjMtMDYtMTBUMTg6MzQ6MTlaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQifSwgWyJzdGFydHMtd2l0aCIsICIka2V5IiwgInVzZXJzL3VwbG9hZHMiXSwgeyJidWNrZXQiOiAicGxhdGVhdW1lZCJ9LCBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidXNlcnMvdXBsb2Fkcy8iXSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiWUNBSkVDaFVaMXNEc0lvUWxqekJLbWNmdy8yMDIzMDYxMC9ydS1jZW50cmFsMS9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1kYXRlIjogIjIwMjMwNjEwVDE3MzQxOVoifV19" />
+                        <input type="hidden" name="X-Amz-Signature" value="ed4fb4e9e2ec3b7a31e7e293b60d6bbe8168eb6a158483cfeb66245d7dd444ee" />
                         <input type="file" @change="saveFileName" multiple id="filename-input" name="file" /> <br />
                         <input type="submit" id="filesend-btn" name="submit" value="Загрузить" />
                     </form>
@@ -64,7 +64,7 @@
                 </div>
             </div>
         </div>
-        <DeletionConfirmationModal v-if="showDeleteFileModal" @cancel="showDeleteFileModal = false" @delete="deleteFile" :text="chosenFileName" :type="'file'" />
+        <ConfirmationModal v-if="showDeleteFileModal" @cancel="showDeleteFileModal = false" @delete="deleteFile" :text="chosenFileName" :type="'file'" />
     </div>
 </template>
 
@@ -78,7 +78,7 @@ export default {
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import Tags from '@/components/Tags.vue'
-import DeletionConfirmationModal from '@/components/DeletionConfirmationModal.vue'
+import ConfirmationModal from '@/components/ConfirmationModal.vue'
 import { ref, reactive, defineProps, onMounted } from 'vue'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
@@ -86,11 +86,12 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'bulma-toast'
+import { useUserStore } from '@/stores/user'
 // import store from '@/stores/user'
 
 const i18n = useI18n()
-
 const route = useRoute()
+const userStore = useUserStore()
 
 const emit = defineEmits(['openMenu', 'closeMenu'])
 
@@ -172,9 +173,10 @@ const REVIEWERS_QUERY = gql`query {
     }
 }`
 
+let user = JSON.parse(userStore.$state.user)
+
 onMounted(() => {
-    // user_role.value = store.state.user.role
-    user_role.value = 'Student'
+    user_role.value = user.role
     if (user_role.value == 'Student') {
         apolloClient
             .query({
@@ -279,7 +281,7 @@ function createArticle() {
     JSON.parse(JSON.stringify(chosenTags.value)).forEach(value => chosenTags2.push(value))
 
     if (type.value == 'text') {
-        if (user_role == 'Student' && chooseReviewer.value == '') {
+        if (user_role.value == 'Student' && chosenReviewer.value == '') {
             toast({
                 message: i18n.t('noReviewer'),
                 type: 'notification-danger',
@@ -297,8 +299,7 @@ function createArticle() {
                     name: articleTitle.value,
                     articleText: jsonresult,
                     reviewer: reviewerID,
-                    // profileId: store.state.user.id,
-                    profileId: 11,
+                    profileId: user.profileID,
                     tags: chosenTags2
                 },
             })
@@ -337,8 +338,7 @@ function createArticle() {
                 variables: {
                     name: articleTitle.value, 
                     notif_text: notifJson,
-                    // author: store.state.user.id,
-                    author: 11,
+                    author: user.profileID,
                     tags: chosenTags2
                 },
             })
@@ -461,16 +461,17 @@ function saveFileName() {
     fileDiv.appendChild(deleteSvg)
 
     document.getElementById('attached-files').appendChild(fileDiv)
-    document.getElementById('filesend-btn').click()
+    // document.getElementById('filesend-btn').click()
 }
 
 function sendFiles() {
     let uploadedFilesArray = Array.from(fileList.files)
-    uploadedFilesArray.forEach(file => {
+    uploadedFilesArray.forEach(async (file) => {
         var dt = new DataTransfer()
         dt.items.add(file)
         document.getElementById('filename-input').files = dt.files
         console.log(document.getElementById('filename-input').files)
+        await new Promise(r => setTimeout(r, 1000));
         document.getElementById('filesend-btn').click()
     })
     
@@ -494,6 +495,7 @@ function showModal() {
 
 function deleteFile() {
     chosenFile.remove()
+    showDeleteFileModal.value = false
 }
 
 function switchMenuDisplay() {

@@ -57,6 +57,12 @@ export default {
     noteEdited: 'The abstract has been edited',
     createNoteFailure: 'Error creating abstract',
     editNoteFailure: 'Error editing abstract',
+    notPublishedYet: 'An article is not published yet',
+    acceptArticleTitle: 'Article publication',
+    declineArticleTitle: 'Article rejection',
+    acceptArticleText: 'Are you sure you want to publish suggested article ',
+    declineArticleTitle: 'Are you sure you want to reject suggested article ',
+    cancelAction: 'No, cancel',
 
     articleTitle: 'Article title',
     tag: 'Tag',
@@ -87,5 +93,8 @@ export default {
     toArticle: 'To the article',
     edit: 'Edit',
     delete: 'Delete',
-    save: 'Save'
+    save: 'Save',
+    noteDeletionTitle: 'Abstract deletion',
+    noteDeletionText: 'Are you sure you want to delete an abstract ',
+    noteDeleted: 'Abstract deleted'
 }

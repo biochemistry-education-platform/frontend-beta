@@ -1,5 +1,5 @@
 <template>
-    <div v-if="this.$store.state.user.role != 'Student'" class="biochemistry-page">
+    <div v-if="user.role != 'Student'" class="biochemistry-page">
         <h1 class="biochemistry-page-title">{{ $t('forChecking') }}</h1>
         <!-- <SearchForm v-bind:items="articles" v-on:filterit="filterit"/> -->
         <hr class="biochemistry-page-hr">
@@ -18,7 +18,7 @@
                         </div>
                         <div class="article-info-item article-info__date">
                             <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m627 769 45-45-159-160V363h-60v225l174 181ZM480 976q-82 0-155-31.5t-127.5-86Q143 804 111.5 731T80 576q0-82 31.5-155t86-127.5Q252 239 325 207.5T480 176q82 0 155 31.5t127.5 86Q817 348 848.5 421T880 576q0 82-31.5 155t-86 127.5Q708 913 635 944.5T480 976Zm0-400Zm0 340q140 0 240-100t100-240q0-140-100-240T480 236q-140 0-240 100T140 576q0 140 100 240t240 100Z"/></svg>
-                            <p>{{ (new Date(Date.parse(article.publish_date.slice(0,19)))).toLocaleString('ru-RU') }}</p>
+                            <p>{{ article.creation_date }}</p>
                         </div>
                     </div>
                     <div class="article__tags-list" v-if="article.tags.length > 0">
@@ -38,86 +38,98 @@
 </template>
 
 <script>
-import axios from 'axios'
-import SearchForm from '@/components/SearchForm.vue'
-
-
 export default {
     name: 'ArticlesForChecking',
-    components: {
-        SearchForm,
-    },
-    data() {
-        return {
-            articles: [],
-            filteredArticles: []
+}
+</script>
+
+<script setup>
+import SearchForm from '@/components/SearchForm.vue'
+import { ref, reactive, defineProps, onMounted } from 'vue'
+import gql from 'graphql-tag'
+import { apolloClient } from '@/vue-apollo'
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
+
+let articles = []
+let filteredArticles = ref([])
+
+let user = JSON.parse(userStore.$state.user)
+
+const ARTICLES_FOR_CHECKING_QUERY = gql`query GetArticlesByReviewer($reviewId: Int!) {
+    getArticlesReview(reviewId: $reviewId) {
+        id
+        name
+        articleText
+        creationDate
+        author {
+            authorId {
+                id
+                name
+                surname
+                secondname
+            }
         }
-    },
-    mounted() {
-        this.getArticles()
-    },
-    methods: {
-        getArticles() {
-            this.articles = [
-                {
-                    id: 1,
-                    title: 'Название статьи',
-                    type: 'text_article',
-                    author: 'Иванов Иван',
-                    tags: ['СНО'],
-                    publish_date: (new Date((new Date('02 May 2023 19:24 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
-                },
-                {
-                    id: 2,
-                    title: 'Название статьи2',
-                    type: 'text_article',
-                    author: 'Петров Петр',
-                    tags: ['белки', 'липиды'],
-                    publish_date: (new Date((new Date('04 May 2023 16:50 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
-                },
-                {
-                    id: 3,
-                    title: 'Название статьи3',
-                    type: 'text_article',
-                    author: 'Павлов Павел',
-                    tags: ['гормоны'],
-                    publish_date: (new Date((new Date('05 May 2023 11:37 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
-                },
-                {
-                    id: 4,
-                    title: 'Название статьи4',
-                    type: 'text_article',
-                    author: 'Андреев Андрей',
-                    tags: ['белки', 'липиды'],
-                    publish_date: (new Date((new Date('06 May 2023 18:21 UTC')) - ((new Date()).getTimezoneOffset() * 72000))).toISOString(),
-                },
-            ]
-            this.filteredArticles = this.articles.reverse()
-        },
-        // getArticles() {
-        //     axios
-        //         .get('/api/v1/articles/')
-        //         .then(response => {
-        //             for (let i = 0; i < response.data.length; i++) {
-        //                 this.articles.push(response.data[i])
-        //                 this.filteredArticles.push(response.data[i])
-        //             }
-        //             this.filteredArticles = this.filteredArticles.reverse()
-        //         })
-        //         .catch(error => {
-        //             console.log(JSON.stringify(error))
-        //         })
-        // },
-        filterit(newArticles) {
-            this.filteredArticles = newArticles
-        },
-        acceptArticle(articleID) {
-            console.log('accepted article!')
-        },
-        declineArticle(articleID) {
-            console.log('declined article!')
+        articletagSet {
+            tagId {
+                name
+            }
         }
+        publishStatus
     }
+}`
+
+onMounted(async () => {
+    await getArticlesForChecking()
+})
+
+async function getArticlesForChecking() {
+    await apolloClient
+        .query({
+            query: ARTICLES_FOR_CHECKING_QUERY,
+            variables: {
+                reviewId: Number(user.profileID)
+            }
+        })
+        .then(result => {
+            console.log(result)
+            result.data.getArticlesReview.forEach(suggestedArticle => {
+                let authorFullName = suggestedArticle.author.authorId.surname + ' ' + suggestedArticle.author.authorId.name.charAt(0) + '.'
+                if (suggestedArticle.author.authorId.secondname != "") { authorFullName += (' ' + suggestedArticle.author.authorId.secondname.charAt(0) + '.')}
+                let tagList = []
+                suggestedArticle.articletagSet.forEach(tag => {
+                    tagList.push(tag.tagId.name)
+                })
+                let date = new Date(Date.parse(suggestedArticle.creationDate)).toLocaleDateString('ru-RU', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                })
+                let fdate = new Date(Date.parse(suggestedArticle.creationDate))
+                let article = {
+                    id: suggestedArticle.id,
+                    title: suggestedArticle.name,
+                    type: 'text_article',
+                    author: authorFullName,
+                    tags: tagList,
+                    creation_date: date,
+                    filter_date: fdate,
+                }
+                articles.push(article)
+            })
+        })
+        .catch(error => console.log(error))
+    
+    articles.forEach(article => filteredArticles.value.push(article))
+    filteredArticles.value.sort((a,b) => new Date(b.filter_date) - new Date(a.filter_date))
+}
+
+function acceptArticle(articleID) {
+    console.log('accepted article!')
+}
+function declineArticle(articleID) {
+    console.log('declined article!')
 }
 </script>
 

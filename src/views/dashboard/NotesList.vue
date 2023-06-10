@@ -9,7 +9,7 @@
         <!-- <SearchForm v-bind:items="notes" v-on:filterit="filterit"/> -->
         <hr v-if="!isMobile" class="biochemistry-page-hr">
         <div class="notes-list">
-            <div class="notes__note" v-for="note in filteredNotes" v-bind:key="note.id">
+            <div class="notes__note" v-for="note in filteredNotes" :key="note.id">
                 <div class="note__content">
                     <router-link :to="{ name: 'Note', params: { id: note.id }}" class="note__title">{{ $t('note') }} «{{ note.based_on_article }}»</router-link>
                     <div class="article__info">
@@ -32,16 +32,17 @@
                 </div>
                 <hr v-if="!isMobile" class="note-separator">
                 <div class="note-delete">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg>
+                    <svg @click="chooseNoteToDelete(note)" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg>
                 </div>
             </div>
         </div>
+        <ConfirmationModal v-if="showDeleteNoteModal" @cancel="showDeleteNoteModal = false" @delete="deleteNote" :text="noteToDeleteName" :type="'note'" />
     </div>
 </template>
 
 <script>
 export default {
-    name: 'Articles',
+    name: 'Notes',
 }
 </script>
 
@@ -49,14 +50,17 @@ export default {
 import SearchForm from '@/components/SearchForm.vue'
 // import store from '@/stores/user'
 import { ref, defineEmits, defineProps, onMounted } from 'vue'
+import ConfirmationModal from '@/components/ConfirmationModal.vue'
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
 const i18n = useI18n()
 const router = useRouter()
+const userStore = useUserStore()
 
 const emit = defineEmits(['openMenu', 'closeMenu'])
 
@@ -65,9 +69,13 @@ const props = defineProps({
     isMobile: Boolean
 })
 
-let articles = []
 let notes = []
 let filteredNotes = ref([])
+let noteToDelete
+let noteToDeleteName = ref('')
+let showDeleteNoteModal = ref(false)
+
+let user = JSON.parse(userStore.$state.user)
 
 const GET_NOTES_QUERY = gql`query GetNotesByUserQuery($userId: Int!) {
     getNoteByUser(id: $userId) {
@@ -99,6 +107,15 @@ const GET_NOTES_QUERY = gql`query GetNotesByUserQuery($userId: Int!) {
         }
     }
 }`
+
+const DELETE_NOTE_MUTATION = gql`mutation DeleteNoteMutation($noteId: ID!) {
+    deleteNote(noteId: $noteId) {
+        note {
+            id
+        }
+    }
+}`
+
 onMounted(async () => {
     await getNotes()
 })
@@ -108,13 +125,22 @@ async function getNotes() {
         .query({
             query: GET_NOTES_QUERY,
             variables: {
-                // userId: store.state.user.id
-                userId: 11
+                userId: user.profileID
             }
         })
         .then(result => { result.data.getNoteByUser.forEach(note => {
             let taglist = []
             note.articleId.articletagSet.forEach(tag => taglist.push(tag.tagId.name))
+            let authorFullName = note.articleId.author.authorId.surname + ' ' + note.articleId.author.authorId.name.charAt(0) + '.'
+            if (note.articleId.author.authorId.secondname != "") { authorFullName += (' ' + note.articleId.author.authorId.secondname.charAt(0) + '.')}
+            let reviewerFullName = ''
+            if (note.articleId.author.authorId.id != note.articleId.reviewer.id) {
+                //есть и автор, и проверяющий
+                reviewerFullName = note.articleId.reviewer.surname + ' ' + note.articleId.reviewer.name.charAt(0) + '.'
+                if (note.articleId.reviewer.secondname != "") { reviewerFullName += (' ' + note.articleId.reviewer.secondname.charAt(0) + '.')}
+            }
+
+            
             let newNote = {
                 id: note.id,
                 based_on_article: note.articleId.name,
@@ -130,36 +156,40 @@ async function getNotes() {
             }
             notes.push(newNote)
         })})
-    // notes = [
-    //     {
-    //         id: 1,
-    //         based_on_article: 'Медицина в литературе',
-    //         article_author: 'Онегин Е.',
-    //         article_publish_date: new Date(Date.parse(new Date('23 May 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
-    //             year: 'numeric',
-    //             month: '2-digit',
-    //             day: '2-digit',
-    //         }),
-    //         article_tags: ['литература', 'дуэли']
-    //     },
-    //     {
-    //         id: 2,
-    //         based_on_article: 'Статья с полным форматированием',
-    //         article_author: 'Быстрых Е.',
-    //         article_publish_date: new Date(Date.parse(new Date('25 May 2023 10:28 UTC'))).toLocaleDateString('ru-RU', {
-    //             year: 'numeric',
-    //             month: '2-digit',
-    //             day: '2-digit',
-    //         }),
-    //         article_tags: ['форматирование', 'платформа']
-    //     }
-    // ]
     notes.forEach(note => filteredNotes.value.push(note))
     filteredNotes.value.sort((a,b) => new Date(b.filter_date) - new Date(a.filter_date))
 }
 
-function filterit(newArticles) {
-    filteredArticles.value = newArticles
+function chooseNoteToDelete(note) {
+    noteToDelete = note
+    noteToDeleteName.value = note.based_on_article
+    showDeleteNoteModal.value = true
+}
+
+function deleteNote() {
+    showDeleteNoteModal.value = false
+    let index = filteredNotes.value.findIndex((note) => note.id === noteToDelete.id)
+    filteredNotes.value.splice(index, 1)
+    apolloClient
+        .mutate({
+            mutation: DELETE_NOTE_MUTATION,
+            variables: {
+                noteId: noteToDelete.id,
+            },
+        })
+        .then(result => {
+            showDeleteNoteModal.value = false
+            toast({
+                message: i18n.t('noteDeleted'),
+                type: 'notification-success',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 2000,
+                position: 'top-right',
+            })
+            router.push({ name: 'Notes' })
+        })
+        .catch(error => { console.log(error) })
 }
 
 function switchMenuDisplay() {

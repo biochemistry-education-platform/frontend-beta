@@ -57,6 +57,12 @@ export default {
     noteEdited: 'Конспект был успешно изменен',
     createNoteFailure: 'Ошибка при создании конспекта',
     editNoteFailure: 'Ошибка при изменении конспекта',
+    notPublishedYet: 'Статья ещё не опубликована',
+    acceptArticleTitle: 'Публикация статьи',
+    declineArticleTitle: 'Отклонение статьи',
+    acceptArticleText: 'Вы уверены, что хотите опубликовать предложенную статью ',
+    declineArticleText: 'Вы уверены, что хотите удалить предложенную статью ',
+    cancelAction: 'Нет, отменить',
 
     articleTitle: 'Название статьи',
     tag: 'Тег',
@@ -87,5 +93,8 @@ export default {
     toArticle: 'К статье',
     edit: 'Редактировать',
     delete: 'Удалить',
-    save: 'Сохранить'
+    save: 'Сохранить',
+    noteDeletionTitle: 'Удаление конспекта',
+    noteDeletionText: 'Вы уверены, что хотите удалить конспект ',
+    noteDeleted: 'Конспект удален'
 }

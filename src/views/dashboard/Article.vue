@@ -11,16 +11,35 @@
         <div v-if="article.tags.length > 0" class="article-tags">
             <div v-for="tag in article.tags" class="article-tag">#{{ tag }}</div>
         </div>
-        <h1 v-if="!isMobile" class="article-title">{{ article.title }}</h1>
-        <div class="mobile-article-title" v-if="isMobile"><h1 class="article-title">{{ article.title }}</h1><svg v-if="!hideForPdf" @click="showActions = true" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M479.858 896Q460 896 446 881.858q-14-14.141-14-34Q432 828 446.142 814q14.141-14 34-14Q500 800 514 814.142q14 14.141 14 34Q528 868 513.858 882q-14.141 14-34 14Zm0-272Q460 624 446 609.858q-14-14.141-14-34Q432 556 446.142 542q14.141-14 34-14Q500 528 514 542.142q14 14.141 14 34Q528 596 513.858 610q-14.141 14-34 14Zm0-272Q460 352 446 337.858q-14-14.141-14-34Q432 284 446.142 270q14.141-14 34-14Q500 256 514 270.142q14 14.141 14 34Q528 324 513.858 338q-14.141 14-34 14Z"/></svg></div>
+
+        <div v-if="!isMobile" class="article-main">
+            <h1 class="article-title">{{ article.title }}</h1>
+            <div v-if="article.publish_status == 'Progress' && article.reviewerID == user.profileID" class="article-main-actions">
+                <button class="article-green-btn" @click="showAcceptArticleModal = true">{{ $t('publish') }}</button>
+                <button class="article-red-btn" @click="showDeclineArticleModal = true">{{ $t('delete') }}</button>
+            </div>
+        </div>
+
+        <div class="mobile-article-title" v-if="isMobile && !hideForPdf"><h1 class="article-title">{{ article.title }}</h1><svg v-if="!hideForPdf" @click="showActions = true" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M479.858 896Q460 896 446 881.858q-14-14.141-14-34Q432 828 446.142 814q14.141-14 34-14Q500 800 514 814.142q14 14.141 14 34Q528 868 513.858 882q-14.141 14-34 14Zm0-272Q460 624 446 609.858q-14-14.141-14-34Q432 556 446.142 542q14.141-14 34-14Q500 528 514 542.142q14 14.141 14 34Q528 596 513.858 610q-14.141 14-34 14Zm0-272Q460 352 446 337.858q-14-14.141-14-34Q432 284 446.142 270q14.141-14 34-14Q500 256 514 270.142q14 14.141 14 34Q528 324 513.858 338q-14.141 14-34 14Z"/></svg></div>
 
         <div class="article-info">
             <div class="article-author">
                 <div><img class="article-author-img" src="@/assets/icons/profile_img.png"></div>
                 <div class="article-author-info">
-                    <p class="article-author-name">{{ article.author }}</p>
-                    <p class="article-author-extra">{{ role == 'Teacher' ? $t('roleTeacher') : (role == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
-                    <p class="article-author-extra">{{ date }}</p>
+                    <p class="article-author-name">{{ article.authorFullName }}</p>
+                    <p class="article-author-extra">{{ article.authorRole == 'Teacher' ? $t('roleTeacher') : (article.authorRole == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
+                    <p v-if="article.publish_status == 'Progress' || article.authorID == article.reviewerID" class="article-author-extra">{{ article.creation_date }}</p>
+                    <p v-else class="article-author-extra">{{ article.publish_date }}</p>
+                </div>
+            </div>
+
+            <div v-if="article.authorID != article.reviewerID" class="article-author">
+                <div><img class="article-author-img" src="@/assets/icons/profile_img.png"></div>
+                <div class="article-author-info">
+                    <p class="article-author-name">{{ article.reviewerFullName }}</p>
+                    <p class="article-author-extra">{{ article.reviewerRole == 'Teacher' ? $t('roleTeacher') : (article.reviewerRole == 'Sno_student' ? $t('roleSSS') : $t('roleStudent')) }}</p>
+                    <p v-if="article.publish_status == 'Progress'" class="article-author-extra">{{ $t('notPublishedYet') }}</p>
+                    <p v-else class="article-author-extra">{{ article.publish_date }}</p>
                 </div>
             </div>
 
@@ -40,6 +59,8 @@
             <div v-if="user_role != 'Teacher' && user_role != ''" class="mobile-article-action"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg><p>{{ $t('toNote') }}</p></div>
             <div class="mobile-article-action" v-on:click="getPdf"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M220 896q-24 0-42-18t-18-42V693h60v143h520V693h60v143q0 24-18 42t-42 18H220Zm260-153L287 550l43-43 120 120V256h60v371l120-120 43 43-193 193Z"/></svg><p>{{ $t('download')}}</p></div>
         </div>
+        <ConfirmationModal v-if="showAcceptArticleModal" @cancel="showAcceptArticleModal = false" @accept="publishArticle" :text="article.title" :type="'acceptArticle'" />
+        <ConfirmationModal v-if="showDeclineArticleModal" @cancel="showDeclineArticleModal = false" @delete="deleteArticle" :text="article.title" :type="'deleteArticle'" />
     </div>
 </template>
 
@@ -55,6 +76,7 @@ import { useRoute } from 'vue-router'
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
+import ConfirmationModal from '@/components/ConfirmationModal.vue'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
@@ -73,6 +95,8 @@ const props = defineProps({
 
 let showActions = ref(false)
 let hideForPdf = ref(false)
+let showAcceptArticleModal = ref(false)
+let showDeclineArticleModal = ref(false)
 
 let user = JSON.parse(userStore.$state.user)
 
@@ -83,6 +107,7 @@ const GET_ARTICLE_QUERY = gql`
             name
             author {
                 authorId {
+                    id
                     name
                     surname
                     secondname
@@ -93,6 +118,7 @@ const GET_ARTICLE_QUERY = gql`
                 }
             }
             reviewer {
+                id
                 name
                 surname
                 secondname
@@ -100,6 +126,7 @@ const GET_ARTICLE_QUERY = gql`
                     roleName
                 }
             }
+            creationDate
             publishDate
             publishStatus
             articleText
@@ -125,7 +152,7 @@ const GET_NOTE_QUERY = gql`
     }`
 
 const CREATE_NOTE_MUTATION = gql`
-    mutation ($userId: Int!, $articleId: Int!, $noteText: String!) {
+    mutation ($userId: Int!, $articleId: Int!, $noteText: JSONString!) {
         createNote(userId: $userId, articleId: $articleId, noteText: $noteText) {
             note {
                 id
@@ -139,7 +166,7 @@ const CREATE_NOTE_MUTATION = gql`
         }
     }`
 
-const EDIT_NOTE_MUTATION = gql`mutation UpdateNoteMutation($noteId: Int!, $noteText: String!) {
+const EDIT_NOTE_MUTATION = gql`mutation UpdateNoteMutation($noteId: Int!, $noteText: JSONString!) {
     updateNote(noteId: $noteId, noteText: $noteText) {
         note {
             id
@@ -150,13 +177,19 @@ const EDIT_NOTE_MUTATION = gql`mutation UpdateNoteMutation($noteId: Int!, $noteT
 
 let isSelected = ref(false)
 let article = reactive({
-    author: '',
-    tags: [],
+    title: '',
     text: '',
-    title: ''
+    tags: [],
+    publish_date: new Date(Date.now()),
+    creation_date: new Date(Date.now()),
+    authorID: 0,
+    authorFullName: '',
+    authorRole: '',
+    reviewerID: 0,
+    reviewerFullName: '',
+    reviewerRole: '',
+    publishStatus: ''
 })
-let date = ref('')
-let role = ref('')
 let user_role = ref('')
 const route = useRoute()
 let quill
@@ -193,15 +226,27 @@ async function getArticle() {
             article.title = result.data.getArticle.name
             article.text = JSON.stringify(result.data.getArticle.articleText)
             let author = result.data.getArticle.author.authorId
-            article.author = author.surname + ' ' + author.name + (author.secondname != '' ? (' ' + author.secondname) : '')
+            let reviewer = result.data.getArticle.reviewer
             result.data.getArticle.articletagSet.forEach(tag => article.tags.push(tag.tagId.name))
-            article.publish_date = result.data.getArticle.publishDate
-            date.value = new Date(Date.parse(article.publish_date)).toLocaleDateString('ru-RU', {
+            let pdate = new Date(Date.parse(result.data.getArticle.publishDate)).toLocaleDateString('ru-RU', {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
             })
-            role.value = author.role.roleName
+            let cdate = new Date(Date.parse(result.data.getArticle.creationDate)).toLocaleDateString('ru-RU', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+            })
+            article.publish_date = pdate
+            article.creation_date = cdate
+            article.publish_status = result.data.getArticle.publishStatus
+            article.authorID = result.data.getArticle.author.authorId.id,
+            article.authorFullName = author.surname + ' ' + author.name + (author.secondname != '' ? (' ' + author.secondname) : '')
+            article.authorRole = author.role.roleName
+            article.reviewerID = result.data.getArticle.reviewer.id
+            article.reviewerFullName = reviewer.surname + ' ' + reviewer.name + (reviewer.secondname != '' ? (' ' + reviewer.secondname) : '')
+            article.reviewerRole = reviewer.role.roleName
         })
         .catch(error => console.log(error))
     if (user) { user_role.value = user.role } else { user_role.value = ''}
@@ -340,21 +385,18 @@ async function getSelectedText(event) {
             .query({
                 query: GET_NOTE_QUERY,
                 variables: {
-                    userId: user.userID, 
+                    userId: user.profileID, 
                     articleId: articleID
                 }
             })
             .then(result => {
                 // конспект существует. добавить в него текст
-                console.log(result.data)
                 let noteID = result.data.getNoteByArticle.id
-                let text = JSON.parse(JSON.parse(result.data.getNoteByArticle.noteText))
+                let text = JSON.parse(result.data.getNoteByArticle.noteText)
                 let p = document.createElement('p')
                 p.innerText = select.toString()
                 text.push(toJSON(p))
                 let noteText = JSON.stringify(text)
-                console.log(text)
-                console.log(noteText)
                 apolloClient
                     .mutate({
                         mutation: EDIT_NOTE_MUTATION,
@@ -395,7 +437,7 @@ async function getSelectedText(event) {
                     .mutate({
                         mutation: CREATE_NOTE_MUTATION,
                         variables: {
-                            userId: user.userID,
+                            userId: user.profileID,
                             articleId: articleID,
                             noteText: noteText,
                         },
@@ -425,6 +467,14 @@ async function getSelectedText(event) {
         isSelected = false
         window.getSelection().empty()
     }
+}
+
+function publishArticle() {
+
+}
+
+function deleteArticle() {
+
 }
 </script>
 

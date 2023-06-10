@@ -143,7 +143,7 @@ function submitForm() {
                 type: 'notification-danger',
                 dismissible: true,
                 pauseOnHover: true,
-                duration: 20000,
+                duration: 2000,
                 position: 'top-right',
             })
         })

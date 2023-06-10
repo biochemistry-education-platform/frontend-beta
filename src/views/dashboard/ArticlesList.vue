@@ -59,10 +59,12 @@ import { apolloClient } from '@/vue-apollo'
 import { toast } from 'bulma-toast'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 // import store from '@/stores/user'
 
 const i18n = useI18n()
 const router = useRouter()
+const userStore = useUserStore()
 
 const emit = defineEmits(['openMenu', 'closeMenu'])
 
@@ -73,6 +75,8 @@ const props = defineProps({
 
 let articles = []
 let filteredArticles = ref([])
+
+let user = JSON.parse(userStore.$state.user)
 
 const FAV_QUERY = gql`query GetUserFavour($userId: Int!) {
     getUserFavour(userId: $userId) {
@@ -182,40 +186,38 @@ async function getArticles() {
         })
         .catch(error => console.log(error))
         
-        articles.push({
-                    id: 9000,
-                    title: 'Конференция СНО биохимические маркеры патологии почек',
-                    type: 'notification_article',
-                    author: 'Селина А.',
-                    reviewer: 'Селина А.',
-                    tags: ['оповещение', 'СНО', 'маркеры', 'почки', 'патология'],
-                    filter_date: new Date(Date.parse('25 May 2023 16:48 UTC')),
-                    publish_date: new Date(Date.parse('25 May 2023 16:48 UTC')).toLocaleString('ru-RU', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit'
-                    }),
-                    event_date: new Date(Date.parse(new Date('25 May 2023 12:00 UTC'))).toLocaleDateString('ru-RU', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute:'2-digit'
-                    }),
-                    event_place: 'Webinar',
-                    isSaved: false
-                })
+        // articles.push({
+        //             id: 9000,
+        //             title: 'Конференция СНО биохимические маркеры патологии почек',
+        //             type: 'notification_article',
+        //             author: 'Селина А.',
+        //             reviewer: 'Селина А.',
+        //             tags: ['оповещение', 'СНО', 'маркеры', 'почки', 'патология'],
+        //             filter_date: new Date(Date.parse('25 May 2023 16:48 UTC')),
+        //             publish_date: new Date(Date.parse('25 May 2023 16:48 UTC')).toLocaleString('ru-RU', {
+        //                 year: 'numeric',
+        //                 month: '2-digit',
+        //                 day: '2-digit'
+        //             }),
+        //             event_date: new Date(Date.parse(new Date('25 May 2023 12:00 UTC'))).toLocaleDateString('ru-RU', {
+        //                 year: 'numeric',
+        //                 month: '2-digit',
+        //                 day: '2-digit',
+        //                 hour: '2-digit',
+        //                 minute:'2-digit'
+        //             }),
+        //             event_place: 'Webinar',
+        //             isSaved: false
+        //         })
         articles.forEach(article => filteredArticles.value.push(article))
         filteredArticles.value.sort((a,b) => new Date(b.filter_date) - new Date(a.filter_date))
 
-        // if (store.state.user.id != '') {
-            // let id = Number(store.state.user.id)
-            let id = 11
+        if (user.profileID != '') {
             await apolloClient
                 .query({
                     query: FAV_QUERY,
                     variables: {
-                        userId: id
+                        userId: user.profileID
                     }
                 })
                 .then(result => { 
@@ -232,7 +234,7 @@ async function getArticles() {
                     }
                 })
                 .catch(error => { console.log(error) })
-        // }
+        }
 }
 
 function filterit(newArticles) {

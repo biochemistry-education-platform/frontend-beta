@@ -2,13 +2,21 @@
     <div class="modal-bg" @click="emit('cancel')"></div>
     <div class="confirm-modal">
         <h2 v-if="props.type == 'file'" class="confirm-modal-title">{{ $t('fileDeletionTitle') }}</h2>
+        <h2 v-else-if="props.type == 'note'" class="confirm-modal-title">{{ $t('noteDeletionTitle') }}</h2>
+        <h2 v-else-if="props.type == 'acceptArticle'" class="confirm-modal-title">{{ $t('acceptArticleTitle') }}</h2>
+        <h2 v-else-if="props.type == 'deleteArticle'" class="confirm-modal-title">{{ $t('declineArticleTitle') }}</h2>
         <h2 v-else class="confirm-modal-title">{{ $t('confirmUnsub') }}</h2>
         <p class="confirm-modal-text" v-if="props.type == 'tag'">{{ $t('unsubTag') }} «{{ props.text }}»?</p>
         <p class="confirm-modal-text" v-if="props.type == 'author'">{{ $t('unsubAuthor') }} «{{ props.text }}»?</p>
         <p class="confirm-modal-text" v-if="props.type == 'file'">{{ $t('fileDeletionText') }} «{{ props.text }}»?</p>
+        <p class="confirm-modal-text" v-if="props.type == 'acceptArticle'">{{ $t('acceptArticleText') }} «{{ props.text }}»?</p>
+        <p class="confirm-modal-text" v-if="props.type == 'deleteArticle'">{{ $t('declineArticleText') }} «{{ props.text }}»?</p>
+        <p class="confirm-modal-text" v-if="props.type == 'note'">{{ $t('noteDeletionText') }} «{{ props.text }}»?</p>
         <div class="confirm-modal-actions">
-            <p class="modal-cancel" @click="emit('cancel')">{{ $t('cancelUnsub') }}</p>
-            <button v-if="props.type == 'file'" class="modal-confirm-btn" @click="emit('delete')">{{ $t('acceptDeletion') }}</button>
+            <p v-if="props.type == 'acceptArticle' || props.type == 'deleteArticle'" class="modal-cancel" @click="emit('cancel')">{{ $t('cancelAction') }}</p>
+            <p v-else class="modal-cancel" @click="emit('cancel')">{{ $t('cancelUnsub') }}</p>
+            <button v-if="props.type == 'file' || props.type == 'note' || props.type == 'deleteArticle'" class="modal-confirm-btn" @click="emit('delete')">{{ $t('acceptDeletion') }}</button>
+            <button v-else-if="props.type == 'acceptArticle'" class="modal-confirm-btn" @click="emit('accept')">{{ $t('publish') }}</button>
             <button v-else class="modal-confirm-btn" @click="emit('delete')">{{ $t('acceptUnsub') }}</button>
         </div>
     </div>
@@ -20,7 +28,7 @@ const props = defineProps({
     text: String,
     type: String
 })
-const emit = defineEmits(['cancel', 'delete'])
+const emit = defineEmits(['cancel', 'delete', 'accept'])
 </script>
 
 <style>

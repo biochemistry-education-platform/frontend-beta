@@ -17,7 +17,7 @@
             <div class="note-main-actions">
                 <button v-if="!isEditMode" class="note-green-btn" @click="editNote">{{ $t('edit') }}</button>
                 <button v-if="isEditMode" class="note-green-btn" @click="saveNote">{{ $t('save') }}</button>
-                <button class="note-red-btn" @click="deleteNote">{{ $t('delete') }}</button>
+                <button class="note-red-btn" @click="showDeleteNoteModal = true">{{ $t('delete') }}</button>
             </div>
         </div>
         <div class="mobile-note-title" v-if="isMobile && !hideForPdf"><h1 class="note-title">{{ $t('note') }} «{{ note.based_on_article }}»</h1><svg @click="showActions = true" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M479.858 896Q460 896 446 881.858q-14-14.141-14-34Q432 828 446.142 814q14.141-14 34-14Q500 800 514 814.142q14 14.141 14 34Q528 868 513.858 882q-14.141 14-34 14Zm0-272Q460 624 446 609.858q-14-14.141-14-34Q432 556 446.142 542q14.141-14 34-14Q500 528 514 542.142q14 14.141 14 34Q528 596 513.858 610q-14.141 14-34 14Zm0-272Q460 352 446 337.858q-14-14.141-14-34Q432 284 446.142 270q14.141-14 34-14Q500 256 514 270.142q14 14.141 14 34Q528 324 513.858 338q-14.141 14-34 14Z"/></svg></div>
@@ -48,6 +48,7 @@
             <div class="mobile-note-action" v-on:click="getPdf"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M220 896q-24 0-42-18t-18-42V693h60v143h520V693h60v143q0 24-18 42t-42 18H220Zm260-153L287 550l43-43 120 120V256h60v371l120-120 43 43-193 193Z"/></svg><p>{{ $t('download')}}</p></div>
             <div v-if="user_role != ''" class="mobile-note-action action-red" @click="deleteNote"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg><p>{{ $t('delete') }}</p></div>
         </div>
+        <ConfirmationModal v-if="showDeleteNoteModal" @cancel="showDeleteNoteModal = false" @delete="deleteNote" :text="note.based_on_article" :type="'note'" />
     </div>
 </template>
 
@@ -58,9 +59,9 @@ export default {
 </script>
 
 <script setup>
-import axios from 'axios'
 import { ref, reactive, onMounted, defineProps, defineEmits } from 'vue'
 import { useRoute } from 'vue-router'
+import ConfirmationModal from '@/components/ConfirmationModal.vue'
 // import store from '@/stores/user'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
@@ -68,9 +69,11 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import { toast } from 'bulma-toast'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import html2pdf from "html2pdf.js"
 
+const router = useRouter()
 const i18n = useI18n()
 
 const emit = defineEmits(['openMenu', 'closeMenu'])
@@ -82,6 +85,7 @@ const props = defineProps({
 
 let showActions = ref(false)
 let hideForPdf = ref(false)
+let showDeleteNoteModal = ref(false)
 
 function switchMenuDisplay() {
     if (props.isMenuShown == false) {
@@ -158,6 +162,24 @@ const GET_NOTE = gql`query GetNoteByIdQuery($noteId: Int!) {
         noteText
   }
 }`
+
+const EDIT_NOTE_MUTATION = gql`mutation UpdateNoteMutation($noteId: Int!, $noteText: JSONString!) {
+    updateNote(noteId: $noteId, noteText: $noteText) {
+        note {
+            id
+            noteText
+        }
+    }
+}`
+
+const DELETE_NOTE_MUTATION = gql`mutation DeleteNoteMutation($noteId: ID!) {
+    deleteNote(noteId: $noteId) {
+        note {
+            id
+        }
+    }
+}`
+
 async function getNote() {
     const noteID = route.params.id
     await apolloClient
@@ -181,16 +203,8 @@ async function getNote() {
             article_reviewer.role = result.data.getNoteById.articleId.reviewer.role.roleName
             article_reviewer.photo = result.data.getNoteById.articleId.reviewer.photo
             note.text = result.data.getNoteById.noteText
-                // article_reviewer: note.articleId.reviewer,
-                // article_publish_date: new Date(Date.parse(new Date(note.articleId.publishDate))).toLocaleDateString('ru-RU', {
-                //     year: 'numeric',
-                //     month: '2-digit',
-                //     day: '2-digit',
-                // }),
-                // filter_date: new Date(Date.parse(note.articleId.publishDate)),
-                // article_tags: taglist
         })
-    let text = JSON.parse(JSON.parse(note.text))
+    let text = JSON.parse(note.text)
     let place = document.getElementsByClassName('ql-editor')[0]
     place.removeChild(place.firstChild)
     Object.entries(text).forEach(entry => {
@@ -198,53 +212,6 @@ async function getNote() {
         let node = toDOM(JSON.stringify(value))
         place.appendChild(node)
     })
-    // await axios
-    //     .get(`/api/v1/articles/${articleID}`)
-    //     .then(response => {
-    //         article.title = response.data.title            
-    //         article.text = response.data.text
-    //         article.author = response.data.author
-    //         article.tags = response.data.tags
-    //         article.publish_date = response.data.publish_date
-    //         date = (new Date(Date.parse(article.publish_date.slice(0,19)))).toLocaleString('en-GB')
-    //         let text = JSON.parse(article.text)
-    //         Object.entries(text).forEach(entry => {
-    //             const [key, value] = entry
-    //             let place = document.getElementById('articleText')
-    //             let node = toDOM(JSON.stringify(value))
-    //             place.appendChild(node)
-    //         })
-    //     })
-    //     .catch(error => {
-    //         console.log(JSON.stringify(error))
-    //     })
-
-
-
-
-
-    // article.author = 'Быстрых Елена'
-    // article.tags = ['форматирование', 'платформа']
-    // note.based_on_article = 'Статья с полным форматированием'
-    // note.text = '[{"nodeType":1,"tagName":"p","childNodes":[{"nodeType":3,"nodeName":"#text","nodeValue":"Заголовок 1 уровня\\nОбычный текст по левому краю\\nЖирный текст"}]}]'
-    // article.publish_date = new Date(Date.parse(new Date('25 May 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
-    //             year: 'numeric',
-    //             month: '2-digit',
-    //             day: '2-digit',
-    //         })
-    // date = new Date(Date.parse(new Date('25 May 2023 16:48 UTC'))).toLocaleDateString('ru-RU', {
-    //             year: 'numeric',
-    //             month: '2-digit',
-    //             day: '2-digit',
-    //         })
-    // let text = JSON.parse(note.text)
-    // let place = document.getElementsByClassName('ql-editor')[0]
-    // place.removeChild(place.firstChild)
-    // Object.entries(text).forEach(entry => {
-    //     const [key, value] = entry
-    //     let node = toDOM(JSON.stringify(value))
-    //     place.appendChild(node)
-    // })
 }
 
 function toJSON(element) {
@@ -351,15 +318,34 @@ async function saveNote(event) {
     let quillEditor = document.getElementsByClassName('ql-editor')[0]
     quillEditor.setAttribute('contenteditable','false')
 
-    // TODO отправить запрос на изменение существующего конспекта на сервер. Если успешно, то показать уведу ниже, иначе - уведу об ошибке
-    toast({
-        message: i18n.t('noteEdited'),
-        type: 'notification-success',
-        dismissible: true,
-        pauseOnHover: true,
-        duration: 2000,
-        position: 'top-right',
-    })
+    apolloClient
+        .mutate({
+            mutation: EDIT_NOTE_MUTATION,
+            variables: {
+                noteId: noteID,
+                noteText: note.text,
+            },
+        })
+        .then(result => {
+            toast({
+                message: i18n.t('noteEdited'),
+                type: 'notification-success',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 2000,
+                position: 'top-right',
+            })
+        })
+        .catch(error => {
+            toast({
+                message: i18n.t('editNoteFailure'),
+                type: 'notification-danger',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 2000,
+                position: 'top-right',
+            })
+        })
 }
 
 async function editNote(event) {
@@ -381,7 +367,26 @@ async function getPdf() {
 
 function deleteNote(event) {
     const noteID = route.params.id
-    // axios.delete(`/api/v1/notes/${noteID}`)
+    apolloClient
+        .mutate({
+            mutation: DELETE_NOTE_MUTATION,
+            variables: {
+                noteId: noteID,
+            },
+        })
+        .then(result => {
+            showDeleteNoteModal.value = false
+            toast({
+                message: i18n.t('noteDeleted'),
+                type: 'notification-success',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 2000,
+                position: 'top-right',
+            })
+            router.push({ name: 'Notes' })
+        })
+        .catch(error => { console.log(error) })
 }
 
 onMounted(async () => {
