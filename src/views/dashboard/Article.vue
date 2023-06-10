@@ -72,7 +72,7 @@ export default {
 
 <script setup>
 import { ref, reactive, onMounted, defineProps, defineEmits } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
@@ -84,6 +84,8 @@ import { useUserStore } from '@/stores/user'
 import html2pdf from "html2pdf.js"
 
 const i18n = useI18n()
+const route = useRoute()
+const router = useRouter()
 const userStore = useUserStore()
 
 const emit = defineEmits(['openMenu', 'closeMenu'])
@@ -175,6 +177,16 @@ const EDIT_NOTE_MUTATION = gql`mutation UpdateNoteMutation($noteId: Int!, $noteT
     }
 }`
 
+const EDIT_ARTICLE_STATUS = gql`mutation UpdateArticleMutation($id: ID!, $status: String) {
+    updateArticle(id: $id, status: $status) {
+        article {
+            id
+            name
+            publishStatus
+        }
+    }
+}`
+
 let isSelected = ref(false)
 let article = reactive({
     title: '',
@@ -191,7 +203,7 @@ let article = reactive({
     publishStatus: ''
 })
 let user_role = ref('')
-const route = useRoute()
+
 let quill
 
 onMounted(async () => {
@@ -470,11 +482,67 @@ async function getSelectedText(event) {
 }
 
 function publishArticle() {
-
+    apolloClient
+        .mutate({
+            mutation: EDIT_ARTICLE_STATUS,
+            variables: {
+                id: route.params.id,
+                status: 'Accepted'
+            },
+        })
+        .then(result => {
+            router.push({ name: 'Articles' })
+            toast({
+                message: i18n.t('articleCreated'),
+                type: 'notification-success',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 2000,
+                position: 'top-right',
+            })
+        })
+        .catch(error => {
+            toast({
+                message: i18n.t('createArticleFailure'),
+                type: 'notification-danger',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 2000,
+                position: 'top-right',
+            })
+        })
 }
 
 function deleteArticle() {
-
+    apolloClient
+        .mutate({
+            mutation: EDIT_ARTICLE_STATUS,
+            variables: {
+                id: route.params.id,
+                status: 'Declined'
+            },
+        })
+        .then(result => {
+            router.push({ name: 'Articles' })
+            toast({
+                message: i18n.t('articleCreated'),
+                type: 'notification-success',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 2000,
+                position: 'top-right',
+            })
+        })
+        .catch(error => {
+            toast({
+                message: i18n.t('createArticleFailure'),
+                type: 'notification-danger',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 2000,
+                position: 'top-right',
+            })
+        })
 }
 </script>
 

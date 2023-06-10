@@ -32,7 +32,7 @@
             <hr class="biochemistry-page-hr">
             <div class="attached-files" id="attached-files"></div>
             <div v-if="!isMobile" class="add-article-footer-actions">
-                <div class="attach-file" @click="attachFile"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>{{ $t('attachFile') }}</div>
+                <div class="attach-file" @click="chooseFile"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>{{ $t('attachFile') }}</div>
                 <div class="add-article-sending">
                     <input v-if="user_role == 'Student'" autocomplete="off" @input="filterReviewers" @keyup.native.enter="saveReviewer" v-model="chosenReviewer" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
                     <div v-if="areReviewersShown && filteredReviewers.length > 0" class="reviewers-block">
@@ -43,13 +43,13 @@
                     </div>
                     <form action="https://storage.yandexcloud.net/plateaumed" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="key" value="users/uploads/${filename}" /><br />
-                        <input type="hidden"   name="X-Amz-Credential" value="YCAJEChUZ1sDsIoQljzBKmcfw/20230610/ru-central1/s3/aws4_request" />
-                        <input type="hidden"   name="acl" value="public-read" />
-                        <input type="hidden"   name="X-Amz-Algorithm" value="AWS4-HMAC-SHA256" />
-                        <input type="hidden"   name="X-Amz-Date" value="20230610T173419Z" />
-                        <input type="hidden"   name="policy" value="eyJleHBpcmF0aW9uIjogIjIwMjMtMDYtMTBUMTg6MzQ6MTlaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQifSwgWyJzdGFydHMtd2l0aCIsICIka2V5IiwgInVzZXJzL3VwbG9hZHMiXSwgeyJidWNrZXQiOiAicGxhdGVhdW1lZCJ9LCBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidXNlcnMvdXBsb2Fkcy8iXSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiWUNBSkVDaFVaMXNEc0lvUWxqekJLbWNmdy8yMDIzMDYxMC9ydS1jZW50cmFsMS9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1kYXRlIjogIjIwMjMwNjEwVDE3MzQxOVoifV19" />
+                        <input type="hidden" name="X-Amz-Credential" value="YCAJEChUZ1sDsIoQljzBKmcfw/20230610/ru-central1/s3/aws4_request" />
+                        <input type="hidden" name="acl" value="public-read" />
+                        <input type="hidden" name="X-Amz-Algorithm" value="AWS4-HMAC-SHA256" />
+                        <input type="hidden" name="X-Amz-Date" value="20230610T173419Z" />
+                        <input type="hidden" name="policy" value="eyJleHBpcmF0aW9uIjogIjIwMjMtMDYtMTBUMTg6MzQ6MTlaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQifSwgWyJzdGFydHMtd2l0aCIsICIka2V5IiwgInVzZXJzL3VwbG9hZHMiXSwgeyJidWNrZXQiOiAicGxhdGVhdW1lZCJ9LCBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidXNlcnMvdXBsb2Fkcy8iXSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiWUNBSkVDaFVaMXNEc0lvUWxqekJLbWNmdy8yMDIzMDYxMC9ydS1jZW50cmFsMS9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1kYXRlIjogIjIwMjMwNjEwVDE3MzQxOVoifV19" />
                         <input type="hidden" name="X-Amz-Signature" value="ed4fb4e9e2ec3b7a31e7e293b60d6bbe8168eb6a158483cfeb66245d7dd444ee" />
-                        <input type="file" @change="saveFileName" multiple id="filename-input" name="file" /> <br />
+                        <input type="file" @change="attachFile" id="filename-input" name="file" /> <br />
                         <input type="submit" id="filesend-btn" name="submit" value="Загрузить" />
                     </form>
                     <button @click="sendFiles">send files</button>
@@ -59,7 +59,7 @@
             <div v-else class="add-article-footer-actions">
                 <input v-if="user_role == 'Student'" autocomplete="off" @input="filterReviewers" @keyup.native.enter="saveReviewer" v-model="chosenReviewer" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
                 <div class="mobile-add-article-btns">
-                    <svg @click="attachFile" xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 96 960 960" width="30"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>
+                    <svg @click="chooseFile" xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 96 960 960" width="30"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>
                     <button class="publish-article-btn" @click="createArticle">{{ user_role == 'Student' ? $t('send') : $t('publish') }}</button>           
                 </div>
             </div>
@@ -110,7 +110,7 @@ let article = reactive({
     text: '',
     tags: []
 })
-let fileList = new DataTransfer()
+let fileList = ref([])
 let reviewers = ref([])
 let chosenReviewer = ref('')
 let reviewerID = 0
@@ -413,28 +413,27 @@ function toJSON(element) {
     return obj
 }
 
-function addFilesToList(files) {
-    let fileArray = Array.from(files)
-    let uploadedFileArray = Array.from(fileList.items)
-    if (fileList.items.length > 0) {
-        fileArray.forEach(file => {
-            uploadedFileArray.forEach(fileUploaded => {
-                if (file.name != fileUploaded.name) {
-                    fileList.items.add(file)
-                }
-            })
-        })
-    } else { 
-        fileArray.forEach(file => { fileList.items.add(file) })
-    }
-    console.log(fileList)
-}
+// function addFilesToList(files) {
+//     let fileArray = Array.from(files)
+//     let uploadedFileArray = Array.from(fileList.items)
+//     if (fileList.items.length > 0) {
+//         fileArray.forEach(file => {
+//             uploadedFileArray.forEach(fileUploaded => {
+//                 if (file.name != fileUploaded.name) {
+//                     fileList.items.add(file)
+//                 }
+//             })
+//         })
+//     } else { 
+//         fileArray.forEach(file => { fileList.items.add(file) })
+//     }
+//     console.log(fileList)
+// }
 
-function saveFileName() {
-    addFilesToList(document.getElementById('filename-input').files)
-    let fileName = document.getElementById('filename-input').files[0].name
+function showFileName(file) {
+    let fileName = file.name
     let fileUrl = `https://storage.yandexcloud.net/plateaumed/users/uploads/${fileName}`
-    
+    fileList.value.push(fileUrl)
     let fileDiv = document.createElement('div')
     fileDiv.classList.add('attached-file')
 
@@ -461,23 +460,39 @@ function saveFileName() {
     fileDiv.appendChild(deleteSvg)
 
     document.getElementById('attached-files').appendChild(fileDiv)
-    // document.getElementById('filesend-btn').click()
-}
-
-function sendFiles() {
-    let uploadedFilesArray = Array.from(fileList.files)
-    uploadedFilesArray.forEach(async (file) => {
-        var dt = new DataTransfer()
-        dt.items.add(file)
-        document.getElementById('filename-input').files = dt.files
-        console.log(document.getElementById('filename-input').files)
-        await new Promise(r => setTimeout(r, 1000));
-        document.getElementById('filesend-btn').click()
-    })
-    
+    document.getElementById('filesend-btn').click()
 }
 
 function attachFile() {
+    let fileArray = Array.from(document.getElementById('filename-input').files)
+    if (fileArray.length > 1) {
+        toast({
+            message: i18n.t('onlyOneFile'),
+            type: 'notification-danger',
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 2000,
+            position: 'top-right',
+        })
+    }
+    else {
+        showFileName(document.getElementById('filename-input').files[0])
+    }
+}
+
+// function sendFiles() {
+//     let uploadedFilesArray = Array.from(fileList.files)
+//     uploadedFilesArray.forEach(async (file) => {
+//         var dt = new DataTransfer()
+//         dt.items.add(file)
+//         document.getElementById('filename-input').files = dt.files
+//         console.log(document.getElementById('filename-input').files)
+//         await new Promise(r => setTimeout(r, 1000));
+//         document.getElementById('filesend-btn').click()
+//     }) 
+// }
+
+function chooseFile() {
     document.getElementById('filename-input').click()
 }
 
@@ -496,6 +511,9 @@ function showModal() {
 function deleteFile() {
     chosenFile.remove()
     showDeleteFileModal.value = false
+    let index = fileList.value.indexOf(`https://storage.yandexcloud.net/plateaumed/users/uploads/${chosenFileName}`)
+    fileList.value.splice(index, 1)
+    console.log(fileList.value)
 }
 
 function switchMenuDisplay() {

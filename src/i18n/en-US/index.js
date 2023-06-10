@@ -87,6 +87,7 @@ export default {
     articleCreated: 'Article created',
     createArticleFailure: 'Error creating article',
     findByName: 'Find article by name',
+    onlyOneFile: 'Please, attach files one by one',
 
     notes: 'Abstracts',
     note: 'Abstract of',

@@ -87,6 +87,7 @@ export default {
     articleCreated: 'Статья создана',
     createArticleFailure: 'Ошибка при создании статьи',
     findByName: 'Найти статью по названию',
+    onlyOneFile: 'Пожалуйста, прикрепляйте файлы по одному',
 
     notes: 'Конспекты',
     note: 'Конспект',

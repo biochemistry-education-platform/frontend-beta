@@ -60,7 +60,7 @@ export default {
 
 <script setup>
 import { ref, reactive, onMounted, defineProps, defineEmits } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import ConfirmationModal from '@/components/ConfirmationModal.vue'
 // import store from '@/stores/user'
 import { QuillEditor, Quill } from '@vueup/vue-quill'
@@ -69,7 +69,6 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import gql from 'graphql-tag'
 import { apolloClient } from '@/vue-apollo'
 import { toast } from 'bulma-toast'
-import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import html2pdf from "html2pdf.js"
 
