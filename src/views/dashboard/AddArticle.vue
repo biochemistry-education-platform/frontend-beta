@@ -34,7 +34,7 @@
             <div v-if="!isMobile" class="add-article-footer-actions">
                 <div class="attach-file" @click="chooseFile"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>{{ $t('attachFile') }}</div>
                 <div class="add-article-sending">
-                    <input v-if="user_role == 'Student'" autocomplete="off" @input="filterReviewers" @keyup.native.enter="saveReviewer" v-model="chosenReviewer" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
+                    <input v-if="user_role == 'Student'" autocomplete="off" @input="filterReviewers" v-model="chosenReviewer" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
                     <div v-if="areReviewersShown && filteredReviewers.length > 0" class="reviewers-block">
                         <div class="reviewer-option" v-for="reviewer in filteredReviewers" :key="reviewer.id">
                             <!-- TODO разместить здесь фото пользователя -->
@@ -57,7 +57,7 @@
                 </div>
             </div>
             <div v-else class="add-article-footer-actions">
-                <input v-if="user_role == 'Student'" autocomplete="off" @input="filterReviewers" @keyup.native.enter="saveReviewer" v-model="chosenReviewer" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
+                <input v-if="user_role == 'Student'" autocomplete="off" @input="filterReviewers" v-model="chosenReviewer" type="text" class="add-article-reviewer" :placeholder="$t('chooseReviewer')">
                 <div class="mobile-add-article-btns">
                     <svg @click="chooseFile" xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 96 960 960" width="30"><path d="M460 976q-91 0-155.5-62.5T240 760V330q0-64 45.5-109T395 176q65 0 110 45t45 110v394q0 38-26 64.5T460 816q-38 0-64-28.5T370 720V328h40v395q0 22 14.5 37.5T460 776q21 0 35.5-15t14.5-36V330q0-48-33.5-81T395 216q-48 0-81.5 33T280 330v432q0 73 53 123.5T460 936q75 0 127.5-51T640 760V328h40v431q0 91-64.5 154T460 976Z"/></svg>
                     <button class="publish-article-btn" @click="createArticle">{{ user_role == 'Student' ? $t('send') : $t('publish') }}</button>           
@@ -531,7 +531,7 @@ function filterReviewers() {
 }
 
 function chooseReviewer(id) {
-    let rev = reviewers.value.find(r => r.id == id)
+    let rev = reviewers.value.find(reviewer => reviewer.id == id)
     reviewerID = id
     chosenReviewer.value = `${rev.surname} ${rev.name} ${rev.secondname}`
     areReviewersShown.value = false

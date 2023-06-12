@@ -94,8 +94,15 @@
                             </div>
                             <hr v-if="!isMobile" class="authors-subscription-hr">
                         </div>
+                        <input v-if="authorSubAdding" autocomplete="off" @input="filterAuthors" v-model="chosenAuthor" type="text" class="add-author-sub-input" :placeholder="$t('chooseAuthor')">
+                        <div v-if="areAuthorsShown && filteredAuthors.length > 0" class="authors-block">
+                            <div class="reviewer-option" v-for="author in filteredAuthors" :key="author.id">
+                                <!-- TODO разместить здесь фото пользователя -->
+                                <p @click="chooseAuthor(author.id)">{{ author.fullname }}</p>
+                            </div>
+                        </div>
                         <div class="add-author-subscription">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="36" viewBox="0 96 960 960" width="36"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
+                            <svg @click="authorSubAdding = true" xmlns="http://www.w3.org/2000/svg" height="36" viewBox="0 96 960 960" width="36"><path d="M453 776h60V610h167v-60H513V376h-60v174H280v60h173v166Zm27.266 200q-82.734 0-155.5-31.5t-127.266-86q-54.5-54.5-86-127.341Q80 658.319 80 575.5q0-82.819 31.5-155.659Q143 347 197.5 293t127.341-85.5Q397.681 176 480.5 176q82.819 0 155.659 31.5Q709 239 763 293t85.5 127Q880 493 880 575.734q0 82.734-31.5 155.5T763 858.316q-54 54.316-127 86Q563 976 480.266 976Zm.234-60Q622 916 721 816.5t99-241Q820 434 721.188 335 622.375 236 480 236q-141 0-240.5 98.812Q140 433.625 140 576q0 141 99.5 240.5t241 99.5Zm-.5-340Z"/></svg>
                         </div>  
                     </div>
                 </div>
@@ -189,10 +196,14 @@ let tempUser = reactive({
 let showDeleteTagModal = ref(false)
 let showDeleteAuthorModal = ref(false)
 let tagAdding = ref(false)
+let authorSubAdding = ref(false)
+let areAuthorsShown = ref(false)
+let chosenAuthor = ref('')
 let allTags = ref([])
 let subscriptedTags = ref([])
 let allAuthors = ref([])
 let subscriptedAuthors = ref([])
+let filteredAuthors = ref([])
 let numberOfTags = ref(0)
 let tagnameToDelete = ref('')
 let isMailFilled = ref(false)
@@ -259,6 +270,10 @@ const ALL_AUTHORS = gql`query{
     allAuthors{
         authorId {
             id
+            role {
+                roleName
+            }
+            photo
             name
             surname
             secondname
@@ -293,6 +308,26 @@ const REMOVE_TAG_SUBSCRIPTION = gql`mutation DeleteTagFromUser($userId: Int!, $t
             tagId {
                 id
                 name
+            }
+        }
+    }
+}`
+
+const ADD_AUTHOR_SUBSCRIPTION = gql`mutation AddAuthorToUser($userId: Int!, $authorId: Int!) {
+    addAuthorToUser(userId: $userId, authorId: $authorId) {
+        authorSubscription {
+            id
+            userId {
+                id
+                user
+                name
+            }
+            authorId {
+                authorId {
+                    id
+                    user
+                    name
+                }
             }
         }
     }
@@ -402,12 +437,16 @@ async function getAllAuthors() {
             }
         })
         .then(result => {
+            console.log(result)
             result.data.allAuthors.forEach(author => {
                 let newAuthor = {
                     id: author.authorId.id,
                     fullname: author.authorId.surname + ' ' + author.authorId.name + (author.authorId.secondname != '' ? (' ' + author.authorId.secondname) : ''),
+                    role: author.authorId.role.roleName,
+                    photo: author.authorId.photo
                 }
                 allAuthors.value.push(newAuthor)
+                filteredAuthors.value.push(newAuthor)
             })
         })
         .catch(error => console.log(error))
@@ -492,8 +531,56 @@ async function deleteTagSubscription(tagToDelete) {
     showDeleteTagModal.value = false
 }
 
-function deleteAuthorSubscription(authorID) {
-    apolloClient
+function filterAuthors() {
+    areAuthorsShown.value = true
+    filteredAuthors.value = allAuthors.value.filter(author => { return author.fullname.toLowerCase().includes(chosenAuthor.value.toLowerCase())})
+}
+
+function chooseAuthor(id) {
+    let newAuthorSub = allAuthors.value.find(author => author.id == id)
+    areAuthorsShown.value = false
+
+    if (newAuthorSub) {
+        chosenAuthor.value = newAuthorSub.fullname
+        let alreadySub = subscriptedAuthors.value.findIndex(author => author.id == id)
+        if (alreadySub == -1) {
+            subscriptedAuthors.value.push(newAuthorSub)
+            authorSubAdding.value = false
+            apolloClient
+                .mutate({
+                    mutation: ADD_AUTHOR_SUBSCRIPTION,
+                    variables: {
+                        userId: user.userID,
+                        authorId: id
+                    },
+                })
+                .then(result => { console.log(result) })
+                .catch(error => { console.log(error) })
+        } else {
+            toast({
+                message: i18n.t('alreadySubscriptedAuthor'),
+                type: 'notification-danger',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 4000,
+                position: 'top-right',
+            })
+        }
+    } else {
+        toast({
+            message: i18n.t('tagDoesntExist'),
+            type: 'notification-danger',
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 4000,
+            position: 'top-right',
+        })
+    }
+    chosenAuthor.value = ''
+}
+
+async function deleteAuthorSubscription(authorID) {
+    await apolloClient
         .mutate({
             mutation: REMOVE_AUTHOR_SUBSCRIPTION,
             variables: {
@@ -503,6 +590,9 @@ function deleteAuthorSubscription(authorID) {
         })
         .then(result => { console.log(result) })
         .catch(error => { console.log(error) })
+    let authorToDelete = subscriptedAuthors.value.findIndex(author => author.id == authorID)
+    subscriptedAuthors.value.splice(authorToDelete, 1)
+    showDeleteAuthorModal.value = false
 }
 
 function changeProfilePhoto() {
@@ -874,6 +964,7 @@ async function deleteChannel(messenger) {
     fill: var(--pages-color);
 }
 .authors-subscriptions-content, .my-account-sss-content {
+    position: relative;
     width: calc(100% - 80px);
     margin: auto;
     padding-top: 20px;
@@ -923,6 +1014,43 @@ async function deleteChannel(messenger) {
     display: flex;
     flex-direction: row;
     align-items: center;
+}
+
+.add-author-sub-input {
+    width: calc(100% - 80px);
+    margin: auto;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+.add-author-sub-input::placeholder {
+    color: var(--text-extra);
+}
+
+.authors-block {
+    position: absolute;
+    bottom: 0;
+    transform: translateY(calc(100% - 40px));
+    left: 0;
+    max-height: 200px;
+    background: var(--card-color);
+    border-radius: 10px;
+    box-shadow: 0px 3.2375px 3.2375px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 12px;
+    z-index: 25;
+    overflow-y: scroll;
+}
+
+.authors-block p {
+    margin-top: 12px;
+    cursor: pointer;
+    color: var(--text-color);
 }
 
 .my-account-sss-user-name {
@@ -1047,6 +1175,18 @@ async function deleteChannel(messenger) {
     border-radius: 10px;
     margin: 12px 30px 8px 30px;
     cursor: pointer;
+}
+
+.notification-success {
+    background-color: #66D9D3;
+    border-radius: 16px;
+    color: white;
+}
+
+.notification-danger {
+    background-color: #F65151;
+    border-radius: 16px;
+    color: white;
 }
 
 @media (max-width: 420px) {
