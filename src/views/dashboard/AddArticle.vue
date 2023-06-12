@@ -173,6 +173,10 @@ const REVIEWERS_QUERY = gql`query {
     }
 }`
 
+const GET_STORAGE = gql`query {
+    getStorageData
+}`
+
 let user = JSON.parse(userStore.$state.user)
 
 onMounted(() => {

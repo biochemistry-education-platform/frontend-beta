@@ -25,6 +25,10 @@ export default {
     registrationSuccess: 'Регистрация прошла успешно!',
     registrationFailed: 'Произошла ошибка регистрации!',
     authFailed: 'Произошла ошибка авторизации!',
+    code: 'Код',
+    sendCode: 'Выслать код',
+    forgotPass: 'Забыли пароль? Войти по коду',
+    authByPass: 'Войти при помощи пароля',
 
     tags: 'Теги',
     authors: 'Авторы',

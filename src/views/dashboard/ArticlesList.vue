@@ -14,7 +14,7 @@
         <div class="articles-list">
             <div class="articles__article" v-for="article in filteredArticles" :key="article.id">
                 <div class="article-type">
-                    <svg v-if="article.type == 'notification_article'" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M180-80q-24 0-42-18t-18-42v-620q0-24 18-42t42-18h65v-60h65v60h340v-60h65v60h65q24 0 42 18t18 42v620q0 24-18 42t-42 18H180Zm0-60h600v-430H180v430Zm0-490h600v-130H180v130Zm0 0v-130 130Zm300 230q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/></svg>
+                    <svg v-if="article.type == 'Notification_article'" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M180-80q-24 0-42-18t-18-42v-620q0-24 18-42t42-18h65v-60h65v60h340v-60h65v60h65q24 0 42 18t18 42v620q0 24-18 42t-42 18H180Zm0-60h600v-430H180v430Zm0-490h600v-130H180v130Zm0 0v-130 130Zm300 230q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z"/></svg>
                     <svg v-else xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="M277 777h275v-60H277v60Zm0-171h406v-60H277v60Zm0-171h406v-60H277v60Zm-97 501q-24 0-42-18t-18-42V276q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600V276H180v600Zm0-600v600-600Z"/></svg>
                 </div>
                 <hr v-if="!isMobile" class="article-separator">
@@ -28,7 +28,7 @@
                         <div class="article-info-item article-info__date">
                             <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path d="m627 769 45-45-159-160V363h-60v225l174 181ZM480 976q-82 0-155-31.5t-127.5-86Q143 804 111.5 731T80 576q0-82 31.5-155t86-127.5Q252 239 325 207.5T480 176q82 0 155 31.5t127.5 86Q817 348 848.5 421T880 576q0 82-31.5 155t-86 127.5Q708 913 635 944.5T480 976Zm0-400Zm0 340q140 0 240-100t100-240q0-140-100-240T480 236q-140 0-240 100T140 576q0 140 100 240t240 100Z"/></svg>
                             <p v-if="article.type == 'Article'">{{ article.publish_date }}</p>
-                            <p v-else>{{ article.event_date }}    {{ article.event_place }}</p>
+                            <p v-else>{{ article.event_date }}    |    {{ article.event_place }}</p>
                         </div>
                     </div>
                     <div class="article__tags-list" v-if="article.tags.length > 0">
@@ -143,6 +143,26 @@ const ALL_ARTICLES_QUERY = gql`query {
   }
 }`
 
+const NOTIF_QUERY = gql`query {
+    allNotifications{
+        id
+        name
+        notifText
+        author {
+            id
+            name
+            surname
+            secondname
+        }
+        notificationtagSet {
+            tagId {
+                id
+                name
+            }
+        }
+    }
+}`
+
 onMounted(async () => {
     await getArticles()
 })
@@ -181,6 +201,41 @@ async function getArticles() {
                     tags: tagList,
                     publish_date: date,
                     filter_date: fdate,
+                    isSaved: false
+                })
+            })
+        })
+        .catch(error => console.log(error))
+    await apolloClient
+        .query({
+            query: NOTIF_QUERY
+        })
+        .then(result => { 
+            result.data.allNotifications.forEach(notif => {
+                let authorFullName = notif.author.surname + ' ' + notif.author.name.charAt(0) + '.'
+                if (notif.author.secondname != "") { authorFullName += (' ' + notif.author.secondname.charAt(0) + '.')}
+                let tagList = []
+                notif.notificationtagSet.forEach(tag => {
+                    tagList.push(tag.tagId.name)
+                })
+                let date = new Date(Date.parse(JSON.parse(notif.notifText).place.date)).toLocaleTimeString('ru-RU', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                })
+                let fdate = new Date(Date.parse(JSON.parse(notif.notifText).place.date))
+                articles.push({
+                    id: notif.id,
+                    title: notif.name,
+                    type: 'Notification_article',
+                    author: authorFullName,
+                    reviewer: authorFullName,
+                    tags: tagList,
+                    event_date: date,
+                    filter_date: fdate,
+                    event_place: JSON.parse(notif.notifText).place.place,
                     isSaved: false
                 })
             })

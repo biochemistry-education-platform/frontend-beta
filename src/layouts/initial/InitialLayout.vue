@@ -200,10 +200,15 @@
     background: var(--menu-accent-darker);
 }
 
-.initial-link {
+.initial-link, .forgot-pass {
     font-size: 16px;
     color: var(--text-extra);
     text-align: center;
+}
+
+.forgot-pass {
+    margin-top: 8px;
+    cursor: pointer;
 }
 
 @media (max-width: 420px) {

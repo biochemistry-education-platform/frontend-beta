@@ -25,6 +25,10 @@ export default {
     registrationSuccess: 'Registration finished successfully',
     registrationFailed: 'Registration error!',
     authFailed: 'Authentication error!',
+    code: 'Code',
+    sendCode: 'Send code',
+    forgotPass: 'Forgot password? Log in with code',
+    authByPass: 'Log in with password',
 
     tags: 'Tags',
     authors: 'Authors',

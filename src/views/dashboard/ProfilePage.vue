@@ -18,8 +18,19 @@
         <hr v-if="!isMobile" class="my-account__hr">
         <div class="my-account__content">
             <div class="my-account__info">
-                <img v-if="user.photo" @click="changeProfilePhoto" id="profile-img" class="my-account__img" :src="user.photo">
-                <img v-else @click="changeProfilePhoto" id="profile-img" class="my-account__img" src="@/assets/icons/profile_img.png">
+                <form action="https://storage.yandexcloud.net/plateaumed" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="key" :value="yandexStorage.key" /><br />
+                    <input type="hidden" name="X-Amz-Credential" :value="yandexStorage.cred" />
+                    <input type="hidden" name="acl" :value="public-read" />
+                    <input type="hidden" name="X-Amz-Algorithm" :value="yandexStorage.alg" />
+                    <input type="hidden" name="X-Amz-Date" :value="yandexStorage.date" />
+                    <input type="hidden" name="policy" :value="yandexStorage.policy" />
+                    <input type="hidden" name="X-Amz-Signature" :value="yandexStorage.sign" />
+                    <input type="file" @change="attachFile" id="filename-input" name="file" /> <br />
+                    <input type="submit" id="filesend-btn" name="submit" value="Загрузить" />
+                </form>
+                <img v-if="user.photo" @click="chooseProfilePhoto" id="profile-img" class="my-account__img" :src="user.photo">
+                <img v-else @click="chooseProfilePhoto" id="profile-img" class="my-account__img" src="@/assets/icons/profile_img.png">
                 <!-- TODO если есть фото в профиле (из запроса на сервер) то в src подставить его, иначе - то, что указано выше -->
                 <div class="my-account-name-block">
                     <h2 class="my-account-name">{{ user.surname }} {{ user.name }} {{ user.patronymic }}</h2>
@@ -210,6 +221,15 @@ let isMailFilled = ref(false)
 let isVkFilled = ref(false)
 let isTgFilled = ref(false)
 let isModalShown = ref(false)
+let yandexStorage = reactive({
+    url: '',
+    key: '',
+    alg: '',
+    cred: '',
+    date: '',
+    policy: '',
+    sign: ''
+})
 let sss = ref([{
                 surname: 'Иванов',
                 name: 'Иван',
@@ -353,10 +373,24 @@ const REMOVE_AUTHOR_SUBSCRIPTION = gql`mutation DeleteAuthorFromUser($userId: In
     }
 }`
 
+const GET_STORAGE = gql`query {
+    getStorageData
+}`
+
+const PHOTO_UPDATE = gql`mutation UpdateUserProfile($userId: Int!, $photo: String) {
+    updateProfile(userId: $userId, photo: $photo) {
+        profile {
+            id
+            photo
+        }
+    }
+}`
+
 onMounted(async () => {
     await getMyInfo()
     await getAllTags()
     await getAllAuthors()
+    await getStorageData()
 })
 
 function logout() {
@@ -437,7 +471,6 @@ async function getAllAuthors() {
             }
         })
         .then(result => {
-            console.log(result)
             result.data.allAuthors.forEach(author => {
                 let newAuthor = {
                     id: author.authorId.id,
@@ -450,6 +483,39 @@ async function getAllAuthors() {
             })
         })
         .catch(error => console.log(error))
+}
+
+async function getStorageData() {
+    await apolloClient
+        .query({
+            query: GET_STORAGE,
+        })
+        .then(result => { 
+            yandexStorage.url = JSON.parse(result.data.getStorageData.replaceAll('\'', '\"')).url
+            let fields = JSON.parse(result.data.getStorageData.replaceAll('\'', '\"')).fields
+            console.log(fields)
+            Object.entries(fields).forEach(entry => {
+                const [key, value] = entry
+                if (key == 'key') {
+                    yandexStorage.key = value
+                }
+                if (key == 'x-amz-algorithm') {
+                    yandexStorage.alg = value
+                }
+                if (key == 'x-amz-credential') {
+                    yandexStorage.cred = value
+                }
+                if (key == 'x-amz-date') {
+                    yandexStorage.date = value
+                }
+                if (key == 'policy') {
+                    yandexStorage.policy = value
+                }
+                if (key == 'x-amz-signature') {
+                    yandexStorage.sign = value
+                }})
+        })
+        .catch(error => { console.log(error) })
 }
 
 function switchMenuDisplay() {
@@ -595,51 +661,56 @@ async function deleteAuthorSubscription(authorID) {
     showDeleteAuthorModal.value = false
 }
 
-function changeProfilePhoto() {
-    let input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-
-    input.onchange = e => { 
-        let file = e.target.files[0]
-        if (file.type.match('image.*')) {
-            let reader = new FileReader()
-            reader.readAsDataURL(file)
-            reader.onload = readerEvent => {
-                let content = readerEvent.target.result
-                document.getElementById('profile-img').src = content
-                // TODO отправить запрос о смене фото профиля на сервер
-                let PHOTO_UPDATE = gql`mutation UpdateUserProfile($userId: Int!, $photo: String) {
-                    updateProfile(userId: $userId, photo: $photo) {
-                        profile {
-                            id
-                            photo
-                        }
-                    }
-                }`
-                // apolloClient
-                //     .mutate({
-                //         mutation: PHOTO_UPDATE,
-                //         variables: {
-                //             userId: user.userID,
-                //             photo: content
-                //         },
-                //     })
-                //     .then(result => { console.log(result) })
-                //     .catch(error => { console.log(error) })
-            }  
-        } else {
-            toast({
-                message: i18n.t('onlyImg'),
-                type: 'notification-danger',
-                dismissible: true,
-                pauseOnHover: true,
-                duration: 4000,
-                position: 'top-right',
-            })
-        }
+function attachFile() {
+    let fileArray = Array.from(document.getElementById('filename-input').files)
+    if (fileArray.length > 1) {
+        toast({
+            message: i18n.t('onlyOneFile'),
+            type: 'notification-danger',
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 2000,
+            position: 'top-right',
+        })
     }
-    input.click()
+    else {
+        changeProfilePhoto(document.getElementById('filename-input').files[0])
+        console.log(document.getElementById('filename-input').files[0])
+        document.getElementById('filesend-btn').click()
+    }
+}
+
+function chooseProfilePhoto() {
+    document.getElementById('filename-input').click()
+}
+
+function changeProfilePhoto(file) {
+    if (file.type.match('image.*')) {
+        let fileName = file.name
+        console.log(fileName)
+        let fileUrl = `https://storage.yandexcloud.net/plateaumed/users/uploads/${fileName}`
+        user.photo = fileUrl
+        // TODO отправить запрос о смене фото профиля на сервер
+        apolloClient
+            .mutate({
+                mutation: PHOTO_UPDATE,
+                variables: {
+                    userId: user.userID,
+                    photo: fileUrl
+                },
+            })
+            .then(result => { console.log(result) })
+            .catch(error => { console.log(error) }) 
+    } else {
+        toast({
+            message: i18n.t('onlyImg'),
+            type: 'notification-danger',
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 4000,
+            position: 'top-right',
+        })
+    }
 }
 
 function changeMyInfo() {
@@ -1187,6 +1258,10 @@ async function deleteChannel(messenger) {
     background-color: #F65151;
     border-radius: 16px;
     color: white;
+}
+
+#filename-input, #filesend-btn {
+    display: none;
 }
 
 @media (max-width: 420px) {

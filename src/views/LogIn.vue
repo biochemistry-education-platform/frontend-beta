@@ -26,16 +26,23 @@
         <div class="initial-form">
             <h1 class="initial-title">{{ $t('logIn') }}</h1>
             <form @submit.prevent="submitForm">
-                <div class="initial-field">
+                <div v-if="!showCodeInput" class="initial-field">
                     <label class="initial-field-label">{{ $t('email') }}</label>
                     <input type="email" name="email" class="initial-input" v-model="email" placeholder="example@mail.ru">
                 </div>
-                <div class="initial-field">
+                <div v-if="showCodeInput" class="initial-field">
+                    <label class="initial-field-label">{{ $t('code') }}</label>
+                    <input type="text" name="text" class="initial-input" v-model="code" placeholder="123456">
+                </div>
+                <div v-if="!hidePassInput" class="initial-field">
                     <label class="initial-field-label">{{ $t('password') }}</label>
                     <input type="password" name="name" class="initial-input" v-model="password" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;">
                 </div>
-                <button class="initial-btn">{{ $t('toLogIn') }}</button>
+                <button v-if="!(hidePassInput && !showCodeInput)" class="initial-btn">{{ $t('toLogIn') }}</button>
+                <button v-else class="initial-btn">{{ $t('sendCode') }}</button>
                 <p class="initial-link">{{ $t('dontSigned') }}<router-link :to="{name: 'SignUp'}" class="initial-link">{{ $t('toSignUp') }}</router-link></p>
+                <p class="forgot-pass" v-if="!hidePassInput" @click="hidePassInput = true">{{ $t('forgotPass') }}</p>
+                <p class="forgot-pass" v-if="hidePassInput" @click="hidePassInput = true">{{ $t('authByPass') }}</p>
             </form>
         </div>
     </div>
@@ -71,6 +78,10 @@ const theme = ref('light')
 const language = ref('ru')
 let email = ref('')
 let password = ref('')
+let code = ref('')
+let correctCode = ref('')
+let hidePassInput = ref(false)
+let showCodeInput = ref(false)
 let user = {
     isAuthenticated: false,
     token: userStore.getToken || '',
@@ -112,41 +123,96 @@ const AUTH_WITH_TOKEN = gql`mutation TokenAuth($username: String!, $password: St
     }
 }`
 
-function submitForm() {
-    apolloClient
-        .mutate({
-            mutation: AUTH_WITH_TOKEN,
-            variables: {
-                username: email.value,
-                password: password.value,
-            },
-        })
-        .then(result => {
-            let user = {
-                userID: result.data.tokenAuth.user.id,
-                profileID: result.data.tokenAuth.profile.id,
-                email: result.data.tokenAuth.user.email,
-                role: result.data.tokenAuth.profile.role.roleName,
-                name: result.data.tokenAuth.profile.name,
-                patronymic: result.data.tokenAuth.profile.secondname,
-                surname: result.data.tokenAuth.profile.surname,
-                photo: result.data.tokenAuth.profile.photo,
-                channels: result.data.tokenAuth.profile.channels
+const SEND_CODE = gql`query SendAuthCode($email: String!) {
+    sendAuthCode(email: $email)
+}`
+
+const AUTH_WITH_CODE = gql`mutation AuthUser($email: String!) {
+    authUser(email: $email){
+        profile {
+            id
+            user
+            role {
+                id
+                roleName
             }
-            userStore.setToken(result.data.tokenAuth.token)
-            userStore.setUser(user)
-            router.push({ name: 'Articles' })
-        })
-        .catch(error => {
-            toast({
-                message: i18n.t('authFailed') + '\n' + error,
-                type: 'notification-danger',
-                dismissible: true,
-                pauseOnHover: true,
-                duration: 2000,
-                position: 'top-right',
+            channels
+            photo
+            getNotification
+            name
+            surname
+            secondname
+        }
+  }
+}`
+
+function submitForm() {
+    if (hidePassInput.value == true && showCodeInput.value == false) {
+        apolloClient
+            .query({
+                query: SEND_CODE,
+                variables: {
+                    email: email.value,
+                },
             })
-        })
+            .then(result => { 
+                correctCode.value = result.data.sendAuthCode.replaceAll(' ', '')
+            })
+            .catch(error => { console.log(error) })
+        showCodeInput.value = true
+    } else if (hidePassInput.value == true && showCodeInput.value == true) {
+        console.log(correctCode.value)
+        console.log(code.value)
+        console.log(email.value)
+        if (correctCode.value == code.value) {
+            console.log('work!')
+            apolloClient
+                .mutate({
+                    mutation: AUTH_WITH_CODE,
+                    variables: {
+                        email: email.value,
+                    },
+                })
+                .then(result => { console.log(result) })
+                .catch(error => { console.log(error) })
+        }
+        
+    } else {
+        apolloClient
+            .mutate({
+                mutation: AUTH_WITH_TOKEN,
+                variables: {
+                    username: email.value,
+                    password: password.value,
+                },
+            })
+            .then(result => {
+                let user = {
+                    userID: result.data.tokenAuth.user.id,
+                    profileID: result.data.tokenAuth.profile.id,
+                    email: result.data.tokenAuth.user.email,
+                    role: result.data.tokenAuth.profile.role.roleName,
+                    name: result.data.tokenAuth.profile.name,
+                    patronymic: result.data.tokenAuth.profile.secondname,
+                    surname: result.data.tokenAuth.profile.surname,
+                    photo: result.data.tokenAuth.profile.photo,
+                    channels: result.data.tokenAuth.profile.channels
+                }
+                userStore.setToken(result.data.tokenAuth.token)
+                userStore.setUser(user)
+                router.push({ name: 'Articles' })
+            })
+            .catch(error => {
+                toast({
+                    message: i18n.t('authFailed') + '\n' + error,
+                    type: 'notification-danger',
+                    dismissible: true,
+                    pauseOnHover: true,
+                    duration: 2000,
+                    position: 'top-right',
+                })
+            })
+    }
 }
 </script>
 
