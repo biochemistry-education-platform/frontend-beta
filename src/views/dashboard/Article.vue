@@ -260,7 +260,7 @@ async function getArticle() {
             article.reviewerFullName = reviewer.surname + ' ' + reviewer.name + (reviewer.secondname != '' ? (' ' + reviewer.secondname) : '')
             article.reviewerRole = reviewer.role.roleName
         })
-        .catch(error => console.log(error))
+        .catch(error =>  router.push({ name: 'NotFound' }))
     if (user) { user_role.value = user.role } else { user_role.value = ''}
 
     let text = JSON.parse(article.text)

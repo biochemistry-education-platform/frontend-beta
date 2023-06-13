@@ -103,5 +103,8 @@ export default {
     save: 'Save',
     noteDeletionTitle: 'Abstract deletion',
     noteDeletionText: 'Are you sure you want to delete an abstract ',
-    noteDeleted: 'Abstract deleted'
+    noteDeleted: 'Abstract deleted',
+
+    page404: "Oops! The page doesn't exist. But you can see the existing sections ",
+    onFeed: 'on the main page.'
 }
