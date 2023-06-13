@@ -19,9 +19,9 @@
         <div class="my-account__content">
             <div class="my-account__info">
                 <form action="https://storage.yandexcloud.net/plateaumed" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="key" :value="yandexStorage.key" /><br />
+                    <input type="hidden" name="key" value='users/uploads/${filename}' /><br />
                     <input type="hidden" name="X-Amz-Credential" :value="yandexStorage.cred" />
-                    <input type="hidden" name="acl" :value="public-read" />
+                    <input type="hidden" name="acl" value="public-read" />
                     <input type="hidden" name="X-Amz-Algorithm" :value="yandexStorage.alg" />
                     <input type="hidden" name="X-Amz-Date" :value="yandexStorage.date" />
                     <input type="hidden" name="policy" :value="yandexStorage.policy" />
@@ -409,9 +409,7 @@ async function getMyInfo() {
             }
         })
         .then(result => {
-            console.log(result)
-            let photoUrl = result.data.getProfile.photo
-            user.photo = photoUrl.slice(1, photoUrl.length - 1).split('?')[0]
+            user.photo = result.data.getProfile.photo
             result.data.getProfile.tagsubscriptionSet.forEach(tag => {
                 subscriptedTags.value.push(tag.tagId.name)
             })
@@ -495,18 +493,20 @@ async function getStorageData() {
         .then(result => { 
             yandexStorage.url = 'https://storage.yandexcloud.net/plateaumed'
             let fields = JSON.parse(result.data.getStorageData.replaceAll('\'', '\"')).fields
-            yandexStorage.key = 'users/uploads/${filename}'
+            // yandexStorage.key = `users/uploads/${filename}`
             yandexStorage.alg = 'AWS4-HMAC-SHA256'
-            yandexStorage.cred = 'YCAJEChUZ1sDsIoQljzBKmcfw/20230610/ru-central1/s3/aws4_request'
-            yandexStorage.policy = 'eyJleHBpcmF0aW9uIjogIjIwMjMtMDYtMTBUMTg6MzQ6MTlaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQifSwgWyJzdGFydHMtd2l0aCIsICIka2V5IiwgInVzZXJzL3VwbG9hZHMiXSwgeyJidWNrZXQiOiAicGxhdGVhdW1lZCJ9LCBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidXNlcnMvdXBsb2Fkcy8iXSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiWUNBSkVDaFVaMXNEc0lvUWxqekJLbWNmdy8yMDIzMDYxMC9ydS1jZW50cmFsMS9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1kYXRlIjogIjIwMjMwNjEwVDE3MzQxOVoifV19'
-            Object.entries(fields).forEach(entry => {
-                const [key, value] = entry
-                if (key == 'x-amz-date') {
-                    yandexStorage.date = value
-                }
-                if (key == 'x-amz-signature') {
-                    yandexStorage.sign = value
-                }})
+            yandexStorage.cred = 'YCAJEyFpGK-G7qKl-OrHy-k3Z/20230613/ru-central1/s3/aws4_request'
+            yandexStorage.policy = 'eyJleHBpcmF0aW9uIjogIjIwMjMtMDYtMTNUMTg6NDY6NDJaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQifSwgWyJzdGFydHMtd2l0aCIsICIka2V5IiwgInVzZXJzL3VwbG9hZHMiXSwgeyJidWNrZXQiOiAicGxhdGVhdW1lZCJ9LCBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidXNlcnMvdXBsb2Fkcy8iXSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiWUNBSkV5RnBHSy1HN3FLbC1Pckh5LWszWi8yMDIzMDYxMy9ydS1jZW50cmFsMS9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1kYXRlIjogIjIwMjMwNjEzVDE3NDY0MloifV19'
+            yandexStorage.date = '20230613T174642Z'
+            yandexStorage.sign = '31772e9fb68f49d8ea437487759441d8feb8559585f311ed5f31d106796ad63c'
+            // Object.entries(fields).forEach(entry => {
+            //     const [key, value] = entry
+            //     if (key == 'x-amz-date') {
+            //         yandexStorage.date = value
+            //     }
+            //     if (key == 'x-amz-signature') {
+            //         yandexStorage.sign = value
+            //     }})
         })
         .catch(error => { console.log(error) })
 }
@@ -674,61 +674,62 @@ function attachFile() {
 }
 
 function chooseProfilePhoto() {
-    // document.getElementById('filename-input').click()
-    let input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.onchange = e => { 
-        let file = e.target.files[0]; 
-        if (file.type.match('image.*')) {
-            let reader = new FileReader()
-            reader.readAsDataURL(file)
-            reader.onload = readerEvent => {
-                let content = readerEvent.target.result
-                document.getElementById('profile-img').src = content
-                // TODO отправить запрос о смене фото профиля на сервер
-            }  
-        } else {
-            toast({
-                message: i18n.t('onlyImg'),
-                type: 'notification-danger',
-                dismissible: true,
-                pauseOnHover: true,
-                duration: 4000,
-                position: 'top-right',
-            })
-        }
-    }
-    input.click()
+    document.getElementById('filename-input').click()
+    // let input = document.createElement('input')
+    // input.type = 'file'
+    // input.accept = 'image/*'
+    // input.onchange = e => { 
+    //     let file = e.target.files[0]; 
+    //     if (file.type.match('image.*')) {
+    //         let reader = new FileReader()
+    //         reader.readAsDataURL(file)
+    //         reader.onload = readerEvent => {
+    //             let content = readerEvent.target.result
+    //             document.getElementById('profile-img').src = content
+    //             // TODO отправить запрос о смене фото профиля на сервер
+    //         }  
+    //     } else {
+    //         toast({
+    //             message: i18n.t('onlyImg'),
+    //             type: 'notification-danger',
+    //             dismissible: true,
+    //             pauseOnHover: true,
+    //             duration: 4000,
+    //             position: 'top-right',
+    //         })
+    //     }
+    // }
+    // input.click()
 }
 
 function changeProfilePhoto(file) {
-    // if (file.type.match('image.*')) {
-    //     let fileName = file.name
-    //     console.log(fileName)
-    //     let fileUrl = `https://storage.yandexcloud.net/plateaumed/users/uploads/${fileName}`
-    //     user.photo = fileUrl
-    //     // TODO отправить запрос о смене фото профиля на сервер
-    //     apolloClient
-    //         .mutate({
-    //             mutation: PHOTO_UPDATE,
-    //             variables: {
-    //                 userId: user.userID,
-    //                 photo: fileUrl
-    //             },
-    //         })
-    //         .then(result => { console.log(result) })
-    //         .catch(error => { console.log(error) }) 
-    // } else {
-    //     toast({
-    //         message: i18n.t('onlyImg'),
-    //         type: 'notification-danger',
-    //         dismissible: true,
-    //         pauseOnHover: true,
-    //         duration: 4000,
-    //         position: 'top-right',
-    //     })
-    // }
+    if (file.type.match('image.*')) {
+        let fileName = file.name
+        console.log(fileName)
+        let fileUrl = `https://storage.yandexcloud.net/plateaumed/users/uploads/${fileName}`
+        // TODO отправить запрос о смене фото профиля на сервер
+        apolloClient
+            .mutate({
+                mutation: PHOTO_UPDATE,
+                variables: {
+                    userId: user.userID,
+                    photo: fileUrl
+                },
+            })
+            .then(result => { 
+                document.getElementById('profile-img').src = fileUrl
+            })
+            .catch(error => { console.log(error) }) 
+    } else {
+        toast({
+            message: i18n.t('onlyImg'),
+            type: 'notification-danger',
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 4000,
+            position: 'top-right',
+        })
+    }
 }
 
 function changeMyInfo() {
