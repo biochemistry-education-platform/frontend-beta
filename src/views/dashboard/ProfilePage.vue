@@ -49,7 +49,7 @@
                             <svg class="channel-edit-btn" @click="editChannel('mail')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M180 876h44l443-443-44-44-443 443v44Zm614-486L666 262l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L248 936H120V808l504-504 128 128Zm-107-21-22-22 44 44-22-22Z"/></svg>
                             <svg class="channel-delete-btn" @click="deleteChannel('mail')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg>
                         </div>
-                        <input v-else class="my-account-channel-empty" id="mail-input" @keyup.native.enter="saveChannel('mail')" type="text" placeholder="adress@mail.ru">
+                        <input v-else class="my-account-channel-empty" id="mail-input" @keyup.native.enter="saveChannel('mail')" type="text" placeholder="address@mail.ru">
                     </div>
                     <div class="my-account-channel">
                         <img src="@/assets/icons/vk-icon.png">
@@ -67,7 +67,7 @@
                             <svg class="channel-edit-btn" @click="editChannel('tg')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M180 876h44l443-443-44-44-443 443v44Zm614-486L666 262l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L248 936H120V808l504-504 128 128Zm-107-21-22-22 44 44-22-22Z"/></svg>
                             <svg class="channel-delete-btn" @click="deleteChannel('tg')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg>
                         </div>
-                        <input v-else class="my-account-channel-empty" id="tg-input" @keyup.native.enter="saveChannel('tg')" type="text" placeholder="t.me/Example">
+                        <input v-else class="my-account-channel-empty" id="tg-input" @keyup.native.enter="saveChannel('tg')" type="text" placeholder="@Example">
                     </div>
                 </div>
             </div>
@@ -674,36 +674,61 @@ function attachFile() {
 }
 
 function chooseProfilePhoto() {
-    document.getElementById('filename-input').click()
+    // document.getElementById('filename-input').click()
+    let input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = e => { 
+        let file = e.target.files[0]; 
+        if (file.type.match('image.*')) {
+            let reader = new FileReader()
+            reader.readAsDataURL(file)
+            reader.onload = readerEvent => {
+                let content = readerEvent.target.result
+                document.getElementById('profile-img').src = content
+                // TODO отправить запрос о смене фото профиля на сервер
+            }  
+        } else {
+            toast({
+                message: i18n.t('onlyImg'),
+                type: 'notification-danger',
+                dismissible: true,
+                pauseOnHover: true,
+                duration: 4000,
+                position: 'top-right',
+            })
+        }
+    }
+    input.click()
 }
 
 function changeProfilePhoto(file) {
-    if (file.type.match('image.*')) {
-        let fileName = file.name
-        console.log(fileName)
-        let fileUrl = `https://storage.yandexcloud.net/plateaumed/users/uploads/${fileName}`
-        user.photo = fileUrl
-        // TODO отправить запрос о смене фото профиля на сервер
-        apolloClient
-            .mutate({
-                mutation: PHOTO_UPDATE,
-                variables: {
-                    userId: user.userID,
-                    photo: fileUrl
-                },
-            })
-            .then(result => { console.log(result) })
-            .catch(error => { console.log(error) }) 
-    } else {
-        toast({
-            message: i18n.t('onlyImg'),
-            type: 'notification-danger',
-            dismissible: true,
-            pauseOnHover: true,
-            duration: 4000,
-            position: 'top-right',
-        })
-    }
+    // if (file.type.match('image.*')) {
+    //     let fileName = file.name
+    //     console.log(fileName)
+    //     let fileUrl = `https://storage.yandexcloud.net/plateaumed/users/uploads/${fileName}`
+    //     user.photo = fileUrl
+    //     // TODO отправить запрос о смене фото профиля на сервер
+    //     apolloClient
+    //         .mutate({
+    //             mutation: PHOTO_UPDATE,
+    //             variables: {
+    //                 userId: user.userID,
+    //                 photo: fileUrl
+    //             },
+    //         })
+    //         .then(result => { console.log(result) })
+    //         .catch(error => { console.log(error) }) 
+    // } else {
+    //     toast({
+    //         message: i18n.t('onlyImg'),
+    //         type: 'notification-danger',
+    //         dismissible: true,
+    //         pauseOnHover: true,
+    //         duration: 4000,
+    //         position: 'top-right',
+    //     })
+    // }
 }
 
 function changeMyInfo() {
@@ -874,7 +899,11 @@ async function deleteChannel(messenger) {
     width: 160px;
     height: 160px;
     border-radius: 50%;
-    margin: 40px 0 20px 0;
+    margin: 0px 0 20px 0;
+}
+
+.my-account__img:hover{
+    cursor: pointer;
 }
 
 .my-account-name-block {
