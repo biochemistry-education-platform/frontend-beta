@@ -67,7 +67,7 @@
                             <svg class="channel-edit-btn" @click="editChannel('tg')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M180 876h44l443-443-44-44-443 443v44Zm614-486L666 262l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L248 936H120V808l504-504 128 128Zm-107-21-22-22 44 44-22-22Z"/></svg>
                             <svg class="channel-delete-btn" @click="deleteChannel('tg')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg>
                         </div>
-                        <input class="my-account-channel-empty" id="tg-input" @keyup.native.enter="saveChannel('tg')" type="text" placeholder="t.me/Example">
+                        <input v-else class="my-account-channel-empty" id="tg-input" @keyup.native.enter="saveChannel('tg')" type="text" placeholder="t.me/Example">
                     </div>
                 </div>
             </div>
@@ -409,24 +409,26 @@ async function getMyInfo() {
             }
         })
         .then(result => {
+            console.log(result)
             let photoUrl = result.data.getProfile.photo
             user.photo = photoUrl.slice(1, photoUrl.length - 1).split('?')[0]
             result.data.getProfile.tagsubscriptionSet.forEach(tag => {
                 subscriptedTags.value.push(tag.tagId.name)
             })
-            let userChannels = result.data.getProfile.channels.split(';')
-            let mail = userChannels[0].split(': ')[1]
-            let vk = userChannels[1].split(': ')[1]
-            let tg = userChannels[2].split(': ')[1]
-            if (mail) {
+            let userChannels = JSON.parse(result.data.getProfile.channels)
+            console.log(userChannels)
+            let mail = userChannels.mail
+            let vk = userChannels.vk
+            let tg = userChannels.tg
+            if (mail != '_') {
                 channels.mail = mail
                 isMailFilled.value = true
             }
-            if (vk) {
+            if (vk != '_') {
                 channels.vk = vk
                 isVkFilled.value = true
             }
-            if (tg) {
+            if (tg != '_') {
                 channels.tg = tg
                 isTgFilled.value = true
             }
@@ -491,25 +493,16 @@ async function getStorageData() {
             query: GET_STORAGE,
         })
         .then(result => { 
-            yandexStorage.url = JSON.parse(result.data.getStorageData.replaceAll('\'', '\"')).url
+            yandexStorage.url = 'https://storage.yandexcloud.net/plateaumed'
             let fields = JSON.parse(result.data.getStorageData.replaceAll('\'', '\"')).fields
-            console.log(fields)
+            yandexStorage.key = 'users/uploads/${filename}'
+            yandexStorage.alg = 'AWS4-HMAC-SHA256'
+            yandexStorage.cred = 'YCAJEChUZ1sDsIoQljzBKmcfw/20230610/ru-central1/s3/aws4_request'
+            yandexStorage.policy = 'eyJleHBpcmF0aW9uIjogIjIwMjMtMDYtMTBUMTg6MzQ6MTlaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQifSwgWyJzdGFydHMtd2l0aCIsICIka2V5IiwgInVzZXJzL3VwbG9hZHMiXSwgeyJidWNrZXQiOiAicGxhdGVhdW1lZCJ9LCBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidXNlcnMvdXBsb2Fkcy8iXSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiWUNBSkVDaFVaMXNEc0lvUWxqekJLbWNmdy8yMDIzMDYxMC9ydS1jZW50cmFsMS9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1kYXRlIjogIjIwMjMwNjEwVDE3MzQxOVoifV19'
             Object.entries(fields).forEach(entry => {
                 const [key, value] = entry
-                if (key == 'key') {
-                    yandexStorage.key = value
-                }
-                if (key == 'x-amz-algorithm') {
-                    yandexStorage.alg = value
-                }
-                if (key == 'x-amz-credential') {
-                    yandexStorage.cred = value
-                }
                 if (key == 'x-amz-date') {
                     yandexStorage.date = value
-                }
-                if (key == 'policy') {
-                    yandexStorage.policy = value
                 }
                 if (key == 'x-amz-signature') {
                     yandexStorage.sign = value
@@ -746,10 +739,18 @@ async function saveChannel(messenger) {
         await (channels.tg = document.getElementById('tg-input').value)
         isTgFilled.value = true
     }
-    let userChannels = `mail: ${channels.mail}; vk: ${channels.vk}; tg: ${channels.tg}`
+    if (channels.mail == '') { channels.mail = '_'}
+    if (channels.vk == '') { channels.vk = '_'}
+    if (channels.tg == '') { channels.tg = '_'}
+    let chan = {
+        mail: channels.mail,
+        vk: channels.vk,
+        tg: channels.tg
+    }
+    let userChannels = JSON.stringify(chan)
     apolloClient
         .mutate({
-            mutation: gql`mutation UpdateUserProfile($userId: Int!, $channels: String) {
+            mutation: gql`mutation UpdateUserProfile($userId: Int!, $channels: JSONString!) {
                 updateProfile(userId: $userId, channels: $channels) {
                     profile {
                         id
@@ -776,19 +777,24 @@ async function saveChannel(messenger) {
 
 async function deleteChannel(messenger) {
     if (messenger == 'mail') {
-        await (channels.mail = '')
+        await (channels.mail = '_')
         isMailFilled.value = false
     } else if (messenger == 'vk') {
-        await (channels.vk = '')
+        await (channels.vk = '_')
         isVkFilled.value = false
     } else if (messenger == 'tg') {
-        await (channels.tg = '')
+        await (channels.tg = '_')
         isTgFilled.value = false
     }
-    let userChannels = `mail: ${channels.mail}; vk: ${channels.vk}; tg: ${channels.tg}`
+    let chan = {
+        mail: channels.mail,
+        vk: channels.vk,
+        tg: channels.tg
+    }
+    let userChannels = JSON.stringify(chan)
     apolloClient
         .mutate({
-            mutation: gql`mutation UpdateUserProfile($userId: Int!, $channels: String) {
+            mutation: gql`mutation UpdateUserProfile($userId: Int!, $channels: JSONString!) {
                 updateProfile(userId: $userId, channels: $channels) {
                     profile {
                         id

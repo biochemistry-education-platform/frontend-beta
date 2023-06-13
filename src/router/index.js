@@ -58,6 +58,14 @@ const routes = [
         // meta: {
         //   requireLogin: true
         // }
+      },
+      {
+        path: 'notification_articles/:id',
+        name: 'NotifArticle',
+        component: () => import('../views/dashboard/NotifArticle.vue'),
+        // meta: {
+        //   requireLogin: true
+        // }
       },      
 
       {
