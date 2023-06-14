@@ -45,7 +45,7 @@
                     <div class="my-account-channel">
                         <img src="@/assets/icons/mail-icon.png">
                         <div v-if="isMailFilled" class="filled-channel-block">
-                            <p class="my-account-channel-filled">{{ channels.mail }}</p>
+                            <p class="my-account-channel-filled">{{ channels.email }}</p>
                             <svg class="channel-edit-btn" @click="editChannel('mail')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="M180 876h44l443-443-44-44-443 443v44Zm614-486L666 262l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L248 936H120V808l504-504 128 128Zm-107-21-22-22 44 44-22-22Z"/></svg>
                             <svg class="channel-delete-btn" @click="deleteChannel('mail')" xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 96 960 960" width="20"><path d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></svg>
                         </div>
@@ -193,7 +193,7 @@ const props = defineProps({
 let user = JSON.parse(userStore.$state.user)
 
 let channels = reactive({
-    mail: '',
+    email: '',
     vk: '',
     tg: ''
 })
@@ -415,11 +415,11 @@ async function getMyInfo() {
             })
             let userChannels = JSON.parse(result.data.getProfile.channels)
             console.log(userChannels)
-            let mail = userChannels.mail
+            let email = userChannels.email
             let vk = userChannels.vk
             let tg = userChannels.tg
-            if (mail != '_') {
-                channels.mail = mail
+            if (email != '_') {
+                channels.email = email
                 isMailFilled.value = true
             }
             if (vk != '_') {
@@ -493,20 +493,21 @@ async function getStorageData() {
         .then(result => { 
             yandexStorage.url = 'https://storage.yandexcloud.net/plateaumed'
             let fields = JSON.parse(result.data.getStorageData.replaceAll('\'', '\"')).fields
-            // yandexStorage.key = `users/uploads/${filename}`
             yandexStorage.alg = 'AWS4-HMAC-SHA256'
-            yandexStorage.cred = 'YCAJEyFpGK-G7qKl-OrHy-k3Z/20230613/ru-central1/s3/aws4_request'
-            yandexStorage.policy = 'eyJleHBpcmF0aW9uIjogIjIwMjMtMDYtMTNUMTg6NDY6NDJaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQifSwgWyJzdGFydHMtd2l0aCIsICIka2V5IiwgInVzZXJzL3VwbG9hZHMiXSwgeyJidWNrZXQiOiAicGxhdGVhdW1lZCJ9LCBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidXNlcnMvdXBsb2Fkcy8iXSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiWUNBSkV5RnBHSy1HN3FLbC1Pckh5LWszWi8yMDIzMDYxMy9ydS1jZW50cmFsMS9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1kYXRlIjogIjIwMjMwNjEzVDE3NDY0MloifV19'
-            yandexStorage.date = '20230613T174642Z'
-            yandexStorage.sign = '31772e9fb68f49d8ea437487759441d8feb8559585f311ed5f31d106796ad63c'
-            // Object.entries(fields).forEach(entry => {
-            //     const [key, value] = entry
-            //     if (key == 'x-amz-date') {
-            //         yandexStorage.date = value
-            //     }
-            //     if (key == 'x-amz-signature') {
-            //         yandexStorage.sign = value
-            //     }})
+            Object.entries(fields).forEach(entry => {
+                const [key, value] = entry
+                if (key == 'x-amz-date') {
+                    yandexStorage.date = value
+                }
+                if (key == 'x-amz-credential') {
+                    yandexStorage.cred = value
+                }
+                if (key == 'policy') {
+                    yandexStorage.policy = value
+                }
+                if (key == 'x-amz-signature') {
+                    yandexStorage.sign = value
+                }})
         })
         .catch(error => { console.log(error) })
 }
@@ -717,7 +718,7 @@ function changeMyInfo() {
 async function editChannel(messenger) {
     if (messenger == 'mail') {
         await (isMailFilled.value = false)
-        document.getElementById('mail-input').value = channels.mail
+        document.getElementById('mail-input').value = channels.email
     } else if (messenger == 'vk') {
         await (isVkFilled.value = false)
         document.getElementById('vk-input').value = channels.vk
@@ -729,7 +730,7 @@ async function editChannel(messenger) {
 
 async function saveChannel(messenger) {
     if (messenger == 'mail') {
-        await (channels.mail = document.getElementById('mail-input').value)
+        await (channels.email = document.getElementById('mail-input').value)
         isMailFilled.value = true
     } else if (messenger == 'vk') {
         await (channels.vk = document.getElementById('vk-input').value)
@@ -738,11 +739,11 @@ async function saveChannel(messenger) {
         await (channels.tg = document.getElementById('tg-input').value)
         isTgFilled.value = true
     }
-    if (channels.mail == '') { channels.mail = '_'}
+    if (channels.email == '') { channels.email = '_'}
     if (channels.vk == '') { channels.vk = '_'}
     if (channels.tg == '') { channels.tg = '_'}
     let chan = {
-        mail: channels.mail,
+        email: channels.email,
         vk: channels.vk,
         tg: channels.tg
     }
@@ -776,7 +777,7 @@ async function saveChannel(messenger) {
 
 async function deleteChannel(messenger) {
     if (messenger == 'mail') {
-        await (channels.mail = '_')
+        await (channels.email = '_')
         isMailFilled.value = false
     } else if (messenger == 'vk') {
         await (channels.vk = '_')
@@ -786,7 +787,7 @@ async function deleteChannel(messenger) {
         isTgFilled.value = false
     }
     let chan = {
-        mail: channels.mail,
+        email: channels.email,
         vk: channels.vk,
         tg: channels.tg
     }

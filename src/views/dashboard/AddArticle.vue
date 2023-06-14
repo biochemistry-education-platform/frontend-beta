@@ -43,12 +43,12 @@
                     </div>
                     <form action="https://storage.yandexcloud.net/plateaumed" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="key" value="users/uploads/${filename}" /><br />
-                        <input type="hidden" name="X-Amz-Credential" value="YCAJEChUZ1sDsIoQljzBKmcfw/20230610/ru-central1/s3/aws4_request" />
+                        <input type="hidden" name="X-Amz-Credential" :value="yandexStorage.cred" />
                         <input type="hidden" name="acl" value="public-read" />
-                        <input type="hidden" name="X-Amz-Algorithm" value="AWS4-HMAC-SHA256" />
-                        <input type="hidden" name="X-Amz-Date" value="20230610T173419Z" />
-                        <input type="hidden" name="policy" value="eyJleHBpcmF0aW9uIjogIjIwMjMtMDYtMTBUMTg6MzQ6MTlaIiwgImNvbmRpdGlvbnMiOiBbeyJhY2wiOiAicHVibGljLXJlYWQifSwgWyJzdGFydHMtd2l0aCIsICIka2V5IiwgInVzZXJzL3VwbG9hZHMiXSwgeyJidWNrZXQiOiAicGxhdGVhdW1lZCJ9LCBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidXNlcnMvdXBsb2Fkcy8iXSwgeyJ4LWFtei1hbGdvcml0aG0iOiAiQVdTNC1ITUFDLVNIQTI1NiJ9LCB7IngtYW16LWNyZWRlbnRpYWwiOiAiWUNBSkVDaFVaMXNEc0lvUWxqekJLbWNmdy8yMDIzMDYxMC9ydS1jZW50cmFsMS9zMy9hd3M0X3JlcXVlc3QifSwgeyJ4LWFtei1kYXRlIjogIjIwMjMwNjEwVDE3MzQxOVoifV19" />
-                        <input type="hidden" name="X-Amz-Signature" value="ed4fb4e9e2ec3b7a31e7e293b60d6bbe8168eb6a158483cfeb66245d7dd444ee" />
+                        <input type="hidden" name="X-Amz-Algorithm" :value="yandexStorage.alg" />
+                        <input type="hidden" name="X-Amz-Date" :value="yandexStorage.date" />
+                        <input type="hidden" name="policy" :value="yandexStorage.policy" />
+                        <input type="hidden" name="X-Amz-Signature" :value="yandexStorage.sign" />
                         <input type="file" @change="attachFile" id="filename-input" name="file" /> <br />
                         <input type="submit" id="filesend-btn" name="submit" value="Загрузить" />
                     </form>
@@ -124,27 +124,34 @@ let eventDate = ref('')
 let chosenFileName = ref('')
 let chosenFile
 let showDeleteFileModal = ref(false)
+let yandexStorage = reactive({
+    url: '',
+    key: '',
+    alg: '',
+    cred: '',
+    date: '',
+    policy: '',
+    sign: ''
+})
 
-const CREATE_ARTICLE_MUTATION = gql`
-    mutation createArticle($name: String!, $articleText: JSONString!, $articleType: String, $reviewer: Int!, $profileId: Int!, $tags: [String!]!, $files: [String!]!) {
-        createArticle(name: $name, articleText: $articleText, articleType: $articleType, reviewer: $reviewer, profileId: $profileId, tags: $tags, files: $files) {
-            article {
+const CREATE_ARTICLE_MUTATION = gql`mutation createArticle($name: String!, $articleText: JSONString!, $reviewer: Int!, $profileId: Int!, $tags: [String!]!, $articleType: String, $files: [String!]) {
+    createArticle(name: $name, articleText: $articleText, reviewer: $reviewer, profileId: $profileId, tags: $tags, articleType: $articleType, files: $files) {
+        article {
+            id
+            name
+            articleText
+            publishDate
+            reviewer {
                 id
-                name
-                articleText
-                articleType
-                publishDate
-                reviewer {
-                    id
-                }
-                articlefileSet {
-                    fileId {
-                        link
-                    }
+            }
+            articlefileSet {
+                fileId {
+                    link
                 }
             }
         }
-    }`
+    }
+}`
 
 const CREATE_NOTIF_ARTICLE_MUTATION = gql`
     mutation($name: String, $notif_text: JSONString, $author: Int, $tags: [String]) {
@@ -255,7 +262,35 @@ onMounted(() => {
     } else if (user_role.value == 'Sno_student') {
         chosenTags.value.push(i18n.t('sno'))
     }
+    getStorageData()
 })
+
+async function getStorageData() {
+    await apolloClient
+        .query({
+            query: GET_STORAGE,
+        })
+        .then(result => { 
+            yandexStorage.url = 'https://storage.yandexcloud.net/plateaumed'
+            let fields = JSON.parse(result.data.getStorageData.replaceAll('\'', '\"')).fields
+            yandexStorage.alg = 'AWS4-HMAC-SHA256'
+            Object.entries(fields).forEach(entry => {
+                const [key, value] = entry
+                if (key == 'x-amz-date') {
+                    yandexStorage.date = value
+                }
+                if (key == 'x-amz-credential') {
+                    yandexStorage.cred = value
+                }
+                if (key == 'policy') {
+                    yandexStorage.policy = value
+                }
+                if (key == 'x-amz-signature') {
+                    yandexStorage.sign = value
+                }})
+        })
+        .catch(error => { console.log(error) })
+}
 
 function addTag(chosenTag) {
     chosenTags.value.push(chosenTag)
@@ -286,8 +321,11 @@ function createArticle() {
         arr.push(toJSON(element))
     })
     let jsonresult = JSON.stringify(arr)
+    jsonresult = jsonresult.replaceAll("\"", "\\\"")
 
+    let files = []
     JSON.parse(JSON.stringify(chosenTags.value)).forEach(value => chosenTags2.push(value))
+    JSON.parse(JSON.stringify(fileList.value)).forEach(value => files.push(value))
 
     if (type.value == 'text') {
         if (user_role.value == 'Student' && chosenReviewer.value == '') {
@@ -301,17 +339,27 @@ function createArticle() {
             })
             return
         }
+        if (user_role.value == 'Teacher' || user_role.value == 'Sno_student') {
+            reviewerID = user.profileID
+        }
+        console.log(articleTitle.value)
+        console.log(jsonresult)
+        console.log('Article')
+        console.log(reviewerID)
+        console.log(user.profileID)
+        console.log(chosenTags2)
+        console.log(files)
         apolloClient
             .mutate({
                 mutation: CREATE_ARTICLE_MUTATION,
                 variables: {
                     name: articleTitle.value,
                     articleText: jsonresult,
-                    articleType: 'Article',
                     reviewer: reviewerID,
                     profileId: user.profileID,
                     tags: chosenTags2,
-                    files: fileList.value
+                    articleType: 'Article',
+                    files: files
                 },
             })
             .then(result => {
