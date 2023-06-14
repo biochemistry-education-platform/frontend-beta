@@ -675,39 +675,12 @@ function attachFile() {
 
 function chooseProfilePhoto() {
     document.getElementById('filename-input').click()
-    // let input = document.createElement('input')
-    // input.type = 'file'
-    // input.accept = 'image/*'
-    // input.onchange = e => { 
-    //     let file = e.target.files[0]; 
-    //     if (file.type.match('image.*')) {
-    //         let reader = new FileReader()
-    //         reader.readAsDataURL(file)
-    //         reader.onload = readerEvent => {
-    //             let content = readerEvent.target.result
-    //             document.getElementById('profile-img').src = content
-    //             // TODO отправить запрос о смене фото профиля на сервер
-    //         }  
-    //     } else {
-    //         toast({
-    //             message: i18n.t('onlyImg'),
-    //             type: 'notification-danger',
-    //             dismissible: true,
-    //             pauseOnHover: true,
-    //             duration: 4000,
-    //             position: 'top-right',
-    //         })
-    //     }
-    // }
-    // input.click()
 }
 
 function changeProfilePhoto(file) {
     if (file.type.match('image.*')) {
         let fileName = file.name
-        console.log(fileName)
         let fileUrl = `https://storage.yandexcloud.net/plateaumed/users/uploads/${fileName}`
-        // TODO отправить запрос о смене фото профиля на сервер
         apolloClient
             .mutate({
                 mutation: PHOTO_UPDATE,

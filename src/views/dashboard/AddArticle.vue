@@ -52,7 +52,6 @@
                         <input type="file" @change="attachFile" id="filename-input" name="file" /> <br />
                         <input type="submit" id="filesend-btn" name="submit" value="Загрузить" />
                     </form>
-                    <button @click="sendFiles">send files</button>
                     <button class="publish-article-btn" @click="createArticle">{{ user_role == 'Student' ? $t('send') : $t('publish') }}</button>
                 </div>
             </div>
@@ -127,15 +126,21 @@ let chosenFile
 let showDeleteFileModal = ref(false)
 
 const CREATE_ARTICLE_MUTATION = gql`
-    mutation createArticle($name: String!, $articleText: JSONString!, $reviewer: Int!, $profileId: Int!, $tags: [String!]!) {
-        createArticle(name: $name, articleText: $articleText, reviewer: $reviewer, profileId: $profileId, tags: $tags) {
+    mutation createArticle($name: String!, $articleText: JSONString!, $articleType: String, $reviewer: Int!, $profileId: Int!, $tags: [String!]!, $files: [String!]!) {
+        createArticle(name: $name, articleText: $articleText, articleType: $articleType, reviewer: $reviewer, profileId: $profileId, tags: $tags, files: $files) {
             article {
                 id
                 name
                 articleText
+                articleType
                 publishDate
                 reviewer {
                     id
+                }
+                articlefileSet {
+                    fileId {
+                        link
+                    }
                 }
             }
         }
@@ -302,9 +307,46 @@ function createArticle() {
                 variables: {
                     name: articleTitle.value,
                     articleText: jsonresult,
+                    articleType: 'Article',
                     reviewer: reviewerID,
                     profileId: user.profileID,
-                    tags: chosenTags2
+                    tags: chosenTags2,
+                    files: fileList.value
+                },
+            })
+            .then(result => {
+                router.push({ name: 'Articles' })
+                toast({
+                    message: i18n.t('articleCreated'),
+                    type: 'notification-success',
+                    dismissible: true,
+                    pauseOnHover: true,
+                    duration: 2000,
+                    position: 'top-right',
+                })
+            })
+            .catch(error => {
+                toast({
+                    message: i18n.t('createArticleFailure') + '\n' + error,
+                    type: 'notification-danger',
+                    dismissible: true,
+                    pauseOnHover: true,
+                    duration: 2000,
+                    position: 'top-right',
+                })
+            })
+    } else if (type.value == 'recommend') {
+        apolloClient
+            .mutate({
+                mutation: CREATE_ARTICLE_MUTATION,
+                variables: {
+                    name: articleTitle.value,
+                    articleText: jsonresult,
+                    articleType: 'Recommendation',
+                    reviewer: reviewerID,
+                    profileId: user.profileID,
+                    tags: chosenTags2,
+                    files: fileList.value
                 },
             })
             .then(result => {
@@ -417,23 +459,6 @@ function toJSON(element) {
     return obj
 }
 
-// function addFilesToList(files) {
-//     let fileArray = Array.from(files)
-//     let uploadedFileArray = Array.from(fileList.items)
-//     if (fileList.items.length > 0) {
-//         fileArray.forEach(file => {
-//             uploadedFileArray.forEach(fileUploaded => {
-//                 if (file.name != fileUploaded.name) {
-//                     fileList.items.add(file)
-//                 }
-//             })
-//         })
-//     } else { 
-//         fileArray.forEach(file => { fileList.items.add(file) })
-//     }
-//     console.log(fileList)
-// }
-
 function showFileName(file) {
     let fileName = file.name
     let fileUrl = `https://storage.yandexcloud.net/plateaumed/users/uploads/${fileName}`
@@ -483,18 +508,6 @@ function attachFile() {
         showFileName(document.getElementById('filename-input').files[0])
     }
 }
-
-// function sendFiles() {
-//     let uploadedFilesArray = Array.from(fileList.files)
-//     uploadedFilesArray.forEach(async (file) => {
-//         var dt = new DataTransfer()
-//         dt.items.add(file)
-//         document.getElementById('filename-input').files = dt.files
-//         console.log(document.getElementById('filename-input').files)
-//         await new Promise(r => setTimeout(r, 1000));
-//         document.getElementById('filesend-btn').click()
-//     }) 
-// }
 
 function chooseFile() {
     document.getElementById('filename-input').click()

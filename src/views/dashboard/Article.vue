@@ -52,6 +52,8 @@
         
         <hr v-if="!isMobile">
 
+        <div class="attached-files" id="attached-files"></div>
+
         <div class="article-text" id="articleText"></div>
         <button v-show="isSelected" id="add-selected-text-btn" v-on:click="getSelectedText">{{ $t('writeToNote') }}</button>
         <div v-if="isMobile && showActions && !hideForPdf" class="mobile-article-actions">
@@ -135,6 +137,11 @@ const GET_ARTICLE_QUERY = gql`
             articletagSet {
                 tagId {
                     name
+                }
+            }
+            articlefileSet {
+                fileId {
+                    link
                 }
             }
         }
@@ -235,6 +242,7 @@ async function getArticle() {
             }
         })
         .then(result => {
+            console.log(result)
             article.title = result.data.getArticle.name
             article.text = JSON.stringify(result.data.getArticle.articleText)
             let author = result.data.getArticle.author.authorId
@@ -259,6 +267,19 @@ async function getArticle() {
             article.reviewerID = result.data.getArticle.reviewer.id
             article.reviewerFullName = reviewer.surname + ' ' + reviewer.name + (reviewer.secondname != '' ? (' ' + reviewer.secondname) : '')
             article.reviewerRole = reviewer.role.roleName
+            let files = []
+            result.data.getArticle.articlefileSet.forEach(file => files.push(file.fileId.link))
+            files.forEach(file => {
+                let fileLink = document.createElement('a')
+                let fileName = file.replace('https://storage.yandexcloud.net/plateaumed/users/uploads/', '')
+                fileLink.setAttribute('download', fileName)
+                fileLink.setAttribute('href', file)
+                fileLink.innerHTML = fileName
+                fileLink.classList.add('attached-file-link')
+                document.getElementById('attached-files').appendChild(fileLink)
+            })
+
+            
         })
         .catch(error =>  router.push({ name: 'NotFound' }))
     if (user) { user_role.value = user.role } else { user_role.value = ''}
